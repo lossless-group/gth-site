@@ -1,0 +1,244 @@
+---
+/* ============================================================================
+ * AtlasHero — the orientation spine, above the fold, in borrowed-nothing
+ * language.
+ *
+ * Order is the whole point and it is not negotiable:
+ *   what this is  →  what you do  →  what you get back  →  (only then) a term.
+ *
+ * The h1 is ORIENTATION.what verbatim. There is no coined word anywhere in
+ * this component; "oral microbiome" and "Orobiome" do not appear until the
+ * next plate, after the reader already knows what the thing is.
+ * ========================================================================== */
+import { ORIENTATION } from '../../lib/site';
+import MouthField from './MouthField.astro';
+
+interface Props {
+  /** the anatomical stops, for the contents strip */
+  stops: { id: string; label: string; gloss: string }[];
+}
+
+const { stops } = Astro.props;
+---
+
+<div class="hero">
+  <div class="hero__grid">
+    <div class="hero__copy">
+      <h1 class="headline">{ORIENTATION.what}</h1>
+
+      <ol class="steps">
+        <li class="step">
+          <span class="step__n" aria-hidden="true">01</span>
+          <span class="step__k">What you do</span>
+          <span class="step__v">{ORIENTATION.do}</span>
+        </li>
+        <li class="step">
+          <span class="step__n" aria-hidden="true">02</span>
+          <span class="step__k">What you get back</span>
+          <span class="step__v">{ORIENTATION.get}</span>
+        </li>
+      </ol>
+
+      <div class="actions">
+        <a class="cta" href="#panel">See what it costs</a>
+        <a class="ghost" href="#library">Or read something first</a>
+      </div>
+    </div>
+
+    <div class="hero__figure">
+      <MouthField />
+    </div>
+  </div>
+
+  <!-- --------------------------------------------------------- contents -->
+  <nav class="contents" aria-label="The tract, top to bottom">
+    <p class="contents__title">The tract, top to bottom</p>
+    <ol class="contents__list">
+      {stops.map((s, i) => (
+        <li class="contents__item">
+          <a class="contents__link" href={`#${s.id}`} data-axis-link={s.id}>
+            <span class="contents__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="contents__label">{s.label}</span>
+            <span class="contents__gloss">{s.gloss}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+</div>
+
+<style>
+  .hero { container-type: inline-size; }
+
+  .hero__grid {
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 3rem);
+    align-items: start;
+  }
+  @container (min-width: 50rem) {
+    .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+  }
+
+  .hero__copy { min-width: 0; }
+  .hero__figure { min-width: 0; }
+
+  .headline {
+    margin: 0 0 1.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.9rem, 5.4vw, 3.1rem);
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+    max-width: 20ch;
+    color: var(--color-text);
+  }
+
+  /* ------------------------------------------------------------- steps -- */
+  .steps {
+    list-style: none;
+    margin: 0 0 2rem;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--color-grid);
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: 0.75rem;
+    row-gap: 0.2rem;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  .step__n {
+    grid-row: 1 / span 2;
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-primary);
+    padding-top: 0.1rem;
+  }
+  .step__k {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .step__v {
+    font-size: clamp(1rem, 1.6vw, 1.125rem);
+    line-height: 1.5;
+    color: var(--color-text);
+    max-width: 44ch;
+  }
+
+  /* ----------------------------------------------------------- actions -- */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.005em;
+    text-decoration: none;
+    color: var(--color-background);
+    background: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-control);
+    transition: filter 150ms ease, transform 150ms ease;
+  }
+  .cta:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+  .ghost {
+    font-family: var(--font-data);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.15rem;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .ghost:hover { color: var(--color-primary); border-color: var(--color-primary); }
+
+  /* ---------------------------------------------------------- contents -- */
+  .contents {
+    margin-top: clamp(2rem, 4vw, 3rem);
+    border-top: 1px solid var(--color-rule);
+    padding-top: 1.1rem;
+  }
+
+  .contents__title {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  .contents__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--color-grid);
+    border: 1px solid var(--color-grid);
+    border-radius: var(--radius-control);
+    overflow: hidden;
+  }
+  @container (min-width: 42rem) {
+    .contents__list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+
+  .contents__item { min-width: 0; }
+
+  .contents__link {
+    display: grid;
+    gap: 0.25rem;
+    height: 100%;
+    padding: 0.8rem 0.9rem;
+    text-decoration: none;
+    background: var(--color-background);
+    transition: background-color 160ms ease;
+  }
+  .contents__link:hover { background: var(--color-surface); }
+
+  .contents__n {
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--color-text-faint);
+  }
+  .contents__label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+  .contents__gloss {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+
+  /* driven by AxisWatcher; absent and harmless with JS off */
+  .contents__link[aria-current="true"] {
+    background: var(--color-surface);
+    box-shadow: inset 2px 0 0 var(--color-primary);
+  }
+  .contents__link[aria-current="true"] .contents__n { color: var(--color-primary); }
+</style>

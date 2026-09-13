@@ -1,0 +1,308 @@
+---
+/* ============================================================================
+ * AtlasPlate — one numbered plate, docked to one stop on the axis.
+ *
+ * THIS IS THE STRUCTURAL DEVICE OF THE WHOLE DIRECTION.
+ *
+ * Each plate renders its own SEGMENT of the axis in its left column: a tube
+ * running the full height of the section, a node glyph at the top, and a
+ * short connector reaching right into the body. Stacked, the segments form
+ * one continuous tract from the mouth at the top of the page to the colon at
+ * the bottom. Nothing is measured in JavaScript and nothing is positioned
+ * absolutely against the page, so the axis is exact at every viewport and
+ * every content length, and it is fully drawn with JS disabled.
+ *
+ * Two registers:
+ *   kind="anatomy"  the tube has two walls and measurement ticks. These are
+ *                   the five real anatomical stops.
+ *   kind="index"    the tube collapses to a single hairline and the glyph
+ *                   becomes an instrument tick. The tract has ended; what
+ *                   continues is the index rule of the atlas.
+ *
+ * On narrow screens the rail column shrinks to a marker strip (`--atlas-rail`
+ * is redefined by the theme at the breakpoint) and the node label drops out —
+ * it is repeated verbatim in the plate's meta line, so nothing is lost.
+ * ========================================================================== */
+import NodeGlyph from './NodeGlyph.astro';
+import type { NodeName } from './NodeGlyph.astro';
+
+interface Props {
+  /** anchor + IntersectionObserver target */
+  id: string;
+  /** "01" … "10" — printed as Fig. for anatomy, Plate. for index */
+  fig: string;
+  /** which mark to draw on the axis */
+  node: NodeName;
+  /** the stop's name in words a stranger already owns. "Mouth", not "oral cavity". */
+  label: string;
+  kind?: 'anatomy' | 'index';
+  /** the plate caption, printed small and mono beneath the body */
+  caption?: string;
+  /** wider top padding for the opening plate */
+  lead?: boolean;
+}
+
+const {
+  id,
+  fig,
+  node,
+  label,
+  kind = 'anatomy',
+  caption,
+  lead = false,
+} = Astro.props;
+
+const figWord = kind === 'anatomy' ? 'Fig.' : 'Plate';
+
+/* The landmark gets an explicit aria-label rather than aria-labelledby: the
+ * meta line hides its node name at the wide breakpoint (the rail shows it
+ * there instead), and a landmark's accessible name must not change with a
+ * media query. */
+const plateLabel = `${figWord} ${fig} — ${label}`;
+---
+
+<section
+  class:list={['plate', `plate--${kind}`, lead && 'plate--lead']}
+  id={id}
+  data-plate={id}
+  data-plate-label={label}
+  aria-label={plateLabel}
+>
+  <!-- ------------------------------------------------------------- axis -->
+  <div class="rail" aria-hidden="true">
+    <span class="rail__tube"></span>
+    <span class="rail__ticks"></span>
+    <span class="rail__connector"></span>
+    <span class="rail__node">
+      <NodeGlyph name={node} />
+    </span>
+    <span class="rail__label">{label}</span>
+  </div>
+
+  <!-- ------------------------------------------------------------- body -->
+  <div class="body">
+    <p class="meta" id={`${id}-meta`}>
+      <span class="meta__fig">{figWord} {fig}</span>
+      <span class="meta__sep" aria-hidden="true">/</span>
+      <span class="meta__node">{label}</span>
+    </p>
+
+    <slot />
+
+    {caption && (
+      <p class="caption">
+        <span class="caption__fig">{figWord} {fig}</span>
+        <span class="caption__text">{caption}</span>
+      </p>
+    )}
+  </div>
+</section>
+
+<style>
+  .plate {
+    /* Vertical position of the node on this plate's segment. It is a single
+       number so the glyph, the connector and the label can never drift apart,
+       and it tracks the body's top padding so the node always sits level with
+       the meta line it names. */
+    --plate-dock-y: 3.2rem;
+
+    display: grid;
+    grid-template-columns: var(--atlas-rail) minmax(0, 1fr);
+    align-items: stretch;
+    position: relative;
+  }
+
+  .plate--lead { --plate-dock-y: 2.2rem; }
+
+  /* --------------------------------------------------------------- rail -- */
+  .rail {
+    position: relative;
+    min-height: 100%;
+  }
+
+  /* The tube itself: two hairline walls. On an index plate it collapses to a
+     single centred hairline, which is how the reader can tell at a glance
+     that the anatomy has stopped. */
+  .rail__tube {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--atlas-tube-x);
+    width: var(--atlas-tube-w);
+    transform: translateX(-50%);
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    transition: border-color 320ms ease;
+  }
+
+  .plate--index .rail__tube {
+    width: 0;
+    border-right: 0;
+    border-left-style: dashed;
+  }
+
+  /* Hairline measurement ticks running the length of the tube — the thing
+     that makes it read as a scale rather than as a decorative line. */
+  .rail__ticks {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--atlas-tube-x);
+    width: var(--atlas-tube-w);
+    transform: translateX(-50%);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--color-grid) 0 1px,
+      transparent 1px 0.75rem
+    );
+  }
+
+  .plate--index .rail__ticks { display: none; }
+
+  /* Where the tract ends. Capping the tube on the last anatomical plate makes
+     the switch to the dashed index rule below read as a deliberate ending
+     rather than as something that failed to draw. Decorative only — a browser
+     without :has() simply gets the change of rule, which is still legible. */
+  .plate--anatomy:has(+ .plate--index) .rail__tube::after {
+    content: '';
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    bottom: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* The dock: a short horizontal tick leaving the tube at exactly the node's
+     height. It is drawn BEFORE the node in source order, so the node's own
+     background disc covers its inner end and the tick appears to emerge from
+     under the glyph rather than to cross it. */
+  .rail__connector {
+    position: absolute;
+    left: var(--atlas-tube-x);
+    right: 0.4rem;
+    top: calc(var(--plate-dock-y) + 0.5px);
+    border-top: 1px solid var(--color-border);
+    transition: border-color 320ms ease;
+  }
+
+  .rail__node {
+    position: absolute;
+    left: var(--atlas-tube-x);
+    top: var(--plate-dock-y);
+    width: var(--atlas-node);
+    height: var(--atlas-node);
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    padding: 0.2rem;
+    border-radius: 999px;
+    background: var(--color-background);
+    color: var(--color-text-faint);
+    transition: color 320ms ease, box-shadow 320ms ease;
+  }
+
+  .rail__label {
+    display: none;
+  }
+
+  /* ------------------------------------------------------- you are here -- */
+  /* Set by the IntersectionObserver in AxisWatcher. With JS off nothing here
+     ever applies and the axis simply renders in its resting state, which is
+     complete and legible on its own. */
+  .plate.is-passed .rail__tube { border-color: var(--color-rule); }
+  .plate.is-passed .rail__node { color: var(--color-text-muted); }
+
+  .plate.is-current .rail__tube { border-color: var(--color-primary); }
+  .plate.is-current .rail__connector { border-top-color: var(--color-primary); }
+  .plate.is-current .rail__node {
+    color: var(--color-primary);
+    box-shadow:
+      0 0 0 1px var(--color-primary),
+      0 0 1.4rem color-mix(in srgb, var(--color-primary) calc(var(--fx-glow-opacity) * 100%), transparent);
+  }
+  .plate.is-current .rail__label { color: var(--color-primary); }
+
+  /* --------------------------------------------------------------- body -- */
+  .body {
+    min-width: 0;
+    padding: 2.75rem 0 3.25rem;
+    padding-left: clamp(0.85rem, 2.5vw, 1.75rem);
+    border-left: 1px solid transparent;
+  }
+
+  .plate--lead .body { padding-top: 1.75rem; }
+
+  .meta {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .meta__fig { color: var(--color-text-muted); }
+  .meta__sep { color: var(--color-border); }
+  .plate.is-current .meta__fig { color: var(--color-primary); }
+
+  .caption {
+    margin: 2.25rem 0 0;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--color-grid);
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .caption__fig {
+    color: var(--color-text-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .caption__text { flex: 1 1 18rem; min-width: 0; }
+
+  /* ------------------------------------------------------------ ≥ 64rem -- */
+  @media (min-width: 64rem) {
+    .plate { --plate-dock-y: 4rem; }
+    .plate--lead { --plate-dock-y: 2.5rem; }
+
+    .rail__label {
+      display: block;
+      position: absolute;
+      left: calc(var(--atlas-tube-x) + var(--atlas-node) / 2 + 0.5rem);
+      top: calc(var(--plate-dock-y) - 0.55rem);
+      font-family: var(--font-eyebrow);
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-faint);
+      transition: color 320ms ease;
+      /* never wider than what is left of the rail column, so a two-word stop
+         name ("Small intestine") wraps instead of reaching into the body */
+      max-width: calc(100% - 3.9rem);
+      line-height: 1.25;
+    }
+
+    /* With the label in the rail the meta line stops repeating it. */
+    .meta__sep,
+    .meta__node { display: none; }
+
+    /* The tick stops just short of where the label begins. */
+    .rail__connector { right: calc(100% - 3.2rem); }
+
+    .body {
+      padding-left: 2.25rem;
+      padding-top: 3.5rem;
+      padding-bottom: 4.5rem;
+    }
+    .plate--lead .body { padding-top: 2rem; }
+  }
+</style>

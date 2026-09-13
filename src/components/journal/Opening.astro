@@ -1,0 +1,251 @@
+---
+/* ============================================================================
+ * Opening — the orientation spine, above the fold, in words a stranger
+ * already owns.
+ *
+ * The site this replaces opened on "the gut lining is a single cell layer
+ * thick" and sold a coined word before defining it. So the order here is
+ * fixed and deliberate:
+ *
+ *   1. WHAT THIS IS   — the h1. One plain sentence. No term of art in it.
+ *   2. WHAT YOU DO    — spit in a tube, mail it back.
+ *   3. WHAT YOU GET   — a report, and a dentist who reads it to you.
+ *
+ * Only after all three does the page earn the right to say "oral microbiome",
+ * which happens in the very next section and nowhere before it.
+ *
+ * Editorial device: the drop cap, used exactly once on the page, in the
+ * oxblood accent. It is the first of the page's two accent appearances.
+ * ========================================================================== */
+
+export interface Props {
+  what: string;
+  doThis: string;
+  getThis: string;
+  contents: { href: string; label: string; value: string }[];
+}
+
+const { what, doThis, getThis, contents } = Astro.props;
+---
+
+<section class="jr-section opening" id="orientation" aria-labelledby="opening-title">
+  <div class="jr-sheet">
+    <div class="jr-cols">
+      <!-- ------------------------------------------------------- body -- -->
+      <div class="body">
+        <p class="jr-eyebrow">From the editors</p>
+
+        <h1 class="title" id="opening-title">{what}</h1>
+
+        <p class="drop jr-measure">
+          They live in colonies on your teeth, on your tongue and under your
+          gums, and what that colony is made of changes what happens to the
+          rest of you &mdash; your gums, your digestion, your energy, your
+          blood sugar. It is one of the few things about your body that has
+          never been measured, by anyone, at any appointment you have ever
+          been to.
+        </p>
+
+        <p class="jr-lede jr-measure second">
+          This journal exists to change that, and to explain the result in
+          language you do not need a clinician standing next to you to parse.
+        </p>
+
+        <!-- The spine, as apparatus. Ruled rows, hanging labels, no boxes. -->
+        <dl class="spine">
+          <div class="row">
+            <dt class="jr-eyebrow">What you do</dt>
+            <dd class="jr-lede">{doThis}</dd>
+          </div>
+          <div class="row">
+            <dt class="jr-eyebrow">What you get back</dt>
+            <dd class="jr-lede">{getThis}</dd>
+          </div>
+        </dl>
+
+        <p class="go-line">
+          <a class="go" href="#panel">Read what the panel includes</a>
+          <a class="go go--quiet" href="#library">Or start with the writing</a>
+        </p>
+      </div>
+
+      <!-- ---------------------------------------------------- margin -- -->
+      <!-- A real table of contents, with leaders. The apparatus of a
+           publication doing the work a hero image would otherwise do. -->
+      <aside class="margin" aria-labelledby="contents-title">
+        <p class="jr-eyebrow" id="contents-title">In this issue</p>
+        <ul class="toc">
+          {
+            contents.map((c) => (
+              <li>
+                <a href={c.href}>
+                  <span class="toc-label">{c.label}</span>
+                  <span class="toc-dots" aria-hidden="true" />
+                  <span class="toc-value tabular">{c.value}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .opening {
+    padding-top: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+
+  .title {
+    max-width: 24ch;
+    margin-top: 0.5rem;
+    font-size: clamp(2.125rem, 5.4vw, 3.75rem);
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+    text-wrap: balance;
+  }
+
+  /* ----------------------------------------------------------- drop cap -- */
+  .drop {
+    font-family: var(--font-display);
+    font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+    line-height: 1.68;
+    color: var(--color-text);
+    margin-top: 0.75rem;
+  }
+  .drop::first-letter {
+    float: left;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 4.1em;
+    line-height: 0.8;
+    padding-right: 0.09em;
+    padding-top: 0.06em;
+    color: var(--color-accent);
+  }
+
+  .second {
+    color: var(--color-text-muted);
+  }
+
+  /* -------------------------------------------------------------- spine -- */
+  .spine {
+    margin-top: 0.75rem;
+    border-top: 1px solid var(--color-rule);
+    max-width: var(--measure-prose);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-grid);
+  }
+  @media (min-width: 38rem) {
+    .row {
+      grid-template-columns: 10rem minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: baseline;
+    }
+  }
+
+  .row dt {
+    padding-top: 0.3rem;
+  }
+  .row dd {
+    min-width: 0;
+  }
+
+  /* ------------------------------------------------------------ actions -- */
+  .go-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.75rem;
+    margin-top: 1.5rem;
+    align-items: center;
+  }
+
+  /* A journal does not have filled buttons. Both actions are set as ruled
+     text; the primary one simply carries more weight and a heavier rule.
+     Hierarchy from type and line, not from a box. */
+  .go {
+    font-family: var(--font-display);
+    font-size: clamp(1.0625rem, 1.6vw, 1.1875rem);
+    line-height: 1.3;
+    color: var(--color-text);
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid var(--color-primary);
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .go:hover {
+    color: var(--color-primary);
+  }
+
+  .go--quiet {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+  }
+  .go--quiet:hover {
+    color: var(--color-text);
+    border-bottom-color: var(--color-text);
+  }
+
+  /* ------------------------------------------------------------- margin -- */
+  .margin {
+    min-width: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-rule);
+  }
+  @media (min-width: 62rem) {
+    .margin {
+      position: sticky;
+      top: 2rem;
+    }
+  }
+
+  .toc {
+    margin-top: 0.75rem;
+  }
+  .toc li + li {
+    margin-top: 0.1rem;
+  }
+  .toc a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    padding-block: 0.4rem;
+    color: var(--color-text-muted);
+    transition: color 150ms ease;
+  }
+  .toc a:hover { color: var(--color-primary); }
+
+  .toc-label {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    white-space: nowrap;
+  }
+  .toc-dots {
+    flex: 1 1 auto;
+    min-width: 1rem;
+    border-bottom: 1px dotted var(--color-border);
+    transform: translateY(-0.3em);
+  }
+  .toc-value {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    white-space: nowrap;
+  }
+</style>

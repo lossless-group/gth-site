@@ -1,0 +1,260 @@
+---
+/* ============================================================================
+ * MouthField — the one diagram a stranger has to understand in two seconds.
+ *
+ * It is deliberately NOT a technical illustration. It is a mouth with dots in
+ * it. Most of the dots are green, a few are amber, and the legend under it
+ * says in eight words which is which. That is the entire sentence the page
+ * opens with ("Your mouth is full of bacteria. Some protect you; some quietly
+ * make you ill.") drawn rather than written — so a worried person gets the
+ * idea before they read anything, and never feels they missed a prerequisite.
+ *
+ * Colour grammar, held: green = alive and protective, amber = the harmful
+ * ones we are looking for, hairlines = the instrument. No hex; the SVG reads
+ * `currentColor` and semantic tokens only.
+ *
+ * The population is generated from a fixed seed so the plate is identical on
+ * every build — an atlas figure should not reshuffle itself between deploys.
+ * ========================================================================== */
+
+function seeded(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s * 1664525 + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+const rand = seeded(20260911);
+
+const CX = 160;
+const CY = 88;
+const HALF_W = 138;
+const HALF_H = 58;
+
+type Dot = {
+  x: number;
+  y: number;
+  r: number;
+  harmful: boolean;
+  dx: number;
+  dy: number;
+  dur: number;
+  delay: number;
+};
+
+const dots: Dot[] = [];
+for (let i = 0; i < 84; i += 1) {
+  const t = rand() * 2 - 1;                       // -1 … 1 across the mouth
+  const x = CX + t * HALF_W * 0.94;
+  const span = HALF_H * (1 - t * t) * 0.88;       // the lens narrows at the corners
+  const y = CY + (rand() * 2 - 1) * span;
+  /* Roughly one in eight. Enough to be obviously present, few enough that the
+   * picture still reads as "mostly fine, and some of it isn't". */
+  const harmful = i % 8 === 3;
+  dots.push({
+    x: Math.round(x * 10) / 10,
+    y: Math.round(y * 10) / 10,
+    r: Math.round((1.7 + rand() * (harmful ? 2.1 : 1.5)) * 10) / 10,
+    harmful,
+    dx: Math.round((rand() * 2 - 1) * 25) / 10,
+    dy: Math.round((rand() * 2 - 1) * 18) / 10,
+    dur: Math.round((9 + rand() * 11) * 10) / 10,
+    delay: Math.round(rand() * 90) / 10,
+  });
+}
+
+const harmfulCount = dots.filter((d) => d.harmful).length;
+---
+
+<figure class="field">
+  <div class="frame">
+    <svg
+      class="plate-svg"
+      viewBox="0 0 320 176"
+      role="img"
+      aria-label={`A diagram of a mouth holding ${dots.length} bacteria. ${dots.length - harmfulCount} are drawn in green for the protective kind and ${harmfulCount} in amber for the harmful kind, with an arrow showing that all of them get swallowed.`}
+    >
+      <!-- corner registration marks: this is a plate, and plates are measured -->
+      <g class="reg" aria-hidden="true">
+        <path d="M6 6h14M6 6v14" />
+        <path d="M314 6h-14M314 6v14" />
+        <path d="M6 170h14M6 170v-14" />
+        <path d="M314 170h-14M314 170v-14" />
+      </g>
+
+      <!-- the mouth itself -->
+      <path
+        class="lip"
+        d="M16 88C70 16 250 16 304 88C250 160 70 160 16 88Z"
+      />
+      <path class="lip lip--inner" d="M34 88C82 38 238 38 286 88C238 138 82 138 34 88Z" />
+
+      <!-- teeth, as ticks on the upper lip line -->
+      <g class="teeth" aria-hidden="true">
+        <path d="M92 48v9M116 43v10M140 40.5v10.5M160 40v11M180 40.5v10.5M204 43v10M228 48v9" />
+      </g>
+
+      <!-- the population -->
+      <g class="pop">
+        {dots.map((d) => (
+          <circle
+            class:list={['dot', d.harmful && 'dot--harm']}
+            cx={d.x}
+            cy={d.y}
+            r={d.r}
+            style={`--dx:${d.dx}px;--dy:${d.dy}px;--dur:${d.dur}s;--del:-${d.delay}s`}
+          />
+        ))}
+      </g>
+
+      <!-- and all of it goes downstream -->
+      <g class="swallow" aria-hidden="true">
+        <path d="M160 152v16" />
+        <path d="M154.5 163.5 160 169l5.5-5.5" />
+      </g>
+    </svg>
+  </div>
+
+  <figcaption class="legend">
+    <ul class="keys">
+      <li class="key">
+        <span class="swatch swatch--good" aria-hidden="true"></span>
+        <span class="key__text">
+          <b>Protective.</b> These keep the balance and you want them there.
+        </span>
+      </li>
+      <li class="key">
+        <span class="swatch swatch--harm" aria-hidden="true"></span>
+        <span class="key__text">
+          <b>Harmful.</b> These are the ones the test is looking for.
+        </span>
+      </li>
+    </ul>
+    <p class="note">
+      You swallow about a litre of saliva a day, so whatever is living up here
+      goes downstream on a schedule. That is what the rest of this page follows.
+    </p>
+  </figcaption>
+</figure>
+
+<style>
+  .field {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .frame {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
+    padding: clamp(0.5rem, 2vw, 1rem);
+    overflow: hidden;
+  }
+
+  .plate-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  .reg,
+  .swallow {
+    fill: none;
+    stroke: var(--color-rule);
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .lip {
+    fill: var(--color-primary-soft);
+    stroke: var(--color-rule);
+    stroke-width: 1.4;
+  }
+  .lip--inner {
+    fill: none;
+    stroke: var(--color-grid);
+    stroke-width: 1;
+  }
+
+  .teeth {
+    fill: none;
+    stroke: var(--color-text-faint);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+
+  .dot {
+    fill: var(--color-primary);
+    animation: drift var(--dur, 14s) ease-in-out var(--del, 0s) infinite alternate;
+  }
+  .dot--harm {
+    fill: var(--color-accent);
+    /* the harmful ones carry a ring so they are findable without colour */
+    stroke: var(--color-accent);
+    stroke-width: 1.1;
+    fill-opacity: 0.45;
+  }
+
+  @keyframes drift {
+    from { transform: translate(0, 0); }
+    to   { transform: translate(var(--dx, 0), var(--dy, 0)); }
+  }
+
+  /* ------------------------------------------------------------ legend -- */
+  .legend { margin: 0; }
+
+  .keys {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  @media (min-width: 40rem) {
+    .keys { grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  }
+
+  .key {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .key b {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-right: 0.3rem;
+  }
+
+  .swatch {
+    flex: 0 0 auto;
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-top: 0.42rem;
+    border-radius: 999px;
+  }
+  .swatch--good { background: var(--color-primary); }
+  .swatch--harm {
+    background: color-mix(in srgb, var(--color-accent) 45%, transparent);
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+  }
+
+  .note {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 52ch;
+  }
+</style>

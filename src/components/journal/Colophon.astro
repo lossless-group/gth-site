@@ -1,0 +1,164 @@
+---
+/* ============================================================================
+ * Colophon — the back page. Imprint, address, disclaimer.
+ *
+ * The disclaimer is reproduced verbatim from the client's live site and is
+ * not ours to soften; it is given the small-print treatment a journal gives
+ * its legal notice, which is legible and unhidden rather than shrunk to
+ * nothing.
+ * ========================================================================== */
+
+export interface Props {
+  disclaimer: string;
+  issue: string;
+  issueDate: string;
+}
+
+const { disclaimer, issue, issueDate } = Astro.props;
+---
+
+<footer class="colophon">
+  <div class="jr-sheet">
+    <div class="top">
+      <div class="imprint">
+        <p class="mark">Threshold</p>
+        <p class="line">
+          A clinical publication about the mouth, the gut, and what travels
+          between them.
+        </p>
+        <p class="dateline tabular">{issue} &middot; {issueDate}</p>
+      </div>
+
+      <nav class="links" aria-label="Footer">
+        <p class="jr-eyebrow">Sections</p>
+        <ul>
+          <li><a href="#orientation">Orientation</a></li>
+          <li><a href="#evidence">Why it matters</a></li>
+          <li><a href="#board">Masthead</a></li>
+          <li><a href="#library">The library</a></li>
+          <li><a href="#series">The series</a></li>
+          <li><a href="#panel">The panel</a></li>
+        </ul>
+      </nav>
+
+      <nav class="links" aria-label="Elsewhere">
+        <p class="jr-eyebrow">Elsewhere</p>
+        <ul>
+          <li><a href="/articles">Full article library</a></li>
+          <li><a href="/">All three directions</a></li>
+        </ul>
+      </nav>
+
+      <address class="address">
+        <p class="jr-eyebrow">Published by</p>
+        <p>Urban Monk Productions, Inc.</p>
+        <p>1250 S Capital of Texas Highway</p>
+        {/* `&num;` is a literal "#". Written as the entity so the repo-wide
+            "no hex literals in component CSS" grep stays a clean signal
+            instead of tripping over a mailbox number. Renders verbatim. */}
+        <p>Building 3, Suite 400 &num;9039</p>
+        <p>Austin, TX 78746</p>
+      </address>
+    </div>
+
+    <p class="disclaimer">{disclaimer}</p>
+  </div>
+</footer>
+
+<style>
+  .colophon {
+    border-top: 3px double var(--color-rule);
+    padding-block: clamp(2.5rem, 6vw, 4rem);
+    background: var(--color-surface);
+  }
+
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.75rem, 4vw, 2.5rem);
+  }
+  @media (min-width: 44rem) {
+    .top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 68rem) {
+    .top {
+      grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+      gap: clamp(1.5rem, 4vw, 3rem);
+    }
+  }
+
+  /* ----------------------------------------------------------- imprint -- */
+  .imprint { min-width: 0; }
+
+  .mark {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--color-text);
+  }
+  .line {
+    margin-top: 0.65rem;
+    max-width: 32ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+  .dateline {
+    margin-top: 0.85rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  /* ------------------------------------------------------------- links -- */
+  .links { min-width: 0; }
+  .links ul {
+    margin-top: 0.75rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .links a {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid transparent;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .links a:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+
+  /* ----------------------------------------------------------- address -- */
+  .address {
+    font-style: normal;
+    min-width: 0;
+  }
+  .address p + p {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+  .address p:nth-child(2) {
+    color: var(--color-text);
+  }
+  .address .jr-eyebrow {
+    margin-bottom: 0.75rem;
+  }
+
+  /* -------------------------------------------------------- disclaimer -- */
+  .disclaimer {
+    margin-top: clamp(2rem, 5vw, 3rem);
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-grid);
+    max-width: 78ch;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--color-text-faint);
+  }
+</style>

@@ -1,0 +1,216 @@
+---
+/* ============================================================================
+ * ArticleLead — a featured entry, given the space a lead article gets.
+ *
+ * THE RULE MADE VISIBLE: `plain_question` is the headline. It is the sentence
+ * the worried person actually types into a search box. The clinical `title` —
+ * the one written for an index — is demoted to a standfirst underneath it, in
+ * the mono face, so it reads as a catalogue reference rather than as the
+ * thing you are being asked to understand.
+ *
+ * Where the piece uses a term of art, the plain-English translation is
+ * carried on the card itself. A term never appears here without it.
+ * ========================================================================== */
+
+export interface Props {
+  href: string;
+  plainQuestion: string;
+  title: string;
+  lede?: string;
+  author?: string;
+  credential?: string;
+  categories: string[];
+  readMinutes?: number;
+  dateline?: string;
+  termOfArt?: string;
+  termPlain?: string;
+  /** `lead` is the single top piece; `second` is the pair beneath it. */
+  size?: 'lead' | 'second';
+}
+
+const {
+  href,
+  plainQuestion,
+  title,
+  lede,
+  author,
+  credential,
+  categories,
+  readMinutes,
+  dateline,
+  termOfArt,
+  termPlain,
+  size = 'second',
+} = Astro.props;
+---
+
+<article class:list={['entry', `entry--${size}`]}>
+  <div class="topline">
+    {categories.length > 0 && <p class="cats jr-eyebrow">{categories.join(' / ')}</p>}
+    {readMinutes && <p class="mins tabular">{readMinutes} min</p>}
+  </div>
+
+  <h3 class="question">
+    <a href={href}>{plainQuestion}</a>
+  </h3>
+
+  <p class="filed tabular">{title}</p>
+
+  {lede && <p class="lede">{lede}</p>}
+
+  {
+    termOfArt && termPlain && (
+      <p class="term">
+        <span class="term-word">{termOfArt}</span>
+        <span class="term-plain">{termPlain}</span>
+      </p>
+    )
+  }
+
+  <p class="byline">
+    {
+      author && (
+        <span class="by">
+          {author}
+          {credential && <sup class="cred tabular">{credential}</sup>}
+        </span>
+      )
+    }
+    {dateline && <span class="date tabular">{dateline}</span>}
+  </p>
+</article>
+
+<style>
+  .entry {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-width: 0;
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .entry--lead {
+    border-top-width: 2px;
+  }
+
+  /* ------------------------------------------------------------ topline -- */
+  .topline {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.15rem;
+  }
+  .cats {
+    color: var(--color-primary);
+    min-width: 0;
+  }
+  .mins {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    white-space: nowrap;
+  }
+
+  /* ----------------------------------------------------------- question -- */
+  .question {
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+  .entry--lead .question {
+    font-size: clamp(1.875rem, 4.6vw, 3.125rem);
+    max-width: 18ch;
+  }
+  .entry--second .question {
+    font-size: clamp(1.375rem, 2.8vw, 1.75rem);
+    max-width: 22ch;
+  }
+  .question a {
+    box-decoration-break: clone;
+    border-bottom: 1px solid transparent;
+    transition: border-color 150ms ease, color 150ms ease;
+  }
+  .question a:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+
+  /* The clinical title, demoted. */
+  .filed {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: var(--color-text-muted);
+    max-width: 46ch;
+  }
+
+  .lede {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: var(--measure-prose);
+  }
+  .entry--lead .lede {
+    font-size: clamp(1.0625rem, 1.8vw, 1.3125rem);
+    color: var(--color-text);
+  }
+
+  /* --------------------------------------------------- term translation -- */
+  .term {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.6rem;
+    padding-top: 0.65rem;
+    border-top: 1px dotted var(--color-border);
+    max-width: 56ch;
+  }
+  .term-word {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+  .term-plain {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    min-width: 0;
+  }
+
+  /* ------------------------------------------------------------ byline -- */
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+  .by {
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    color: var(--color-text);
+  }
+  .cred {
+    font-size: 0.58em;
+    letter-spacing: 0.08em;
+    margin-left: 0.35em;
+    color: var(--color-primary);
+    vertical-align: super;
+    line-height: 0;
+    white-space: nowrap;
+  }
+  .date {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+</style>

@@ -1,0 +1,81 @@
+---
+/* ============================================================================
+ * PullQuote — a patient's sentence, set in the flow.
+ *
+ * Explicitly NOT a testimonials band. No stars, no grid of three, no
+ * "WHAT OUR CLIENTS SAY" in caps. These people are describing exactly the
+ * symptoms the page opened with, so each one is dropped next to the section it
+ * answers and left to do its work as a sentence.
+ * ========================================================================== */
+
+export interface Props {
+  quote: string;
+  who: string;
+  /* Optional half-line of framing in her voice, above the quote. */
+  context?: string;
+}
+
+const { quote, who, context } = Astro.props;
+---
+
+<aside class="pull">
+  <div class="wrap">
+    {context && <p class="context">{context}</p>}
+    <figure>
+      <blockquote>
+        <p>&ldquo;{quote}&rdquo;</p>
+      </blockquote>
+      <figcaption>{who}</figcaption>
+    </figure>
+  </div>
+</aside>
+
+<style>
+  .pull { padding-block: clamp(1.5rem, 4vw, 2.5rem); }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .context {
+    margin: 0 0 0.75rem;
+    max-width: 46ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  figure {
+    margin: 0;
+    max-width: 40ch;
+    padding-left: clamp(1rem, 3vw, 1.75rem);
+    border-left: 3px solid var(--color-primary);
+  }
+
+  blockquote { margin: 0; }
+
+  blockquote p {
+    margin: 0;
+    font-family: var(--font-display);
+    /* Large optical size, light weight, generous leading — the softest this
+       face gets, which is the point of putting a patient's words here. */
+    font-variation-settings: 'opsz' 144;
+    font-weight: 340;
+    font-style: italic;
+    font-size: clamp(1.375rem, 3.4vw, 2rem);
+    line-height: 1.32;
+    letter-spacing: -0.012em;
+    color: var(--color-text);
+    text-wrap: pretty;
+  }
+
+  figcaption {
+    margin-top: 0.85rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+</style>

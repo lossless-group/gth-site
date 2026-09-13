@@ -1,0 +1,225 @@
+---
+/* ============================================================================
+ * ThePeople — she leads, the other two support.
+ *
+ * The client is shy about thought leadership, so the move here is not to make
+ * her louder. It is to make her SPECIFIC: first person, one paragraph about
+ * what she actually kept seeing, and an honest sentence about why she is
+ * publishing at all. That is a consultation introducing itself. A bio block
+ * with a credential list is not.
+ *
+ * She introduces her colleagues in her own voice, which is also why they read
+ * as people she works with rather than as logos on a trust bar.
+ * ========================================================================== */
+import { PRACTITIONERS } from '../../lib/site';
+import PortraitFrame from './PortraitFrame.astro';
+
+const her = PRACTITIONERS.dental;
+
+const SUPPORT = [
+  {
+    person: PRACTITIONERS.medical,
+    initials: 'PS',
+    line:
+      'Pedram works the other end of the same tube. When a mouth result explains a gut that would not settle, he is the one who takes it from there.',
+  },
+  {
+    person: PRACTITIONERS.hygiene,
+    initials: 'LH',
+    line:
+      'Lora has spent her career in the part of this that is hands-on and daily — what actually keeps a mouth in balance between appointments, and what quietly wrecks it.',
+  },
+];
+---
+
+<section class="people" id="people" aria-labelledby="people-title">
+  <div class="wrap">
+    <div class="lead">
+      <div class="lead-portrait">
+        <PortraitFrame name={her.name} initials="EG" variant="lead" note={true} />
+      </div>
+
+      <div class="lead-copy">
+        <p class="eyebrow">Who is telling you this</p>
+        <h2 id="people-title">
+          I have spent twenty years looking in mouths and finding the rest of the
+          body.
+        </h2>
+
+        <p>
+          I trained to fix teeth. What I kept running into was patients whose
+          teeth were the least of it — the one with recurring decay who was also
+          exhausted all the time, the one with bleeding gums who was also on her
+          third round of gut protocols and getting nowhere. After enough years
+          you stop filing that under coincidence.
+        </p>
+
+        <p>
+          I am not a natural at being a voice on the internet, and I would
+          rather be in clinic. I am doing this because the people who need it are
+          currently being handed either a cleaning or a supplement, and neither
+          of those is an answer to the question they actually asked.
+        </p>
+
+        <p class="attrib">
+          <span class="attrib-name">{her.name}, {her.credential}</span>
+          <span class="attrib-role">{her.role}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="support">
+      <h3 class="support-title">Who I work on this with</h3>
+      <ul class="support-list">
+        {
+          SUPPORT.map((s) => (
+            <li class="mate">
+              <PortraitFrame name={s.person.name} initials={s.initials} variant="support" />
+              <div class="mate-copy">
+                <p class="mate-name">
+                  {s.person.name}, {s.person.credential}
+                </p>
+                <p class="mate-role">{s.person.role}</p>
+                <p class="mate-line">{s.line}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .people {
+    padding-block: clamp(3rem, 7vw, 5rem);
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-grid);
+    scroll-margin-top: 1.5rem;
+  }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  /* ------------------------------------------------------------- lead -- */
+  .lead {
+    display: grid;
+    gap: clamp(1.75rem, 4vw, 3rem);
+    align-items: start;
+  }
+  @media (min-width: 52rem) {
+    .lead { grid-template-columns: minmax(0, 17rem) minmax(0, 1fr); }
+  }
+
+  .lead-portrait { max-width: 17rem; }
+
+  .eyebrow {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  h2 {
+    margin: 0 0 1.25rem;
+    max-width: 24ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144;
+    font-weight: 370;
+    font-size: clamp(1.6rem, 4.2vw, 2.5rem);
+    line-height: 1.14;
+    letter-spacing: -0.018em;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+
+  .lead-copy p {
+    margin: 0 0 1.1rem;
+    max-width: 56ch;
+    font-size: clamp(1rem, 1.8vw, 1.0625rem);
+    line-height: 1.72;
+    color: var(--color-text-muted);
+  }
+
+  .attrib {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-bottom: 0 !important;
+    padding-top: 0.5rem;
+  }
+  .attrib-name {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 40;
+    font-weight: 540;
+    font-size: 1.0625rem;
+    color: var(--color-text);
+  }
+  .attrib-role {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  /* ---------------------------------------------------------- support -- */
+  .support {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: clamp(2rem, 4vw, 2.5rem);
+    border-top: 1px solid var(--color-grid);
+  }
+
+  .support-title {
+    margin: 0 0 1.5rem;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 60;
+    font-weight: 450;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+
+  .support-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+  }
+  @media (min-width: 46rem) {
+    .support-list { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  }
+
+  .mate {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.15rem;
+  }
+
+  .mate-copy { min-width: 0; }
+
+  .mate-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 40;
+    font-weight: 540;
+    font-size: 1.0625rem;
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+  .mate-role {
+    margin: 0.2rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--color-accent);
+  }
+  .mate-line {
+    margin: 0.6rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+</style>

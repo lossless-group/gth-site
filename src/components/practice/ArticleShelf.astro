@@ -1,0 +1,327 @@
+---
+/* ============================================================================
+ * ArticleShelf — the library.
+ *
+ * The one rule that is not negotiable here: `plain_question` leads. The big
+ * type on every card is the question a worried person actually types at
+ * 1am. The clinical `title` is demoted to a subtitle — it still has to be
+ * there, because that is what the piece is called and what search will match,
+ * but it is never the thing the reader has to decode first.
+ *
+ * `term_of_art` / `term_in_plain_english` ride along as a footer on the card,
+ * so a term never appears anywhere near a card without its translation.
+ * ========================================================================== */
+import { getCollection } from 'astro:content';
+import { CATEGORY_LABELS } from '../../lib/site';
+
+const all = await getCollection('articles');
+
+const byDate = (a: (typeof all)[number], b: (typeof all)[number]) =>
+  (b.data.date_published?.getTime() ?? 0) - (a.data.date_published?.getTime() ?? 0);
+
+const featured = all.filter((a) => a.data.featured).sort(byDate);
+const rest = all.filter((a) => !a.data.featured).sort(byDate);
+
+/* Dates are UTC at rest; render them in UTC so a reader in Auckland and a
+ * reader in Austin see the same publication date. */
+const fmt = (d?: Date) =>
+  d
+    ? new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        timeZone: 'UTC',
+      }).format(d)
+    : '';
+
+const cats = (list?: string[]) =>
+  (list ?? []).map((c) => CATEGORY_LABELS[c] ?? c).join(' · ');
+---
+
+<section class="shelf" id="library" aria-labelledby="library-title">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Reading</p>
+      <h2 id="library-title">
+        Everything here starts from the question, not from the science.
+      </h2>
+      <p class="sub">
+        The big line on each one is what people actually ask me. The smaller
+        line under it is what the piece is called, for when you need to find it
+        again.
+      </p>
+    </div>
+
+    <!-- --------------------------------------------------------- featured -->
+    <ul class="featured">
+      {
+        featured.map((a) => (
+          <li class="feature">
+            <a class="feature-link" href={`/articles/${a.id}`}>
+              <p class="q">{a.data.plain_question ?? a.data.title}</p>
+              {a.data.plain_question && <p class="t">{a.data.title}</p>}
+              {a.data.lede && <p class="lede">{a.data.lede}</p>}
+              <p class="meta">
+                <span>{a.data.author}{a.data.author_credential ? `, ${a.data.author_credential}` : ''}</span>
+                {a.data.read_minutes && (
+                  <span class="tabular">{a.data.read_minutes} min</span>
+                )}
+                {a.data.categories?.length && <span>{cats(a.data.categories)}</span>}
+              </p>
+            </a>
+            {a.data.term_of_art && a.data.term_in_plain_english && (
+              <p class="term">
+                <span class="term-word">{a.data.term_of_art}</span>
+                <span class="term-plain">{a.data.term_in_plain_english}</span>
+              </p>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- ------------------------------------------------------------- rest -->
+    <h3 class="rest-title">The rest of it</h3>
+    <ul class="rest">
+      {
+        rest.map((a) => (
+          <li class="row">
+            <a class="row-link" href={`/articles/${a.id}`}>
+              <span class="row-q">{a.data.plain_question ?? a.data.title}</span>
+              {a.data.plain_question && <span class="row-t">{a.data.title}</span>}
+            </a>
+            <span class="row-meta">
+              {a.data.categories?.length ? <span>{cats(a.data.categories)}</span> : null}
+              {a.data.read_minutes ? (
+                <span class="tabular">{a.data.read_minutes} min</span>
+              ) : null}
+              {a.data.date_published ? (
+                <span class="tabular">{fmt(a.data.date_published)}</span>
+              ) : null}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="all">
+      <a href="/articles">All articles, with the categories laid out &rarr;</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .shelf {
+    padding-block: clamp(3rem, 7vw, 5rem);
+    scroll-margin-top: 1.5rem;
+  }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .eyebrow {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  h2 {
+    margin: 0;
+    max-width: 24ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144;
+    font-weight: 380;
+    font-size: clamp(1.6rem, 4.2vw, 2.5rem);
+    line-height: 1.14;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+
+  .sub {
+    margin: 1.1rem 0 0;
+    max-width: 48ch;
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+
+  /* --------------------------------------------------------- featured -- */
+  .featured {
+    list-style: none;
+    margin: clamp(2rem, 4vw, 2.75rem) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 54rem) {
+    .featured { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+  }
+  .feature:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+
+  .feature-link {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: clamp(1.25rem, 3vw, 1.6rem);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .q {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 96;
+    font-weight: 430;
+    font-size: clamp(1.25rem, 2.4vw, 1.4rem);
+    line-height: 1.24;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    text-wrap: pretty;
+  }
+
+  .t {
+    margin: 0.6rem 0 0;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    letter-spacing: 0.01em;
+    color: var(--color-text-muted);
+  }
+
+  .lede {
+    margin: 0.9rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.9rem;
+    margin: 1.1rem 0 0;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--color-grid);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+
+  .term {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin: 0;
+    padding: 0.85rem clamp(1.25rem, 3vw, 1.6rem);
+    background: var(--color-primary-soft);
+  }
+  .term-word {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .term-plain {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  /* ------------------------------------------------------------- rest -- */
+  .rest-title {
+    margin: clamp(2.5rem, 5vw, 3.25rem) 0 0.5rem;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 60;
+    font-weight: 450;
+    font-size: 1.25rem;
+    color: var(--color-text);
+  }
+
+  .rest {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.35rem 1.5rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  .row-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    flex: 1 1 22rem;
+    min-width: 0;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .row-q {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 48;
+    font-weight: 430;
+    font-size: 1.125rem;
+    line-height: 1.35;
+    color: var(--color-text);
+    transition: color 150ms ease;
+  }
+  .row-link:hover .row-q { color: var(--color-primary); }
+
+  .row-t {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+  }
+
+  .row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.9rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .all {
+    margin: 1.75rem 0 0;
+  }
+  .all a {
+    font-size: 0.9375rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-primary-soft);
+    padding-bottom: 0.1rem;
+    transition: border-color 150ms ease;
+  }
+  .all a:hover { border-bottom-color: var(--color-primary); }
+</style>

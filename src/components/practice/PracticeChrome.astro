@@ -1,0 +1,134 @@
+---
+/* ============================================================================
+ * PracticeChrome — the site header for Direction C.
+ *
+ * Deliberately quiet. A consultation does not open with a masthead; it opens
+ * with someone saying hello. So: wordmark, one plain line under it, five
+ * links, and the mode toggle. No sticky bar swallowing the top of the screen,
+ * no announcement ribbon, no "BOOK NOW" in a contrasting pill.
+ *
+ * Carries the two required escape hatches — `/` back to the direction chooser
+ * and `/articles` into the library — alongside the in-page anchors.
+ * ========================================================================== */
+import ModeToggle from '../ui/ModeToggle.astro';
+---
+
+<header class="chrome">
+  <div class="wrap">
+    <a class="mark" href="#main">
+      <span class="mark-word">Threshold</span>
+      <span class="mark-sub">Oral and whole-body health, explained plainly</span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <ul class="links">
+        <li><a href="#what">What this is</a></li>
+        <li><a href="#people">Who we are</a></li>
+        <li><a href="#library">Reading</a></li>
+        <li><a href="#kit">The kit</a></li>
+      </ul>
+      <span class="divider" aria-hidden="true"></span>
+      <ul class="links links--aside">
+        <li><a href="/articles">All articles</a></li>
+        <li><a href="/" class="chooser">Other directions</a></li>
+      </ul>
+      <ModeToggle />
+    </nav>
+  </div>
+</header>
+
+<style>
+  .chrome {
+    border-bottom: 1px solid var(--color-grid);
+    background: var(--color-background);
+  }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding: 1.4rem var(--page-gutter);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+  }
+
+  /* ------------------------------------------------------------- mark -- */
+  .mark {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+  }
+  .mark-word {
+    font-family: var(--font-display);
+    /* High optical size, low weight — Fraunces at its softest. */
+    font-variation-settings: 'opsz' 144;
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+  .mark-sub {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+
+  /* -------------------------------------------------------------- nav -- */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .links a {
+    display: inline-block;
+    padding: 0.3rem 0;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid transparent;
+    transition: color 160ms ease, border-color 160ms ease;
+  }
+  .links a:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+
+  .links--aside a { color: var(--color-text-muted); }
+  .chooser { font-style: italic; }
+
+  .divider {
+    width: 1px;
+    height: 1.1rem;
+    background: var(--color-border);
+  }
+
+  /* On narrow screens the in-page anchors are noise — the page is short
+     enough to scroll and the aside links are the ones you cannot get to
+     any other way. Nothing is removed from the DOM, only from view. */
+  @media (max-width: 47.99rem) {
+    .divider { display: none; }
+    .nav { width: 100%; justify-content: space-between; }
+  }
+  @media (max-width: 35.99rem) {
+    .links:not(.links--aside) { display: none; }
+  }
+</style>

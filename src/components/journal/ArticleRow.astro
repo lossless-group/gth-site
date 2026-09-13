@@ -1,0 +1,179 @@
+---
+/* ============================================================================
+ * ArticleRow — one line of the index, set like a table of contents entry.
+ *
+ * Same rule as the featured cards: the plain question leads, the clinical
+ * title sits under it in the mono face. What makes nine of these read as a
+ * BODY OF WORK rather than as a "latest posts" list is that they share one
+ * grid — question, byline, subject, extent — and are separated by hairlines
+ * rather than wrapped in anything.
+ * ========================================================================== */
+
+export interface Props {
+  index: number;
+  href: string;
+  plainQuestion: string;
+  title: string;
+  author?: string;
+  credential?: string;
+  categories: string[];
+  readMinutes?: number;
+  dateline?: string;
+}
+
+const {
+  index,
+  href,
+  plainQuestion,
+  title,
+  author,
+  credential,
+  categories,
+  readMinutes,
+  dateline,
+} = Astro.props;
+---
+
+<li class="row">
+  <a class="hit" href={href}>
+    <span class="idx tabular" aria-hidden="true">{String(index).padStart(2, '0')}</span>
+
+    <span class="main">
+      <span class="question">{plainQuestion}</span>
+      <span class="filed tabular">{title}</span>
+    </span>
+
+    <span class="by">
+      {author}{credential && <sup class="cred tabular">{credential}</sup>}
+      {dateline && <span class="date tabular">{dateline}</span>}
+    </span>
+
+    <span class="tail">
+      <span class="cats jr-eyebrow">{categories.join(' / ')}</span>
+      <span class="mins tabular">{readMinutes ? `${readMinutes} min` : ''}</span>
+    </span>
+  </a>
+</li>
+
+<style>
+  .row {
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  .hit {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    grid-template-areas:
+      'idx main'
+      '.   by'
+      '.   tail';
+    gap: 0.3rem 0.85rem;
+    padding-block: 1.1rem;
+    align-items: baseline;
+    transition: background-color 150ms ease;
+  }
+
+  @media (min-width: 56rem) {
+    .hit {
+      grid-template-columns: 2.5rem minmax(0, 1fr) minmax(0, 11rem) minmax(0, 7rem) 4rem;
+      grid-template-areas: 'idx main by cats mins';
+      column-gap: clamp(1rem, 2.5vw, 2rem);
+    }
+  }
+
+  .hit:hover {
+    background: var(--color-surface);
+  }
+  .hit:hover .question {
+    color: var(--color-primary);
+  }
+
+  .idx {
+    grid-area: idx;
+    font-size: 0.6875rem;
+    color: var(--color-text-faint);
+    letter-spacing: 0.06em;
+  }
+
+  .main {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .question {
+    font-family: var(--font-display);
+    font-size: clamp(1.0625rem, 1.9vw, 1.25rem);
+    line-height: 1.28;
+    color: var(--color-text);
+    transition: color 150ms ease;
+    overflow-wrap: break-word;
+  }
+
+  .filed {
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    overflow-wrap: break-word;
+  }
+
+  .by {
+    grid-area: by;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    min-width: 0;
+  }
+  .cred {
+    font-size: 0.62em;
+    letter-spacing: 0.08em;
+    margin-left: 0.3em;
+    color: var(--color-primary);
+    vertical-align: super;
+    line-height: 0;
+    white-space: nowrap;
+  }
+  .date {
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  /* On narrow screens subject and extent share one footer line; on wide they
+     become two columns of the same table. `display: contents` lets the same
+     markup do both without duplicating it. */
+  .tail {
+    grid-area: tail;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.9rem;
+    min-width: 0;
+  }
+
+  .cats {
+    color: var(--color-text-muted);
+    min-width: 0;
+  }
+
+  .mins {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 56rem) {
+    .tail { display: contents; }
+    .cats { grid-area: cats; }
+    .mins { grid-area: mins; text-align: right; }
+  }
+</style>

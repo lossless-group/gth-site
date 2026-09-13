@@ -1,0 +1,179 @@
+---
+/* ============================================================================
+ * SystemBody — the body of one "why it matters" plate.
+ *
+ * Shape enforces the content rule: the everyday sentence comes first, the
+ * clinical claim second, and a term of art only ever appears in the glossary
+ * row at the bottom, already translated. A reader who stops after the first
+ * two lines has still been told the true thing.
+ * ========================================================================== */
+
+interface Props {
+  /** the h2, in plain words */
+  heading: string;
+  /** what a person actually notices, before any mechanism */
+  felt: string;
+  /** the client's own sentence about this system, kept intact */
+  claim: string;
+  /** concrete things a reader can check against their own week */
+  signs: string[];
+  /** optional term of art, never introduced before the sentences above */
+  term?: string;
+  termPlain?: string;
+}
+
+const { heading, felt, claim, signs, term, termPlain } = Astro.props;
+---
+
+<div class="sys">
+  <div class="sys__head">
+    <h2 class="sys__h">{heading}</h2>
+    <p class="sys__felt">{felt}</p>
+  </div>
+
+  <div class="sys__cols">
+    <blockquote class="sys__claim">
+      <p>{claim}</p>
+      <footer>The clinical version of the same sentence</footer>
+    </blockquote>
+
+    <div class="sys__signs">
+      <p class="sys__signs-k">What it looks like from the inside</p>
+      <ul>
+        {signs.map((s, i) => (
+          <li>
+            <span class="sys__tick" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span>{s}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  {term && termPlain && (
+    <p class="sys__term">
+      <span class="sys__term-k">Term</span>
+      <span class="sys__term-v">{term}</span>
+      <span class="sys__term-d">{termPlain}</span>
+    </p>
+  )}
+</div>
+
+<style>
+  .sys { container-type: inline-size; }
+
+  .sys__head { margin-bottom: 1.75rem; }
+
+  .sys__h {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.018em;
+    color: var(--color-text);
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  .sys__felt {
+    margin: 0;
+    font-size: clamp(1.0625rem, 1.8vw, 1.25rem);
+    line-height: 1.55;
+    color: var(--color-text);
+    max-width: 56ch;
+  }
+
+  .sys__cols {
+    display: grid;
+    gap: 1.5rem;
+  }
+  @container (min-width: 46rem) {
+    .sys__cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2.5rem; }
+  }
+
+  /* -------------------------------------------------------------- claim -- */
+  .sys__claim {
+    margin: 0;
+    padding: 1.1rem 1.25rem;
+    background: var(--color-surface);
+    border-left: 2px solid var(--color-primary);
+    border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  }
+  .sys__claim p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+    color: var(--color-text);
+  }
+  .sys__claim footer {
+    margin-top: 0.7rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  /* -------------------------------------------------------------- signs -- */
+  .sys__signs-k {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .sys__signs ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+  }
+  .sys__signs li {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.6rem;
+    padding: 0.55rem 0;
+    border-top: 1px solid var(--color-grid);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .sys__tick {
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    color: var(--color-text-faint);
+    padding-top: 0.18rem;
+  }
+
+  /* --------------------------------------------------------------- term -- */
+  .sys__term {
+    margin: 1.75rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.75rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-control);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .sys__term-k {
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .sys__term-v {
+    font-family: var(--font-data);
+    font-size: 0.875rem;
+    color: var(--color-accent);
+  }
+  .sys__term-d { flex: 1 1 18rem; min-width: 0; }
+</style>

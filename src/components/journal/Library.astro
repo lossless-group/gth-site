@@ -1,0 +1,222 @@
+---
+/* ============================================================================
+ * Library — the corpus, and the hero of the middle of the page.
+ *
+ * Not "latest posts". A table of contents: three lead pieces given real
+ * column inches, then the balance of the collection set as an index with
+ * bylines, subjects and extents on one shared grid. Twelve entries laid out
+ * this way look like a body of work, which is the entire argument the
+ * publication is making about its author.
+ * ========================================================================== */
+import SectionHead from './SectionHead.astro';
+import ArticleLead from './ArticleLead.astro';
+import ArticleRow from './ArticleRow.astro';
+
+export interface Entry {
+  id: string;
+  href: string;
+  plainQuestion: string;
+  title: string;
+  lede?: string;
+  author?: string;
+  credential?: string;
+  categories: string[];
+  readMinutes?: number;
+  dateline?: string;
+  termOfArt?: string;
+  termPlain?: string;
+}
+
+export interface Props {
+  featured: Entry[];
+  rest: Entry[];
+  total: number;
+  totalMinutes: number;
+  subjects: { label: string; count: number }[];
+  span: string;
+}
+
+const { featured, rest, total, totalMinutes, subjects, span } = Astro.props;
+
+const [lead, ...pair] = featured;
+---
+
+<section class="jr-section" id="library" aria-labelledby="library-title">
+  <div class="jr-sheet">
+    <SectionHead
+      num="03"
+      eyebrow="The library"
+      title="What has been published here"
+      titleId="library-title"
+      standfirst="Every piece starts from the question a person actually asks, and only then gives the clinical name for it. The name in the smaller type is what the article is filed under."
+      meta={`${total} entries · ${span}`}
+    />
+
+    <!-- ------------------------------------------------------- leads -- -->
+    {lead && (
+      <ArticleLead
+        size="lead"
+        href={lead.href}
+        plainQuestion={lead.plainQuestion}
+        title={lead.title}
+        lede={lead.lede}
+        author={lead.author}
+        credential={lead.credential}
+        categories={lead.categories}
+        readMinutes={lead.readMinutes}
+        dateline={lead.dateline}
+        termOfArt={lead.termOfArt}
+        termPlain={lead.termPlain}
+      />
+    )}
+
+    {pair.length > 0 && (
+      <div class="pair">
+        {pair.map((e) => (
+          <ArticleLead
+            size="second"
+            href={e.href}
+            plainQuestion={e.plainQuestion}
+            title={e.title}
+            lede={e.lede}
+            author={e.author}
+            credential={e.credential}
+            categories={e.categories}
+            readMinutes={e.readMinutes}
+            dateline={e.dateline}
+            termOfArt={e.termOfArt}
+            termPlain={e.termPlain}
+          />
+        ))}
+      </div>
+    )}
+
+    <!-- ------------------------------------------------------- index -- -->
+    <div class="jr-cols index-block">
+      <div class="index-main">
+        <div class="index-head">
+          <p class="jr-eyebrow">The rest of the index</p>
+          <p class="jr-eyebrow count tabular">{rest.length} more</p>
+        </div>
+
+        <ol class="index">
+          {rest.map((e, i) => (
+            <ArticleRow
+              index={i + 1}
+              href={e.href}
+              plainQuestion={e.plainQuestion}
+              title={e.title}
+              author={e.author}
+              credential={e.credential}
+              categories={e.categories}
+              readMinutes={e.readMinutes}
+              dateline={e.dateline}
+            />
+          ))}
+        </ol>
+
+        <p class="more">
+          <a href="/articles">Browse the full library</a>
+        </p>
+      </div>
+
+      <!-- Marginal apparatus: what the corpus is made of, as a tally. -->
+      <aside class="margin" aria-labelledby="tally-title">
+        <p class="jr-eyebrow" id="tally-title">By subject</p>
+        <dl class="tally">
+          {subjects.map((s) => (
+            <div class="tally-row">
+              <dt>{s.label}</dt>
+              <dd class="tabular">{s.count}</dd>
+            </div>
+          ))}
+        </dl>
+        <p class="extent">
+          {total} entries. Roughly {totalMinutes} minutes of reading, all of it
+          free, none of it behind a form.
+        </p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: clamp(1.5rem, 4vw, 3.5rem);
+  }
+  @media (min-width: 52rem) {
+    .pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  .index-block {
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .index-main { min-width: 0; }
+
+  .index-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--color-text);
+  }
+  .count { color: var(--color-text-faint); }
+
+  .more {
+    margin-top: 1.5rem;
+  }
+  .more a {
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-rule);
+    padding-bottom: 0.15rem;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .more a:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+
+  /* ------------------------------------------------------------- margin -- */
+  .margin {
+    min-width: 0;
+    padding-top: 0.55rem;
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .tally {
+    margin-top: 0.75rem;
+  }
+  .tally-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.45rem;
+    border-bottom: 1px solid var(--color-grid);
+  }
+  .tally-row dt {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--color-text);
+    min-width: 0;
+  }
+  .tally-row dd {
+    font-size: 0.8125rem;
+    color: var(--color-text-faint);
+  }
+
+  .extent {
+    margin-top: 0.9rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+</style>

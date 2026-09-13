@@ -1,0 +1,230 @@
+/* ============================================================================
+ * DIRECTION C — "Practice" · theme slug `practice`
+ *
+ * TIER 2 semantic tokens. kebab-case only. Tier 1 `--color__*` / `--font__*`
+ * live in global.css and may be referenced ONLY from inside this file.
+ * No component under src/components/practice/ reads a `__` token, and no
+ * component under src/components/practice/ contains a hex literal.
+ *
+ * The premise: the reader did not arrive curious about the oral microbiome.
+ * They arrived tired, with bleeding gums, having been told nothing useful.
+ * So the page is a consultation, not a keynote — one doctor, first person,
+ * at conversational volume. The palette has to be able to hold that voice:
+ * warm enough to feel like a room with a lamp in it, honest enough that
+ * nothing is ever hard to read.
+ *
+ * ---------------------------------------------------------------------------
+ * THE TOKEN CONTRACT. Identical set to journal.css and atlas.css. Anything a
+ * component needs that is not here is a missing token, not a licence to reach
+ * for a `__` value or a hex literal.
+ *
+ *   type      --font-display  --font-body  --font-data  --font-eyebrow
+ *   ground    --color-background  --color-surface  --color-surface-raised
+ *   ink       --color-text  --color-text-muted  --color-text-faint
+ *   signal    --color-primary  --color-primary-soft  --color-accent
+ *   lines     --color-border  --color-rule  --color-grid
+ *   shape     --radius-control  --page-measure  --page-gutter
+ *   effects   --fx-grain-opacity  --fx-glow-opacity
+ *
+ * Plus two Direction-C extensions, declared per mode alongside the contract
+ * (the same move Direction A makes with --measure-prose / --measure-note):
+ *
+ *   depth     --shadow-soft  --shadow-lift
+ *
+ * Soft shadow is this direction's chrome and Journal's prohibition, so it
+ * cannot live in the shared contract — but it still must never be a hex
+ * literal in a component. Both are therefore built here, from Tier 1, and
+ * re-cast per mode: a shadow on paper is a darkening, a shadow under lamplight
+ * is a deeper black with a warm rim, and neither value works in the other's
+ * mode. A component writes `box-shadow: var(--shadow-soft)` and is done.
+ *
+ * PALETTE INTENT
+ *   sand        the paper. Warm but high-value, so black-brown ink on it
+ *               clears 12:1 and the warmth never costs legibility.
+ *   terracotta  the voice. It is the CTA, the marker, the underline — the one
+ *               colour that speaks. Darkened toward umber in light mode so
+ *               white-on-primary clears AA at body size instead of sitting at
+ *               a fashionable 4.1.
+ *   sage        the living things. This is where the client's extracted brand
+ *               green survives into this direction: the light accent is
+ *               literally signal-green mixed into sage and settled with umber,
+ *               so the green is still in the room without being the colour of
+ *               every button, which is what it was on the old site.
+ *   umber       the ink, and the night ground.
+ *
+ * THE WARM-DARK PROBLEM. A warm palette taken dark goes muddy by default —
+ * brown text on brown ground, everything at the same value, nothing legible.
+ * Three rules keep dark mode lamplit instead:
+ *   1. the ground is nearly neutral (umber-deep), and the warmth arrives as
+ *      LIGHT — the lifted terracotta primary and the glow — rather than as a
+ *      brown wash over everything;
+ *   2. surfaces separate by VALUE, not by hue: deep ground, umber surface,
+ *      terracotta-warmed raised surface, each a clear step up;
+ *   3. lines are pale sand at low alpha, never brown-on-brown, so edges read
+ *      as light catching an edge rather than as a smear.
+ *
+ * Mode intent
+ *   light   — the consulting room by daylight. Sand paper, umber ink,
+ *             terracotta voice, sage for living things. AUTHORED DEFAULT.
+ *   dark    — the same room at night with one lamp on. Near-neutral deep
+ *             ground; heat comes from the lifted terracotta, not from mud.
+ *   vibrant — the lamp turned all the way up. DARK-BASED; every ground,
+ *             surface, text and border below is set explicitly so nothing
+ *             inherits from light.
+ * ========================================================================== */
+
+[data-theme="practice"] {
+  /* Type is mode-invariant.
+   *
+   * Fraunces is a variable serif with a real optical-size axis; components set
+   * `opsz` high and weight low, which is where it gets soft and humane rather
+   * than editorial. It is the maximum-distance answer to the old site's
+   * all-caps condensed sans.
+   *
+   * Karla — not Inter — for body: slightly quirky, warm terminals, reads as a
+   * person talking rather than as an interface.
+   *
+   * The eyebrow is ALSO Karla, deliberately. Every other direction sets small
+   * labels in mono; here a mono eyebrow would reintroduce exactly the clinical
+   * distance this direction exists to remove. Numbers still get mono, via
+   * --font-data and the global .tabular class. */
+  --font-display:  var(--font__fraunces);
+  --font-body:     var(--font__karla);
+  --font-data:     var(--font__plex-mono);
+  --font-eyebrow:  var(--font__karla);
+
+  /* Soft chrome is this direction's signature. Large enough that the cart's
+   * `steps` layout (which pushes its own rungs to full pills) reads as
+   * continuous with everything around it. */
+  --radius-control: 1.125rem;
+
+  /* Narrower than Journal. A consultation is not a broadsheet. */
+  --page-measure:   68rem;
+  --page-gutter:    clamp(1.25rem, 6vw, 3.5rem);
+}
+
+/* --------------------------------------------------------------- light --- */
+/* The authored default. Warm paper, honest contrast. */
+[data-theme="practice"][data-mode="light"] {
+  --color-background:     var(--color__sand);
+  --color-surface:        var(--color__sand-deep);
+  --color-surface-raised: var(--color__white);
+
+  --color-text:           var(--color__umber);          /* 12.8:1 on sand, 10.8:1 on surface */
+  /* Set by the WORST ground it lands on, not the best. Muted body copy sits on
+   * sand-deep in four sections; at the obvious 68% it read 4.1:1 there. 74%
+   * clears AA on every ground this direction uses (4.9 on surface, 5.8 on the
+   * page, 6.8 on a white card). Warmth is not allowed to cost a reader. */
+  --color-text-muted:     color-mix(in srgb, var(--color__umber) 74%, var(--color__sand));
+  /* Decorative only — the portrait monogram, and nothing else. Anything that
+   * carried meaning was promoted to muted rather than have this tier lifted
+   * until it was indistinguishable from it. */
+  --color-text-faint:     color-mix(in srgb, var(--color__umber) 54%, var(--color__sand));
+
+  /* Raw terracotta on sand is 4.2:1 — fine for a heading, not fine for a 17px
+   * button label in white, and not fine at all on the sand-deep surface. Settled
+   * a quarter of the way toward umber it clears AA everywhere it is used:
+   * 5.5:1 as text on sand, 4.6:1 as text on the surface, 5.5:1 as a ground
+   * under sand-coloured type. Still unmistakably the same colour. */
+  --color-primary:        color-mix(in srgb, var(--color__terracotta) 76%, var(--color__umber));
+  --color-primary-soft:   color-mix(in srgb, var(--color__terracotta) 13%, transparent);
+
+  /* The client's brand green, still here, no longer shouting: signal-green
+   * folded into sage, then settled with umber until it clears AA. */
+  --color-accent:         color-mix(
+                            in srgb,
+                            color-mix(in srgb, var(--color__signal-green) 26%, var(--color__sage-deep)) 66%,
+                            var(--color__umber)
+                          );   /* 5.4:1 on sand, 4.6:1 on surface */
+
+  --color-border:         color-mix(in srgb, var(--color__sand-shadow) 76%, var(--color__umber));
+  --color-rule:           color-mix(in srgb, var(--color__umber) 34%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__umber) 11%, transparent);
+
+  --fx-grain-opacity: 0.045;   /* paper tooth */
+  --fx-glow-opacity:  0;       /* daylight does not glow */
+
+  /* On paper a shadow is just the paper, darker. Umber rather than black
+   * keeps it from going grey and cold against the sand. */
+  --shadow-soft:
+    0 1px 2px color-mix(in srgb, var(--color__umber) 7%, transparent),
+    0 6px 20px color-mix(in srgb, var(--color__umber) 6%, transparent);
+  --shadow-lift:
+    0 2px 4px color-mix(in srgb, var(--color__umber) 8%, transparent),
+    0 14px 40px color-mix(in srgb, var(--color__umber) 11%, transparent);
+}
+
+/* ---------------------------------------------------------------- dark --- */
+/* Lamplight. Ground stays near-neutral; the heat is a light source, not a
+ * brown filter over the whole page. */
+[data-theme="practice"][data-mode="dark"] {
+  --color-background:     var(--color__umber-deep);
+  --color-surface:        var(--color__umber);
+  /* The only surface allowed to carry hue — this is the pool of lamplight. */
+  --color-surface-raised: color-mix(in srgb, var(--color__terracotta) 12%, var(--color__umber));
+
+  --color-text:           var(--color__sand);                                /* ~15.5:1 */
+  --color-text-muted:     color-mix(in srgb, var(--color__sand-shadow) 82%, var(--color__umber-deep));
+  --color-text-faint:     color-mix(in srgb, var(--color__sand-shadow) 58%, var(--color__umber-deep));
+
+  /* Terracotta is far too dark to survive here. `lit` alone gets to 5.8:1 on
+   * the page ground but only 4.3:1 on the terracotta-warmed raised surface —
+   * which is exactly where the small uppercase labels live. A tenth of sand
+   * pushes it to 4.8 there and 6.5 on the page, and incidentally makes it read
+   * more like lamplight and less like paint. */
+  --color-primary:        color-mix(in srgb, var(--color__terracotta-lit) 90%, var(--color__sand));
+  --color-primary-soft:   color-mix(in srgb, var(--color__terracotta-lit) 20%, transparent);
+  --color-accent:         var(--color__sage-lit);                            /* 7.3:1 on ground */
+
+  /* Pale sand at low alpha — light on an edge. Never brown-on-brown. */
+  --color-border:         color-mix(in srgb, var(--color__sand-shadow) 22%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__sand-shadow) 40%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__sand-shadow) 13%, transparent);
+
+  --fx-grain-opacity: 0.05;
+  --fx-glow-opacity:  0.22;
+
+  /* Under a lamp, a card is separated by the dark it sits in, not by a grey
+   * blur — so the shadow goes to real black and a warm rim does the lifting. */
+  --shadow-soft:
+    0 1px 0 color-mix(in srgb, var(--color__terracotta-lit) 12%, transparent) inset,
+    0 8px 26px color-mix(in srgb, var(--color__black) 42%, transparent);
+  --shadow-lift:
+    0 1px 0 color-mix(in srgb, var(--color__terracotta-lit) 18%, transparent) inset,
+    0 18px 48px color-mix(in srgb, var(--color__black) 55%, transparent);
+}
+
+/* ------------------------------------------------------------- vibrant --- */
+/* DARK-BASED. The single most common mistake is letting vibrant inherit the
+ * light ground; every ground/surface/text/border is therefore set here. */
+[data-theme="practice"][data-mode="vibrant"] {
+  --color-background:     var(--color__void-plum);
+  --color-surface:        color-mix(in srgb, var(--color__terracotta) 22%, var(--color__void-plum));
+  --color-surface-raised: color-mix(in srgb, var(--color__neon-coral) 18%, var(--color__void-plum));
+
+  --color-text:           var(--color__white);
+  --color-text-muted:     color-mix(in srgb, var(--color__neon-coral) 46%, var(--color__sand));
+  --color-text-faint:     color-mix(in srgb, var(--color__terracotta-lit) 52%, transparent);
+
+  --color-primary:        var(--color__neon-coral);                          /* ~6.8:1 */
+  --color-primary-soft:   color-mix(in srgb, var(--color__neon-coral) 24%, transparent);
+  --color-accent:         var(--color__neon-magenta);                        /* ~5.9:1 */
+
+  --color-border:         color-mix(in srgb, var(--color__neon-coral) 32%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__neon-coral) 56%, transparent);
+  /* The brand green's one appearance in vibrant: the hairlines between rows
+   * stay faintly alive, so the loudest mode is still the same organism. */
+  --color-grid:           color-mix(in srgb, var(--color__signal-green) 24%, transparent);
+
+  --fx-grain-opacity: 0.085;
+  --fx-glow-opacity:  0.6;
+
+  /* Loudest mode: the rim becomes coral and does most of the separating,
+   * because a blur alone disappears against a ground this saturated. */
+  --shadow-soft:
+    0 0 0 1px color-mix(in srgb, var(--color__neon-coral) 14%, transparent),
+    0 10px 30px color-mix(in srgb, var(--color__black) 55%, transparent);
+  --shadow-lift:
+    0 0 0 1px color-mix(in srgb, var(--color__neon-coral) 24%, transparent),
+    0 20px 54px color-mix(in srgb, var(--color__black) 66%, transparent);
+}

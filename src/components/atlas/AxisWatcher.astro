@@ -1,0 +1,84 @@
+---
+/* ============================================================================
+ * AxisWatcher — the "you are here" marker on the axis.
+ *
+ * Vanilla IntersectionObserver, no library, ~40 lines. It toggles two classes
+ * (`is-current`, `is-passed`) and one attribute (`aria-current`). It never
+ * measures, never animates, never writes a style, and never moves anything.
+ *
+ * DEGRADATION, in order of how badly things can go:
+ *   - JS disabled            the axis renders complete in its resting state;
+ *                            every node, tube and connector is already drawn
+ *                            in CSS, so nothing is missing, only unhighlighted.
+ *   - IntersectionObserver
+ *     unsupported            same as above; the guard below simply returns.
+ *   - prefers-reduced-motion the script still runs, because it produces no
+ *                            motion. The colour transitions it triggers are
+ *                            flattened by the global rule in global.css. The
+ *                            marker keeps working, which is the accessible
+ *                            outcome — it is an orientation aid, not an
+ *                            effect.
+ * ========================================================================== */
+---
+
+<script is:inline>
+  (function () {
+    if (!('IntersectionObserver' in window)) return;
+
+    var plates = Array.prototype.slice.call(
+      document.querySelectorAll('[data-plate]')
+    );
+    if (!plates.length) return;
+
+    var links = Array.prototype.slice.call(
+      document.querySelectorAll('[data-axis-link]')
+    );
+
+    var live = Object.create(null);
+    var currentId = null;
+
+    function paint() {
+      /* The topmost plate currently crossing the middle band wins. If none is
+       * crossing (long plate, fast scroll) we keep the last answer rather than
+       * blanking the marker. */
+      var pick = null;
+      for (var i = 0; i < plates.length; i += 1) {
+        var id = plates[i].getAttribute('data-plate');
+        if (live[id]) { pick = id; break; }
+      }
+      if (!pick || pick === currentId) return;
+      currentId = pick;
+
+      var passed = true;
+      for (var j = 0; j < plates.length; j += 1) {
+        var pid = plates[j].getAttribute('data-plate');
+        if (pid === currentId) passed = false;
+        plates[j].classList.toggle('is-current', pid === currentId);
+        plates[j].classList.toggle('is-passed', passed && pid !== currentId);
+      }
+
+      for (var k = 0; k < links.length; k += 1) {
+        if (links[k].getAttribute('data-axis-link') === currentId) {
+          links[k].setAttribute('aria-current', 'true');
+        } else {
+          links[k].removeAttribute('aria-current');
+        }
+      }
+    }
+
+    var io = new IntersectionObserver(
+      function (entries) {
+        for (var i = 0; i < entries.length; i += 1) {
+          var id = entries[i].target.getAttribute('data-plate');
+          live[id] = entries[i].isIntersecting;
+        }
+        paint();
+      },
+      /* A thin band across the middle of the viewport. Whatever is in the
+       * band is what the reader is looking at. */
+      { rootMargin: '-42% 0px -48% 0px', threshold: 0 }
+    );
+
+    plates.forEach(function (p) { io.observe(p); });
+  })();
+</script>

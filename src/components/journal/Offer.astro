@@ -1,0 +1,142 @@
+---
+/* ============================================================================
+ * Offer — the shop, which in this direction is one page at the back.
+ *
+ * The publication does not open with the product and does not interrupt the
+ * corpus with it. It arrives here, after the reader has been oriented, shown
+ * the evidence, shown who stands behind it and given the writing for free.
+ *
+ * Editorial device: the marginal pull quote, used once, and taken from the
+ * house's own copy rather than invented for decoration.
+ *
+ * The ladder itself is the shared Svelte island in `layout="ledger"` — the
+ * hairline, no-fill variant. It is not modified here; it reads the same Tier 2
+ * tokens this page already sets.
+ * ========================================================================== */
+import SectionHead from './SectionHead.astro';
+import BundleLadder from '../cart/BundleLadder.svelte';
+
+/* Mirrors the island's own `Tier` shape. Declared here rather than imported
+ * because BundleLadder is a Svelte file and does not export its types — and
+ * per the brief the island is not to be edited to add one. */
+export interface Tier {
+  tier_id: string;
+  name: string;
+  plain_name?: string;
+  one_liner?: string;
+  best_for?: string;
+  price: number;
+  list_value?: number;
+  most_popular?: boolean;
+  upgrade_hook?: string;
+  includes?: {
+    label: string;
+    detail?: string;
+    list_value?: number;
+    kind?: string;
+  }[];
+}
+
+export interface Props {
+  tiers: Tier[];
+  priceFrom: string;
+}
+
+const { tiers, priceFrom } = Astro.props;
+---
+
+<section class="jr-section" id="panel" aria-labelledby="panel-title">
+  <div class="jr-sheet">
+    <SectionHead
+      num="05"
+      eyebrow="The instrument"
+      title="The panel this research is built on"
+      titleId="panel-title"
+      standfirst="One saliva sample, sequenced, and a report written to be read by the person who spat in the tube. Choose how much help you want with what it says."
+      meta={`From ${priceFrom}`}
+    />
+
+    <div class="jr-cols">
+      <div class="ladder-wrap">
+        <BundleLadder
+          client:visible
+          layout="ledger"
+          tiers={tiers}
+          cta="Get the panel"
+          orientation="Pick how far you want to go. Every option includes the test and the report; the ones above it add a person to talk to, and then a second test for the other end of the tract."
+        />
+      </div>
+
+      <aside class="margin">
+        <!-- The pull quote, in the margin, set once. -->
+        <figure class="pull">
+          <blockquote>
+            A result you cannot act on is just anxiety with a lab logo on it.
+          </blockquote>
+          <figcaption class="jr-eyebrow">From the editors</figcaption>
+        </figure>
+
+        <dl class="facts">
+          <div class="fact">
+            <dt class="jr-eyebrow">Collection</dt>
+            <dd>About four minutes, at home, before you brush.</dd>
+          </div>
+          <div class="fact">
+            <dt class="jr-eyebrow">Reading the report</dt>
+            <dd>Plain English first, the strain-by-strain data after. No login.</dd>
+          </div>
+          <div class="fact">
+            <dt class="jr-eyebrow">Who reviews it</dt>
+            <dd>A dentist licensed in your state, on the two upper options.</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ladder-wrap {
+    min-width: 0;
+  }
+
+  .margin {
+    min-width: 0;
+  }
+
+  /* -------------------------------------------------------- pull quote -- */
+  .pull {
+    border-top: 2px solid var(--color-text);
+    padding-top: 1rem;
+  }
+  .pull blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.3vw, 1.5rem);
+    line-height: 1.32;
+    letter-spacing: -0.012em;
+    color: var(--color-text);
+    text-wrap: pretty;
+  }
+  .pull figcaption {
+    margin-top: 0.85rem;
+  }
+
+  /* -------------------------------------------------------------- facts -- */
+  .facts {
+    margin-top: 1.75rem;
+    border-top: 1px solid var(--color-grid);
+  }
+  .fact {
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--color-grid);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .fact dd {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+/* ============================================================================
+ * TestimonialStrip — three sentences, set as specimen notes rather than as
+ * glowing pull-quotes. Each one names a symptom that went away, which is the
+ * only kind of testimonial worth printing next to a diagram.
+ * ========================================================================== */
+
+interface Props {
+  items: readonly { readonly quote: string; readonly who: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="quotes">
+  {items.map((t, i) => (
+    <li class="quote">
+      <span class="quote__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+      <blockquote class="quote__body">
+        <p>{t.quote}</p>
+        <cite>{t.who}</cite>
+      </blockquote>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .quotes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--color-grid);
+    border: 1px solid var(--color-grid);
+    border-radius: var(--radius-control);
+    overflow: hidden;
+  }
+  @media (min-width: 52rem) {
+    .quotes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .quote {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 1.25rem 1.1rem;
+    background: var(--color-background);
+    min-width: 0;
+  }
+
+  .quote__no {
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-text-faint);
+    padding-top: 0.25rem;
+  }
+
+  .quote__body { margin: 0; min-width: 0; }
+
+  .quote__body p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    line-height: 1.42;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    text-wrap: pretty;
+  }
+
+  .quote__body cite {
+    display: block;
+    margin-top: 0.75rem;
+    font-family: var(--font-data);
+    font-style: normal;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+</style>

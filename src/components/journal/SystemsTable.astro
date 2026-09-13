@@ -1,0 +1,93 @@
+---
+/* ============================================================================
+ * SystemsTable — why it matters, set as a three-column table rather than as
+ * three cards. Hairline rules between columns, roman numerals hanging above
+ * each, no borders around anything. The reader should be able to scan the
+ * three system names in one pass and then decide whether to read the body.
+ * ========================================================================== */
+import SectionHead from './SectionHead.astro';
+
+export interface Props {
+  systems: { numeral: string; name: string; claim: string }[];
+}
+
+const { systems } = Astro.props;
+---
+
+<section class="jr-section" id="evidence" aria-labelledby="evidence-title">
+  <div class="jr-sheet">
+    <SectionHead
+      num="01"
+      eyebrow="Why it matters"
+      title="Three systems downstream of your mouth"
+      titleId="evidence-title"
+      standfirst="The mouth is the top of the digestive tract, not a separate department of the body. What lives up there ends up further down, and these are the three places it shows."
+      meta="Three systems"
+    />
+
+    <ol class="systems">
+      {
+        systems.map((s) => (
+          <li class="system">
+            <p class="numeral tabular" aria-hidden="true">
+              {s.numeral}
+            </p>
+            <h3 class="name">{s.name}</h3>
+            <p class="claim">{s.claim}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .systems {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    border-top: 1px solid var(--color-rule);
+  }
+  @media (min-width: 52rem) {
+    .systems {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: clamp(1.5rem, 3.5vw, 3rem);
+    }
+  }
+
+  .system {
+    min-width: 0;
+    padding-block: clamp(1.5rem, 3vw, 2rem);
+    border-bottom: 1px solid var(--color-grid);
+  }
+  @media (min-width: 52rem) {
+    .system {
+      border-bottom: 0;
+      padding-inline-end: clamp(1.5rem, 3.5vw, 3rem);
+      border-inline-end: 1px solid var(--color-grid);
+    }
+    .system:last-child {
+      border-inline-end: 0;
+      padding-inline-end: 0;
+    }
+  }
+
+  .numeral {
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    color: var(--color-primary);
+    margin-bottom: 0.9rem;
+  }
+
+  .name {
+    font-size: clamp(1.375rem, 2.6vw, 1.625rem);
+    line-height: 1.15;
+    margin-bottom: 0.65rem;
+  }
+
+  .claim {
+    font-size: 1rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+    max-width: 38ch;
+  }
+</style>

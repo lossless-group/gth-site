@@ -1,0 +1,133 @@
+---
+/* ============================================================================
+ * PracticeFooter — disclaimer, address, and the way out.
+ *
+ * The DISCLAIMER is carried verbatim from the live site; it is a legal string
+ * and not ours to soften or reword. It is given real size and real contrast
+ * rather than being set in 10px grey, because a disclaimer nobody can read is
+ * not a disclaimer.
+ * ========================================================================== */
+import { DISCLAIMER } from '../../lib/site';
+---
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="top">
+      <div class="ident">
+        <p class="mark">Threshold</p>
+        <p class="tag">
+          Oral and whole-body health, explained in the order a person actually
+          needs it.
+        </p>
+      </div>
+
+      <nav class="links" aria-label="Footer">
+        <ul>
+          <li><a href="#what">What this is</a></li>
+          <li><a href="#people">Who we are</a></li>
+          <li><a href="#library">Reading</a></li>
+          <li><a href="#series">Watch</a></li>
+          <li><a href="#kit">The kit</a></li>
+        </ul>
+        <ul>
+          <li><a href="/articles">All articles</a></li>
+          <li><a href="/">Other design directions</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <p class="disclaimer">{DISCLAIMER}</p>
+
+    {/* The suite number is written as the `&num;` entity rather than a literal
+        `#`. It renders identically, and it keeps the repo-wide "no hex colour
+        literals in a component" grep (`#[0-9a-fA-F]{3,8}`) from reporting a
+        false positive on a street address. */}
+    <address class="addr">
+      Urban Monk Productions, Inc.<br />
+      1250 S Capital of Texas Highway, Building 3, Suite 400 &num;9039<br />
+      Austin, TX 78746
+    </address>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    padding-block: clamp(2.5rem, 6vw, 4rem);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  .ident { flex: 1 1 20rem; min-width: 0; }
+
+  .mark {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144;
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+
+  .tag {
+    margin: 0.6rem 0 0;
+    max-width: 36ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 3rem;
+  }
+  .links ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .links a {
+    font-size: 0.9375rem;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: color 150ms ease;
+  }
+  .links a:hover { color: var(--color-primary); }
+
+  .disclaimer {
+    margin: 2rem 0 0;
+    max-width: 64ch;
+    font-size: 0.9375rem;
+    line-height: 1.68;
+    color: var(--color-text-muted);
+  }
+
+  .addr {
+    margin: 1.75rem 0 0;
+    font-style: normal;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+</style>

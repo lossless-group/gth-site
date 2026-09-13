@@ -1,0 +1,144 @@
+---
+/* ============================================================================
+ * PractitionerCard — a person, presented the way a specimen label presents a
+ * provenance: who, what they are licensed to do, and what they actually look
+ * at. No stock photography, no adjectives.
+ * ========================================================================== */
+
+interface Props {
+  index: number;
+  name: string;
+  credential: string;
+  role: string;
+  focus: string;
+  /** what this person does for YOU, in plain words */
+  forYou: string;
+}
+
+const { index, name, credential, role, focus, forYou } = Astro.props;
+const initials = name
+  .replace(/^Dr\.\s*/, '')
+  .split(/\s+/)
+  .map((w) => w[0])
+  .filter(Boolean)
+  .slice(0, 2)
+  .join('');
+---
+
+<article class="who">
+  <div class="who__plate" aria-hidden="true">
+    <span class="who__initials">{initials}</span>
+    <span class="who__ticks"></span>
+  </div>
+
+  <div class="who__body">
+    <p class="who__index" aria-hidden="true">{String(index).padStart(2, '0')}</p>
+    <h3 class="who__name">
+      {name}<span class="who__cred">{credential}</span>
+    </h3>
+    <p class="who__role">{role}</p>
+    <p class="who__foryou">{forYou}</p>
+    <p class="who__focus"><span>Focus</span>{focus}</p>
+  </div>
+</article>
+
+<style>
+  .who {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--color-grid);
+  }
+
+  .who__plate {
+    position: relative;
+    width: 3.5rem;
+    height: 3.5rem;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
+    overflow: hidden;
+  }
+  .who__initials {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-primary);
+  }
+  .who__ticks {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--color-grid) 0 1px,
+      transparent 1px 0.4rem
+    );
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  .who__body { min-width: 0; }
+
+  .who__index {
+    margin: 0 0 0.3rem;
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-text-faint);
+  }
+
+  .who__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+    color: var(--color-text);
+  }
+  .who__cred {
+    font-family: var(--font-data);
+    font-weight: 400;
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-left: 0.55rem;
+  }
+
+  .who__role {
+    margin: 0.3rem 0 0;
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  .who__foryou {
+    margin: 0.7rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-text);
+    max-width: 46ch;
+  }
+
+  .who__focus {
+    margin: 0.55rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    max-width: 46ch;
+  }
+  .who__focus span {
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    margin-right: 0.5rem;
+  }
+</style>

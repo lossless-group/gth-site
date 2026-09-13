@@ -1,0 +1,165 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseThemeLayout from '../../layouts/BaseThemeLayout.astro';
+import Wordmark from '../../components/basics/Wordmark.astro';
+import ModeToggle from '../../components/ui/ModeToggle.astro';
+import { CATEGORY_LABELS, DISCLAIMER } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles');
+  return articles.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+type Props = { entry: CollectionEntry<'articles'> };
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const fmt = (x?: Date) =>
+  x ? new Date(x).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }) : '';
+---
+
+<BaseThemeLayout title={`${d.title} — Threshold`} description={d.lede} theme="journal" mode="light">
+  <header class="chrome">
+    <Wordmark size={28} />
+    <nav class="chrome-nav"><a href="/articles">All articles</a><a href="/">Directions</a></nav>
+    <ModeToggle />
+  </header>
+
+  <main id="main">
+    <article class="piece">
+      {/* The question is the headline. The clinical title sits under it as the
+          citable name — the same inversion the index uses. */}
+      <p class="q">{d.plain_question}</p>
+      <h1>{d.title}</h1>
+      {d.lede && <p class="lede">{d.lede}</p>}
+
+      <p class="byline">
+        <span class="by">{d.author}{d.author_credential && <span>, {d.author_credential}</span>}</span>
+        <span class="dot" aria-hidden="true">·</span>
+        <span class="tabular">{fmt(d.date_published)}</span>
+        {d.read_minutes && (<><span class="dot" aria-hidden="true">·</span><span class="tabular">{d.read_minutes} min</span></>)}
+      </p>
+
+      {d.term_of_art && d.term_in_plain_english && (
+        <aside class="gloss">
+          <p class="gloss-k">{d.term_of_art}</p>
+          <p class="gloss-v">{d.term_in_plain_english}</p>
+        </aside>
+      )}
+
+      <div class="prose"><Content /></div>
+
+      <footer class="end">
+        <p class="tags">
+          {(d.categories ?? []).map((c) => <span class="tag">{CATEGORY_LABELS[c] ?? c}</span>)}
+        </p>
+        <p class="disclaim">{DISCLAIMER}</p>
+        <a class="back" href="/articles">&larr; All articles</a>
+      </footer>
+    </article>
+  </main>
+</BaseThemeLayout>
+
+<style>
+  .chrome {
+    display: flex; align-items: center; gap: 1.5rem;
+    padding: 1.4rem var(--page-gutter);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .chrome-nav { display: flex; gap: 1.25rem; margin-left: auto; font-size: 0.8125rem; }
+  .chrome-nav a { color: var(--color-text-muted); text-decoration: none; }
+  .chrome-nav a:hover { color: var(--color-primary); }
+
+  .piece {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 7vw, 5rem) var(--page-gutter) 5rem;
+  }
+  .q {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+    line-height: 1.12; letter-spacing: -0.02em;
+    color: var(--color-text);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-eyebrow);
+    font-weight: 400; font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    color: var(--color-text-faint);
+  }
+  .lede {
+    margin: 1.5rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem; line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+  .byline {
+    margin: 1.75rem 0 0; padding: 0.9rem 0;
+    border-top: 1px solid var(--color-rule);
+    border-bottom: 1px solid var(--color-grid);
+    display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: baseline;
+    font-size: 0.875rem; color: var(--color-text-muted);
+  }
+  .byline .by { color: var(--color-text); }
+  .dot { color: var(--color-text-faint); }
+
+  .gloss {
+    margin: 2rem 0 0; padding: 0.9rem 1.1rem;
+    border-left: 3px solid var(--color-primary);
+    background: var(--color-surface);
+  }
+  .gloss-k {
+    margin: 0; font-family: var(--font-eyebrow);
+    font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .gloss-v { margin: 0.3rem 0 0; font-size: 0.9375rem; line-height: 1.55; }
+
+  .prose { margin-top: 2.5rem; }
+  .prose :global(p) {
+    margin: 0 0 1.4rem;
+    font-size: 1.0625rem; line-height: 1.75;
+    max-width: 68ch;
+  }
+  .prose :global(h2) {
+    margin: 2.75rem 0 1rem;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: 1.5rem; line-height: 1.25; letter-spacing: -0.01em;
+  }
+  .prose :global(h3) {
+    margin: 2rem 0 0.75rem;
+    font-family: var(--font-display); font-weight: 500; font-size: 1.1875rem;
+  }
+  /* Tailwind's preflight flattens list markers — restore them explicitly.
+     This is the recurring cross-site issue the astro-knots docs call out. */
+  .prose :global(ul), .prose :global(ol) {
+    margin: 0 0 1.4rem; padding-left: 1.4rem;
+    max-width: 68ch;
+  }
+  .prose :global(ul) { list-style: disc; }
+  .prose :global(ol) { list-style: decimal; }
+  .prose :global(li) { margin-bottom: 0.5rem; line-height: 1.7; }
+  .prose :global(li::marker) { color: var(--color-primary); }
+  .prose :global(strong) { font-weight: 600; }
+  .prose :global(a) { color: var(--color-primary); }
+  .prose :global(blockquote) {
+    margin: 1.75rem 0; padding-left: 1.1rem;
+    border-left: 3px solid var(--color-primary-soft);
+    font-family: var(--font-display); font-size: 1.125rem; line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .end { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-rule); }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 1.25rem; }
+  .tag {
+    font-family: var(--font-eyebrow); font-size: 0.625rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.15rem 0.45rem; border: 1px solid var(--color-border);
+    color: var(--color-text-faint);
+  }
+  .disclaim { margin: 0 0 1.5rem; font-size: 0.75rem; line-height: 1.6; color: var(--color-text-faint); max-width: 68ch; }
+  .back { font-size: 0.875rem; color: var(--color-primary); text-decoration: none; }
+</style>

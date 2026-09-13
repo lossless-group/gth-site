@@ -1,0 +1,497 @@
+---
+/* ============================================================================
+ * DIRECTION B — "Atlas"
+ *
+ * One anatomical axis runs the full height of this page: mouth, throat,
+ * stomach, small intestine, colon. Every section docks to a stop on it, in
+ * the order the body actually puts them, so the client's central claim — that
+ * the gut begins in the mouth — is carried by the page's STRUCTURE before any
+ * sentence has to argue for it. Scrolling is travelling down the tract.
+ *
+ * Below the colon the tract ends and the rail changes register: a dashed
+ * index rule with instrument ticks instead of anatomy, carrying the plates
+ * that are about the practice rather than about the body.
+ *
+ * Content order is the orientation contract, not editorial taste:
+ *   what this is → what you do → what you get → and only then, the term.
+ * ========================================================================== */
+import { getCollection } from 'astro:content';
+import BaseThemeLayout from '../layouts/BaseThemeLayout.astro';
+import BundleLadder from '../components/cart/BundleLadder.svelte';
+
+import AtlasChrome from '../components/atlas/AtlasChrome.astro';
+import AtlasPlate from '../components/atlas/AtlasPlate.astro';
+import AtlasHero from '../components/atlas/AtlasHero.astro';
+import TermBridge from '../components/atlas/TermBridge.astro';
+import SystemBody from '../components/atlas/SystemBody.astro';
+import PractitionerCard from '../components/atlas/PractitionerCard.astro';
+import ArticleCard from '../components/atlas/ArticleCard.astro';
+import SeriesTable from '../components/atlas/SeriesTable.astro';
+import TestimonialStrip from '../components/atlas/TestimonialStrip.astro';
+import AtlasFooter from '../components/atlas/AtlasFooter.astro';
+import AxisWatcher from '../components/atlas/AxisWatcher.astro';
+import Plate from '../components/basics/Plate.astro';
+
+import {
+  PRACTITIONERS,
+  TESTIMONIALS,
+  CATEGORY_LABELS,
+} from '../lib/site';
+
+/* ------------------------------------------------------------ collections */
+const bundles = (await getCollection('bundles')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const episodes = (await getCollection('series'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((e) => e.data);
+
+const allArticles = (await getCollection('articles')).sort((a, b) => {
+  const ad = a.data.date_published ? new Date(a.data.date_published).getTime() : 0;
+  const bd = b.data.date_published ? new Date(b.data.date_published).getTime() : 0;
+  return bd - ad;
+});
+
+const featured = allArticles.filter((a) => a.data.featured);
+const rest = allArticles.filter((a) => !a.data.featured);
+
+const labelFor = (slugs: string[] = []) =>
+  slugs.map((s) => CATEGORY_LABELS[s] ?? s);
+
+/* --------------------------------------------------- the axis, in words */
+const STOPS = [
+  { id: 'mouth', label: 'Mouth', gloss: 'Where it starts, and what lives there.' },
+  { id: 'throat', label: 'Throat', gloss: 'A litre of saliva a day, going down.' },
+  { id: 'stomach', label: 'Stomach', gloss: 'Whether you get anything out of food.' },
+  {
+    id: 'small-intestine',
+    label: 'Small intestine',
+    gloss: 'Where most of your immune system lives.',
+  },
+  { id: 'colon', label: 'Colon', gloss: 'The end that talks to your head.' },
+];
+
+/* The three systems, docked to the stop each one actually belongs to. The
+ * client's own sentence is kept verbatim in `claim`; everything above it in
+ * each card is the plain-language version a stranger can start from. */
+const SYSTEMS = [
+  {
+    id: 'stomach',
+    fig: '03',
+    node: 'stomach' as const,
+    label: 'Stomach',
+    caption: 'where food stops being food and starts being you.',
+    heading: 'Whether you actually get anything out of your food',
+    felt: 'You eat well and still feel bloated, heavy or wiped out an hour later. Digestion is not only what you put in; it is what the bacteria do with it before you ever get the benefit.',
+    claim: 'Our ability to digest and assimilate food is tied to our microbiome and gut ecology.',
+    signs: [
+      'Bloating or gas after most meals, not just the rich ones.',
+      'Foods that used to be fine and suddenly are not.',
+      'Heartburn you have started planning your evenings around.',
+      'Supplements that never seem to move a blood test.',
+    ],
+    term: 'Dysbiosis',
+    termPlain: 'The wrong bacteria outnumbering the right ones.',
+  },
+  {
+    id: 'small-intestine',
+    fig: '04',
+    node: 'small-intestine' as const,
+    label: 'Small intestine',
+    caption: 'where the immune system actually lives.',
+    heading: 'Most of your immune system lives down here',
+    felt: 'If you catch everything going round, flare up for no reason you can trace, or have been told your immune system is attacking you, most of that argument is happening in a tube you never see.',
+    claim: 'The majority of our immune system lines our gut. A leaky gut creates chaos and autoimmunity.',
+    signs: [
+      'Inflammation that moves — joints one month, skin the next.',
+      'An autoimmune diagnosis with no account of where it came from.',
+      'Getting ill noticeably more often than the people around you.',
+      'Gums that bleed when you floss, which is inflammation you can see.',
+    ],
+    term: 'Intestinal permeability',
+    termPlain: 'Your gut wall letting through things it should be holding back.',
+  },
+  {
+    id: 'colon',
+    fig: '05',
+    node: 'colon' as const,
+    label: 'Colon',
+    caption: 'the far end of the tube, and the one with a line to your head.',
+    heading: 'Brain fog is a downstream symptom',
+    felt: 'Losing the word you wanted. Reading the same paragraph three times. A flat mood you cannot account for. It gets treated as a head problem, and it often starts a long way from your head.',
+    claim: 'The downstream effects lead to mental health issues and brain fog.',
+    signs: [
+      'Fog that lifts and returns on no schedule you can name.',
+      'Low mood that does not match what is actually happening in your life.',
+      'Eight hours in bed that leave you unrested.',
+      'Fatigue that survives every reasonable amount of rest.',
+    ],
+    term: 'The gut-brain axis',
+    termPlain: 'The constant two-way signalling between your gut and your head.',
+  },
+];
+
+const PEOPLE = [
+  {
+    ...PRACTITIONERS.dental,
+    forYou:
+      'She is the one who reads your results back to you, line by line, and writes down what to do about them.',
+  },
+  {
+    ...PRACTITIONERS.medical,
+    forYou:
+      'He is why this does not stop at your teeth. The gut half of the protocol is his.',
+  },
+  {
+    ...PRACTITIONERS.hygiene,
+    forYou:
+      'She has done this chairside thousands of times, on real mouths, which is a different kind of knowing.',
+  },
+];
+---
+
+<BaseThemeLayout
+  title="Threshold — an atlas of one tube, from your mouth down"
+  description="Your mouth is full of bacteria. Some protect you; some quietly make you ill. Spit in a tube at home, mail it back, and get a report naming which ones you have — plus a dentist who explains what to do about it."
+  theme="atlas"
+  mode="dark"
+>
+  <AtlasChrome />
+
+  <main id="main" class="atlas">
+    <div class="atlas__field" aria-hidden="true"></div>
+
+    <div class="atlas__plates">
+      <!-- ============================================== 01 · MOUTH ===== -->
+      <AtlasPlate
+        id="mouth"
+        fig="01"
+        node="mouth"
+        label="Mouth"
+        caption="what is living in your mouth right now, and which way it travels."
+        lead
+      >
+        <AtlasHero stops={STOPS} />
+      </AtlasPlate>
+
+      <!-- ============================================= 02 · THROAT ===== -->
+      <AtlasPlate
+        id="throat"
+        fig="02"
+        node="throat"
+        label="Throat"
+        caption="the swallow — the only reason anything in plate 01 matters further down."
+      >
+        <TermBridge />
+        <Plate
+          src="/img/illustration__Threshold--Colony.jpg"
+          alt="A dense field of rounded microorganisms among fine filaments, drawn in ink hatching."
+          ratio="16 / 9"
+          figure="Fig. 02a"
+          caption="What the swallow carries down. Several hundred species, in proportions unique to one mouth."
+          tint={0.45}
+        />
+      </AtlasPlate>
+
+      <!-- ================================ 03–05 · THE THREE SYSTEMS ==== -->
+      {SYSTEMS.map((s) => (
+        <AtlasPlate
+          id={s.id}
+          fig={s.fig}
+          node={s.node}
+          label={s.label}
+          caption={s.caption}
+        >
+          <SystemBody
+            heading={s.heading}
+            felt={s.felt}
+            claim={s.claim}
+            signs={s.signs}
+            term={s.term}
+            termPlain={s.termPlain}
+          />
+        </AtlasPlate>
+      ))}
+
+      <!-- ============================================= 06 · PEOPLE ===== -->
+      <AtlasPlate
+        id="people"
+        fig="06"
+        node="index"
+        label="Who reads it"
+        kind="index"
+        caption="the three people whose names are on every report that goes out."
+      >
+        <div class="block">
+          <h2 class="h2">A result is only as good as the person who reads it to you</h2>
+          <p class="lede">
+            The test is a machine measurement. Everything after it is a
+            conversation with one of these three.
+          </p>
+          <div class="people">
+            {PEOPLE.map((p, i) => (
+              <PractitionerCard
+                index={i + 1}
+                name={p.name}
+                credential={p.credential}
+                role={p.role}
+                focus={p.focus}
+                forYou={p.forYou}
+              />
+            ))}
+          </div>
+        </div>
+      </AtlasPlate>
+
+      <!-- ============================================ 07 · LIBRARY ===== -->
+      <AtlasPlate
+        id="library"
+        fig="07"
+        node="index"
+        label="The library"
+        kind="index"
+        caption={`${allArticles.length} pieces, each one filed under the question somebody actually asked.`}
+      >
+        <div class="block">
+          <h2 class="h2">Questions people bring us, answered at length</h2>
+          <p class="lede">
+            Every piece is titled twice: once the way you would ask it, and
+            once the way it gets filed. You only ever need the first one.
+          </p>
+
+          {featured.length > 0 && (
+            <div class="feature-grid">
+              {featured.map((a, i) => (
+                <ArticleCard
+                  variant="featured"
+                  href={`/articles/${a.id}`}
+                  index={i + 1}
+                  plainQuestion={a.data.plain_question ?? a.data.title}
+                  title={a.data.title}
+                  lede={a.data.lede}
+                  author={a.data.author}
+                  credential={a.data.author_credential}
+                  readMinutes={a.data.read_minutes}
+                  categories={labelFor(a.data.categories)}
+                  term={a.data.term_of_art}
+                  termPlain={a.data.term_in_plain_english}
+                />
+              ))}
+            </div>
+          )}
+
+          {rest.length > 0 && (
+            <div class="rest">
+              <p class="rest__k">Everything else in the library</p>
+              {rest.map((a, i) => (
+                <ArticleCard
+                  href={`/articles/${a.id}`}
+                  index={featured.length + i + 1}
+                  plainQuestion={a.data.plain_question ?? a.data.title}
+                  title={a.data.title}
+                  author={a.data.author}
+                  credential={a.data.author_credential}
+                  readMinutes={a.data.read_minutes}
+                  categories={labelFor(a.data.categories)}
+                />
+              ))}
+              <p class="rest__more">
+                <a href="/articles">Open the full index</a>
+              </p>
+            </div>
+          )}
+        </div>
+      </AtlasPlate>
+
+      <!-- ============================================= 08 · SERIES ===== -->
+      <AtlasPlate
+        id="series"
+        fig="08"
+        node="index"
+        label="The series"
+        kind="index"
+        caption="Gateway to Health — the documentary the practice built its case on."
+      >
+        <div class="block">
+          <h2 class="h2">Eight episodes, if you would rather be told than read</h2>
+          <p class="lede">
+            The same argument as this page, at length, with the clinicians on
+            camera. The first three are free; the rest come with every package.
+          </p>
+          <SeriesTable episodes={episodes} />
+        </div>
+      </AtlasPlate>
+
+      <!-- ============================================== 09 · PANEL ===== -->
+      <AtlasPlate
+        id="panel"
+        fig="09"
+        node="index"
+        label="What it costs"
+        kind="index"
+        caption="three packages, each a strict superset of the one before it."
+      >
+        <div class="block">
+          <h2 class="h2">What it costs</h2>
+          <BundleLadder
+            client:visible
+            layout="compare"
+            tiers={bundles.map((b) => b.data)}
+            cta="Order the panel"
+            orientation="Pick a row below and the list underneath fills in — each package contains everything in the one before it, so moving up never takes anything away."
+          />
+        </div>
+      </AtlasPlate>
+
+      <!-- ============================================ 10 · READERS ===== -->
+      <AtlasPlate
+        id="readers"
+        fig="10"
+        node="index"
+        label="Afterwards"
+        kind="index"
+        caption="three people, on what changed. Their words, not ours."
+      >
+        <div class="block">
+          <h2 class="h2">What people said afterwards</h2>
+          <p class="lede">
+            Not "I feel amazing". Specific symptoms, named, that stopped.
+          </p>
+          <TestimonialStrip items={TESTIMONIALS} />
+          <p class="closer">
+            <a class="closer__cta" href="#panel">See what it costs</a>
+            <span class="closer__note">
+              Spit in a tube at home, mail it back, and a dentist walks you
+              through what came out.
+            </span>
+          </p>
+        </div>
+      </AtlasPlate>
+    </div>
+  </main>
+
+  <AtlasFooter />
+  <AxisWatcher />
+</BaseThemeLayout>
+
+<style>
+  .atlas {
+    position: relative;
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  /* A fixed, very faint measurement field behind everything — the graticule
+     of the plate. Strength comes straight from the theme's grain token, so it
+     is near-invisible in light and slightly present in vibrant. */
+  .atlas__field {
+    position: fixed;
+    inset: 0;
+    /* behind every plate, above the page ground — a graticule, not a veil */
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--fx-grain-opacity);
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      var(--color-text) 1px,
+      transparent 0
+    );
+    background-size: 5px 5px;
+  }
+
+  .atlas__plates { position: relative; z-index: 1; }
+
+  /* --------------------------------------------- shared plate interior -- */
+  .block { min-width: 0; }
+
+  .h2 {
+    margin: 0 0 0.85rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3.4vw, 2.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    max-width: 24ch;
+    text-wrap: balance;
+  }
+
+  .lede {
+    margin: 0 0 2rem;
+    font-size: clamp(1rem, 1.7vw, 1.125rem);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 56ch;
+  }
+
+  .people {
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  /* ------------------------------------------------------------ library -- */
+  .feature-grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  @media (min-width: 60rem) {
+    .feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .rest { border-top: 1px solid var(--color-rule); padding-top: 1.25rem; }
+  .rest__k {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .rest__more {
+    margin: 1.25rem 0 0;
+    border-top: 1px solid var(--color-grid);
+    padding-top: 1rem;
+  }
+  .rest__more a {
+    font-family: var(--font-data);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--color-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.15rem;
+  }
+  .rest__more a:hover { border-color: var(--color-primary); }
+
+  /* ------------------------------------------------------------ closer -- */
+  .closer {
+    margin: 2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+  }
+  .closer__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.8rem 1.4rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    color: var(--color-background);
+    background: var(--color-primary);
+    border-radius: var(--radius-control);
+    transition: filter 150ms ease, transform 150ms ease;
+  }
+  .closer__cta:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .closer__note {
+    flex: 1 1 20rem;
+    min-width: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+</style>

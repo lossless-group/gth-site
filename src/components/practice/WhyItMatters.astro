@@ -1,0 +1,169 @@
+---
+/* ============================================================================
+ * WhyItMatters — the three downstream systems.
+ *
+ * Client copy, carried verbatim, with one addition: each card gets a plain
+ * "what that feels like" line first, so the reader recognises the experience
+ * before reading the mechanism. Same rule as the hero, at card scale.
+ *
+ * The glyphs are decorative and aria-hidden — the heading carries the meaning,
+ * so nothing is lost if they never render.
+ * ========================================================================== */
+
+const SYSTEMS = [
+  {
+    name: 'Immune Function',
+    feels: 'Flaring, reacting, catching everything.',
+    body: 'The majority of our immune system lines our gut. A leaky gut creates chaos and autoimmunity.',
+    /* shield */
+    path: 'M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z',
+  },
+  {
+    name: 'Mental Wellbeing',
+    feels: 'Fog, flatness, losing the word you wanted.',
+    body: 'The downstream effects lead to mental health issues and brain fog.',
+    /* head */
+    path: 'M12 2a7 7 0 00-4 12.8V18a2 2 0 002 2h4a2 2 0 002-2v-3.2A7 7 0 0012 2zM9.5 22h5',
+  },
+  {
+    name: 'Digestive Health',
+    feels: 'Bloating, discomfort, eating well and feeling worse.',
+    body: 'Our ability to digest and assimilate food is tied to our microbiome and gut ecology.',
+    /* tract */
+    path: 'M7 3v4a5 5 0 005 5 5 5 0 015 5v4M7 21h10',
+  },
+];
+---
+
+<section class="why" aria-labelledby="why-title">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Why the mouth keeps coming up</p>
+      <h2 id="why-title">
+        You swallow about a litre of saliva a day. Whatever lives in your mouth
+        goes downstream on a schedule.
+      </h2>
+      <p class="sub">
+        Which is why a mouth problem does not stay a mouth problem. Three places
+        it shows up.
+      </p>
+    </div>
+
+    <ul class="cards">
+      {
+        SYSTEMS.map((s) => (
+          <li class="card">
+            <span class="glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d={s.path} />
+              </svg>
+            </span>
+            <h3>{s.name}</h3>
+            <p class="feels">{s.feels}</p>
+            <p class="body">{s.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .why { padding-block: clamp(3rem, 7vw, 5rem); }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .eyebrow {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  h2 {
+    margin: 0;
+    max-width: 26ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144;
+    font-weight: 380;
+    font-size: clamp(1.6rem, 4.2vw, 2.6rem);
+    line-height: 1.14;
+    letter-spacing: -0.015em;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+
+  .sub {
+    margin: 1.1rem 0 0;
+    max-width: 44ch;
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+
+  /* ------------------------------------------------------------ cards -- */
+  .cards {
+    list-style: none;
+    margin: clamp(2rem, 4vw, 2.75rem) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 50rem) {
+    .cards { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .glyph {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 1rem;
+    border-radius: 999px;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+  .glyph svg { width: 1.4rem; height: 1.4rem; }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 48;
+    font-weight: 540;
+    font-size: 1.1875rem;
+    line-height: 1.25;
+    color: var(--color-text);
+  }
+
+  .feels {
+    margin: 0.45rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--color-accent);
+  }
+
+  .body {
+    margin: 0.85rem 0 0;
+    font-size: 1rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+</style>

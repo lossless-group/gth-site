@@ -1,0 +1,270 @@
+---
+/* The chooser. Not a homepage — the surface you hand someone so they can
+ * compare three full builds of the same content like-for-like. */
+import { getCollection } from 'astro:content';
+import BaseThemeLayout from '../layouts/BaseThemeLayout.astro';
+import Wordmark from '../components/basics/Wordmark.astro';
+import ModeToggle from '../components/ui/ModeToggle.astro';
+import Plate from '../components/basics/Plate.astro';
+
+const articles = await getCollection('articles');
+const series = await getCollection('series');
+const bundles = await getCollection('bundles');
+
+const directions = [
+  {
+    slug: 'journal',
+    name: 'Journal',
+    stance: 'Authority without volume',
+    blurb:
+      'The site as a clinical publication that happens to sell the instrument its research is built on. Serif, generous measure, the article corpus as the hero. Built for a clinician who will not self-promote: the body of work does the asserting.',
+    cart: 'Ledger — the order fills in line by line as you climb.',
+    plate: '/img/illustration__Threshold--Arch.jpg',
+    alt: 'A stone archway with fine particles drifting through the opening, drawn in ink hatching.',
+  },
+  {
+    slug: 'atlas',
+    name: 'Atlas',
+    stance: 'The science is the structure',
+    blurb:
+      'An anatomical axis runs down the page — mouth at the top, colon at the bottom — and every section docks to a point on it. Scrolling is travelling down the tract, so you can see the argument before you read it.',
+    cart: 'Comparison — three columns and a sliding you-are-here band.',
+    plate: '/img/illustration__Threshold--Axis.jpg',
+    alt: 'A branching channel descending through layered tissue, drawn in ink hatching.',
+  },
+  {
+    slug: 'practice',
+    name: 'Practice',
+    stance: 'Meet the reader where they are',
+    blurb:
+      'Nobody arrives curious about microbiology. They arrive tired, with bleeding gums, and no explanation. This one opens on the symptom, in her voice, at conversational volume — a consultation, not a keynote.',
+    cart: 'Steps — start here, most people add this, go all the way.',
+    plate: '/img/illustration__Threshold--Colony.jpg',
+    alt: 'A dense field of rounded microorganisms among fine filaments, drawn in ink hatching.',
+  },
+];
+
+const stats = [
+  { value: String(articles.length), label: 'articles' },
+  { value: String(series.length), label: 'episodes' },
+  { value: String(bundles.length), label: 'tiers, each a superset' },
+  { value: '3', label: 'modes per direction' },
+];
+---
+
+<BaseThemeLayout
+  title="Threshold — three design directions"
+  description="Three full builds of one content-and-commerce site, running the same collections so the comparison is about form, not copy."
+  theme="journal"
+  mode="light"
+>
+  <header class="chrome">
+    <Wordmark size={28} />
+    <ModeToggle />
+  </header>
+
+  <main class="wrap" id="main">
+    <p class="eyebrow">Three directions · one content spine</p>
+    <h1>Same content. Three ways of making the case.</h1>
+    <p class="lede">
+      Every direction runs the identical collections — the same twelve articles, the
+      same eight episodes, the same three-tier ladder — so what you are comparing is
+      form, not copy. All three ship light, dark and vibrant.
+    </p>
+
+    <ul class="stats">
+      {stats.map((s) => (
+        <li><span class="stat-v tabular">{s.value}</span><span class="stat-l">{s.label}</span></li>
+      ))}
+    </ul>
+
+    <ul class="grid">
+      {directions.map((d, i) => (
+        <li class="card">
+          <a href={`/${d.slug}`}>
+            <Plate src={d.plate} alt={d.alt} ratio="16 / 10" tint={0.5} loading={i === 0 ? 'eager' : 'lazy'} />
+            <span class="stance">{d.stance}</span>
+            <h2>{d.name}</h2>
+            <p>{d.blurb}</p>
+            <p class="cart"><span>Cart</span>{d.cart}</p>
+            <span class="go">Open direction &rarr;</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <section class="notes">
+      <h2 class="notes-h">What all three are correcting</h2>
+      <ol class="notes-list">
+        <li>
+          <strong>Orientation before vocabulary.</strong> The current site's first
+          substantive sentence is about the permeability of a single-cell-thick
+          membrane, and its product is a coined word. Every direction here answers
+          <em>what this is, what you do, what you get</em> in plain words first, and
+          earns the term of art afterwards.
+        </li>
+        <li>
+          <strong>A ladder you can climb.</strong> One price with no upgrade path
+          became three tiers where each is a strict superset of the one below — which
+          is what lets the cart show you the two lines you are adding instead of
+          swapping in a whole new cart.
+        </li>
+        <li>
+          <strong>Authority built from the corpus.</strong> Persistent bylines and
+          credentials on a real body of work, so a clinician who is shy about
+          thought leadership never has to raise her voice to have one.
+        </li>
+      </ol>
+    </section>
+
+    <nav class="refs">
+      <a href="/articles">Article index</a>
+      <a href="/brand-kit">Brand kit</a>
+      <a href="/design-system">Design system</a>
+    </nav>
+  </main>
+
+  <footer class="foot">
+    <p>Prototype. Illustrative pricing. Not a live storefront.</p>
+  </footer>
+</BaseThemeLayout>
+
+<style>
+  .chrome {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem var(--page-gutter);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .wrap {
+    max-width: var(--page-measure);
+    margin: 0 auto;
+    padding: clamp(3rem, 8vw, 6rem) var(--page-gutter) 4rem;
+  }
+  .eyebrow {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    max-width: 18ch;
+  }
+  .lede {
+    margin: 1.5rem 0 0;
+    max-width: 62ch;
+    font-size: clamp(1.0625rem, 1.6vw, 1.1875rem);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  .stats {
+    list-style: none; margin: 2.5rem 0 0; padding: 1.25rem 0 0;
+    border-top: 1px solid var(--color-rule);
+    display: flex; flex-wrap: wrap; gap: 2.5rem;
+  }
+  .stats li { display: flex; align-items: baseline; gap: 0.5rem; }
+  .stat-v { font-size: 1.375rem; color: var(--color-text); }
+  .stat-l { font-size: 0.8125rem; color: var(--color-text-muted); }
+
+  .grid {
+    list-style: none; margin: 3.5rem 0 0; padding: 0;
+    display: grid; gap: 2.5rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 52rem) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .card a {
+    display: flex; flex-direction: column; gap: 0.6rem;
+    text-decoration: none; color: inherit;
+    padding-bottom: 1.25rem;
+    border-bottom: 2px solid transparent;
+    transition: border-color 180ms ease;
+  }
+  .card a:hover { border-bottom-color: var(--color-primary); }
+  .stance {
+    margin-top: 0.9rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .card h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+  .card p { margin: 0; font-size: 0.9375rem; line-height: 1.6; color: var(--color-text-muted); }
+  .cart { display: flex; gap: 0.5rem; font-size: 0.8125rem !important; }
+  .cart span {
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    flex: 0 0 auto;
+    padding-top: 0.15rem;
+  }
+  .go { margin-top: 0.4rem; font-size: 0.875rem; color: var(--color-primary); }
+
+  .notes {
+    margin-top: 4.5rem; padding-top: 2rem;
+    border-top: 1px solid var(--color-rule);
+  }
+  .notes-h {
+    margin: 0 0 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+  }
+  .notes-list {
+    margin: 0; padding: 0; list-style: none;
+    display: grid; gap: 1.5rem;
+    grid-template-columns: 1fr;
+    counter-reset: n;
+  }
+  @media (min-width: 52rem) { .notes-list { grid-template-columns: repeat(3, 1fr); } }
+  .notes-list li {
+    counter-increment: n;
+    font-size: 0.9375rem; line-height: 1.65;
+    color: var(--color-text-muted);
+    padding-top: 1.75rem;
+    position: relative;
+  }
+  .notes-list li::before {
+    content: counter(n, decimal-leading-zero);
+    position: absolute; top: 0; left: 0;
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    color: var(--color-primary);
+  }
+  .notes-list strong { color: var(--color-text); font-weight: 600; }
+
+  .refs {
+    margin-top: 3rem; padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    display: flex; flex-wrap: wrap; gap: 1.75rem;
+    font-size: 0.875rem;
+  }
+  .refs a { color: var(--color-text-muted); text-decoration: none; }
+  .refs a:hover { color: var(--color-primary); }
+
+  .foot {
+    padding: 2rem var(--page-gutter) 3rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .foot p {
+    margin: 0; max-width: var(--page-measure); margin-inline: auto;
+    font-size: 0.8125rem; color: var(--color-text-faint);
+  }
+</style>

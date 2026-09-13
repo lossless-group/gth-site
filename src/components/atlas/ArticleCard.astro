@@ -1,0 +1,202 @@
+---
+/* ============================================================================
+ * ArticleCard — the plain question leads. Always.
+ *
+ * `plain_question` is what a worried person types into a search box at 1am.
+ * It is the headline. The clinical `title` is demoted to a mono sub-line
+ * labelled "Filed as", which is honest — it IS the filing name — and which
+ * means no card ever presents a term of art as the first thing a reader sees.
+ * ========================================================================== */
+
+interface Props {
+  href: string;
+  index: number;
+  plainQuestion: string;
+  title: string;
+  lede?: string;
+  author?: string;
+  credential?: string;
+  readMinutes?: number;
+  categories?: string[];
+  term?: string;
+  termPlain?: string;
+  variant?: 'featured' | 'row';
+}
+
+const {
+  href,
+  index,
+  plainQuestion,
+  title,
+  lede,
+  author,
+  credential,
+  readMinutes,
+  categories = [],
+  term,
+  termPlain,
+  variant = 'row',
+} = Astro.props;
+---
+
+<article class:list={['art', `art--${variant}`]}>
+  <p class="art__no" aria-hidden="true">{String(index).padStart(2, '0')}</p>
+
+  <div class="art__body">
+    <h3 class="art__q">
+      <a href={href}>{plainQuestion}</a>
+    </h3>
+
+    <p class="art__filed">
+      <span class="art__filed-k">Filed as</span>
+      <span class="art__filed-v">{title}</span>
+    </p>
+
+    {variant === 'featured' && lede && <p class="art__lede">{lede}</p>}
+
+    {variant === 'featured' && term && termPlain && (
+      <p class="art__term">
+        <span class="art__term-v">{term}</span>
+        <span class="art__term-d">{termPlain}</span>
+      </p>
+    )}
+
+    <p class="art__meta">
+      {author && (
+        <span class="art__by">
+          {author}{credential ? <span class="art__cred">{credential}</span> : null}
+        </span>
+      )}
+      {readMinutes ? <span class="art__run">{readMinutes} min read</span> : null}
+      {categories.map((c) => <span class="art__cat">{c}</span>)}
+    </p>
+  </div>
+</article>
+
+<style>
+  .art {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.85rem;
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--color-grid);
+  }
+
+  .art__no {
+    margin: 0;
+    padding-top: 0.35rem;
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-text-faint);
+  }
+
+  .art__body { min-width: 0; }
+
+  .art__q {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+    line-height: 1.22;
+    letter-spacing: -0.014em;
+    text-wrap: balance;
+  }
+  .art__q a {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+  .art__q a:hover { color: var(--color-primary); }
+
+  .art__filed {
+    margin: 0.4rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .art__filed-k {
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    padding-top: 0.08rem;
+  }
+  .art__filed-v { flex: 1 1 14rem; min-width: 0; }
+
+  .art__lede {
+    margin: 0.75rem 0 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 52ch;
+  }
+
+  .art__term {
+    margin: 0.8rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 0.7rem;
+    padding: 0.5rem 0.7rem;
+    border-left: 2px solid var(--color-accent);
+    background: var(--color-surface);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .art__term-v {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+  .art__term-d { flex: 1 1 16rem; min-width: 0; }
+
+  .art__meta {
+    margin: 0.7rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.85rem;
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    color: var(--color-text-faint);
+  }
+  .art__by { color: var(--color-text-muted); }
+  .art__cred {
+    margin-left: 0.4rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .art__run::before,
+  .art__cat::before {
+    content: '';
+    display: inline-block;
+    width: 0.3rem;
+    height: 1px;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    background: var(--color-rule);
+  }
+  .art__cat { text-transform: uppercase; letter-spacing: 0.12em; }
+
+  /* ---------------------------------------------------------- featured -- */
+  .art--featured {
+    padding: 1.4rem;
+    border: 1px solid var(--color-border);
+    border-top: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    background: var(--color-surface);
+    align-content: start;
+    transition: border-color 180ms ease;
+  }
+  .art--featured:hover { border-color: var(--color-primary); }
+  .art--featured .art__q { font-size: clamp(1.2rem, 2.2vw, 1.45rem); }
+</style>

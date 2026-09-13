@@ -1,0 +1,280 @@
+---
+/* ============================================================================
+ * DIRECTION A — "Journal"
+ *
+ * The premise: this is a clinical publication that happens to sell the
+ * instrument its research is built on. Not a brochure with a blog bolted on.
+ * A journal, whose masthead is a practising dentist, and whose shop is one
+ * page at the back.
+ *
+ * That premise is what solves the actual client problem. She is mid-transition
+ * from practitioner to thought leader and is shy about it. Journal never asks
+ * her to be loud: the authority is asserted by the corpus, the bylines and the
+ * credentials, and by the restraint around them.
+ *
+ * Everything below is composition. The colour, the type and the measure all
+ * arrive through Tier 2 semantic tokens set in src/styles/themes/journal.css,
+ * which is why all three modes work without a single mode-specific rule on
+ * this route.
+ * ========================================================================== */
+import { getCollection } from 'astro:content';
+
+import BaseThemeLayout from '../layouts/BaseThemeLayout.astro';
+import JournalStyles from '../components/journal/JournalStyles.astro';
+import Grain from '../components/journal/Grain.astro';
+import Masthead from '../components/journal/Masthead.astro';
+import Opening from '../components/journal/Opening.astro';
+import TerminologyNote from '../components/journal/TerminologyNote.astro';
+import SystemsTable from '../components/journal/SystemsTable.astro';
+import EditorialBoard from '../components/journal/EditorialBoard.astro';
+import Library from '../components/journal/Library.astro';
+import Syllabus from '../components/journal/Syllabus.astro';
+import Offer from '../components/journal/Offer.astro';
+import Correspondence from '../components/journal/Correspondence.astro';
+import Colophon from '../components/journal/Colophon.astro';
+import FigurePlate from '../components/journal/FigurePlate.astro';
+
+import {
+  PRACTITIONERS,
+  DISCLAIMER,
+  TESTIMONIALS,
+  ORIENTATION,
+  CATEGORY_LABELS,
+} from '../lib/site.ts';
+
+/* -------------------------------------------------------------- formatting -- */
+/* Dates are UTC at rest; render them in UTC so a build machine in another
+ * zone cannot walk an issue date backwards by one day. */
+const longDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+const shortDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'short',
+  timeZone: 'UTC',
+});
+const monthYear = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  timeZone: 'UTC',
+});
+
+/* ---------------------------------------------------------------- articles -- */
+const articleEntries = await getCollection('articles');
+
+const articles = articleEntries
+  .map((entry) => ({
+    id: entry.id,
+    href: `/articles/${entry.id}`,
+    /* The rule made visible: the plain question leads. Where an author has
+     * not written one, the clinical title stands in rather than the card
+     * rendering an empty headline. */
+    plainQuestion: entry.data.plain_question ?? entry.data.title,
+    title: entry.data.title,
+    lede: entry.data.lede,
+    author: entry.data.author,
+    credential: entry.data.author_credential,
+    categories: (entry.data.categories ?? []).map(
+      (c: string) => CATEGORY_LABELS[c] ?? c
+    ),
+    readMinutes: entry.data.read_minutes,
+    date: entry.data.date_published,
+    dateline: entry.data.date_published
+      ? shortDate.format(entry.data.date_published)
+      : undefined,
+    termOfArt: entry.data.term_of_art,
+    termPlain: entry.data.term_in_plain_english,
+    featured: entry.data.featured === true,
+  }))
+  .sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
+
+const featured = articles.filter((a) => a.featured);
+const rest = articles.filter((a) => !a.featured);
+
+const totalMinutes = articles.reduce((sum, a) => sum + (a.readMinutes ?? 0), 0);
+
+/* Subject tally for the margin — the corpus described by what it covers. */
+const subjectCounts = new Map<string, number>();
+for (const a of articles) {
+  for (const c of a.categories) {
+    subjectCounts.set(c, (subjectCounts.get(c) ?? 0) + 1);
+  }
+}
+const subjects = [...subjectCounts.entries()]
+  .map(([label, count]) => ({ label, count }))
+  .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+
+const dated = articles.filter((a) => a.date).map((a) => a.date as Date);
+const newest = dated.length ? dated[0] : undefined;
+const oldest = dated.length ? dated[dated.length - 1] : undefined;
+const span =
+  oldest && newest
+    ? `${monthYear.format(oldest)} – ${monthYear.format(newest)}`
+    : 'In progress';
+
+/* ------------------------------------------------------------------ series -- */
+const seriesEntries = await getCollection('series');
+const episodes = seriesEntries
+  .map((entry) => ({
+    id: entry.id,
+    order: entry.data.order,
+    title: entry.data.title,
+    promise: entry.data.promise,
+    runtimeMinutes: entry.data.runtime_minutes,
+    discoveries: entry.data.discoveries ?? [],
+    featuring: entry.data.featuring ?? [],
+    free: entry.data.free === true,
+  }))
+  .sort((a, b) => a.order - b.order);
+
+const totalRuntime = episodes.reduce((s, e) => s + (e.runtimeMinutes ?? 0), 0);
+
+/* ----------------------------------------------------------------- bundles -- */
+const bundles = (await getCollection('bundles')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const priceFrom = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+}).format(Math.min(...bundles.map((b) => b.data.price)));
+
+/* ------------------------------------------------------------------ chrome -- */
+const issue = 'Vol. I, No. 1';
+const issueDate = newest ? longDate.format(newest) : longDate.format(new Date());
+
+/* -------------------------------------------------------------- the people -- */
+const board = [
+  PRACTITIONERS.dental,
+  PRACTITIONERS.medical,
+  PRACTITIONERS.hygiene,
+].map((p) => ({
+  name: p.name,
+  credential: p.credential,
+  role: p.role,
+  focus: p.focus,
+}));
+
+/* Footnote marks, expanded once at the foot of the masthead listing. */
+const credentialGlossary = [
+  { mark: 'DDS', expansion: 'Doctor of Dental Surgery' },
+  { mark: 'OMD', expansion: 'Doctor of Oriental Medicine' },
+  {
+    mark: 'BSDH, RDH, EFDA',
+    expansion:
+      'Bachelor of Science in Dental Hygiene; Registered Dental Hygienist; Expanded Functions Dental Assistant',
+  },
+];
+
+/* ------------------------------------------------------- why it matters ---- */
+/* Client copy, verbatim. Not ours to rewrite. */
+const systems = [
+  {
+    numeral: 'I',
+    name: 'Immune Function',
+    claim:
+      'The majority of our immune system lines our gut. A leaky gut creates chaos and autoimmunity.',
+  },
+  {
+    numeral: 'II',
+    name: 'Mental Wellbeing',
+    claim: 'The downstream effects lead to mental health issues and brain fog.',
+  },
+  {
+    numeral: 'III',
+    name: 'Digestive Health',
+    claim:
+      'Our ability to digest and assimilate food is tied to our microbiome and gut ecology.',
+  },
+];
+
+/* ------------------------------------------------------------ the contents -- */
+const contents = [
+  { href: '#evidence', label: 'Why it matters', value: '3 systems' },
+  { href: '#board', label: 'Masthead', value: `${board.length} named` },
+  { href: '#library', label: 'The library', value: `${articles.length} entries` },
+  {
+    href: '#series',
+    label: 'The series',
+    value: `${episodes.length} ${episodes.length === 1 ? 'part' : 'parts'}`,
+  },
+  { href: '#panel', label: 'The panel', value: `from ${priceFrom}` },
+  {
+    href: '#correspondence',
+    label: 'Correspondence',
+    value: `${TESTIMONIALS.length} letters`,
+  },
+];
+---
+
+<BaseThemeLayout
+  title="Threshold — a clinical journal of the mouth and the gut"
+  description="Your mouth is full of bacteria. Some protect you; some quietly make you ill. Spit in a tube at home, mail it back, and get a report naming which ones you have — plus a dentist who explains what to do about it."
+  theme="journal"
+  mode="light"
+>
+  <div class="jr-page">
+    <Grain />
+
+    <Masthead
+      issue={issue}
+      issueDate={issueDate}
+      editorialLine="A clinical publication about the mouth, the gut, and what travels between them — written by the dentists and doctors who read the results."
+    />
+
+    <main id="main">
+      <Opening
+        what={ORIENTATION.what}
+        doThis={ORIENTATION.do}
+        getThis={ORIENTATION.get}
+        contents={contents}
+      />
+
+      <TerminologyNote sentence={ORIENTATION.then_the_term} coined="Orobiome" />
+
+      <FigurePlate
+        src="/img/illustration__Threshold--Colony.jpg"
+        alt="A dense field of rounded microorganisms among fine filaments, drawn in ink hatching."
+        ratio="16 / 9"
+        number="I"
+        title="The colony, at the gumline"
+        legend="Several hundred species, in proportions that differ from one mouth to the next. The panel measures which ones, and how much of each."
+      />
+
+      <SystemsTable systems={systems} />
+
+      <EditorialBoard people={board} glossary={credentialGlossary} />
+
+      <Library
+        featured={featured}
+        rest={rest}
+        total={articles.length}
+        totalMinutes={totalMinutes}
+        subjects={subjects}
+        span={span}
+      />
+
+      <Syllabus episodes={episodes} totalRuntime={totalRuntime} />
+
+      <FigurePlate
+        src="/img/illustration__Threshold--Vial.jpg"
+        alt="A small sealed laboratory collection vial standing upright, drawn in ink hatching."
+        ratio="3 / 2"
+        number="II"
+        title="What arrives in the post"
+        legend="One tube. Four minutes, before you brush. Everything on the next page proceeds from what is in it."
+      />
+
+      <Offer tiers={bundles.map((b) => b.data)} priceFrom={priceFrom} />
+
+      <Correspondence letters={[...TESTIMONIALS]} />
+    </main>
+
+    <Colophon disclaimer={DISCLAIMER} issue={issue} issueDate={issueDate} />
+  </div>
+
+  <JournalStyles />
+</BaseThemeLayout>

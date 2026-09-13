@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@source "../../src/**/*.astro";
+@source "../../src/**/*.svelte";
+@source "../../src/**/*.ts";
+
+/* Per-direction Tier 2 semantic token blocks. Each file owns exactly one
+ * [data-theme="..."] plus its three [data-mode="..."] blocks and nothing else. */
+@import "./themes/journal.css";
+@import "./themes/atlas.css";
+@import "./themes/practice.css";
+
+/* ============================================================================
+ * TIER 1 — NAMED TOKENS. Raw values only, BEM-ish `__` separator.
+ *
+ * NEVER read a `__` token from a component or a Tailwind utility. The only
+ * files permitted to reference these are src/styles/themes/*.css.
+ * See: Maintain-Themes-Mode-Across-CSS-Tailwind.md §2.1
+ *
+ * The first three are the client's actual brand, extracted from the live site
+ * (green appeared 24x, blue 7x, both hard-coded on buttons). Everything after
+ * is a per-direction extension. The green survives into every direction --
+ * it is the one genuinely ownable thing the old site had -- but it is demoted
+ * from "colour of all buttons" to "the colour of living things."
+ * ========================================================================== */
+:root {
+  /* -- Extracted brand (live site, 2026-09-11) -- */
+  --color__signal-green:      #43B900;
+  --color__gateway-blue:      #2D7FC0;
+  --color__gateway-blue-deep: #1B679B;
+
+  /* -- Direction A - Journal: bone, ink, clinical green, oxblood -- */
+  --color__bone:              #F7F4ED;
+  --color__bone-warm:         #EFE9DD;
+  --color__bone-shadow:       #DED7C7;
+  --color__ink-slate:         #16211E;
+  --color__ink-deep:          #0B1311;
+  --color__clinical-green:    #1F4D3D;
+  --color__clinical-lit:      #2E7A5F;
+  --color__sage-pale:         #A9BFB2;
+  --color__oxblood:           #8C3A2B;
+  --color__void-green:        #04120C;
+
+  /* -- Direction B - Atlas: petrol, teal, cool bone, amber -- */
+  --color__petrol:            #06262E;
+  --color__petrol-deep:       #041A20;
+  --color__teal-mid:          #0E4A56;
+  --color__teal-lit:          #2393A6;
+  --color__teal-ice:          #8FD8E2;
+  --color__bone-cool:         #E8EFEE;
+  --color__amber-warn:        #E2A03C;
+  --color__void-teal:         #01141A;
+
+  /* -- Direction C - Practice: sand, terracotta, sage, umber -- */
+  --color__sand:              #F5EDE3;
+  --color__sand-deep:         #E7DACA;
+  --color__sand-shadow:       #D3C2AD;
+  --color__terracotta:        #B4573A;
+  --color__terracotta-lit:    #D97A56;
+  --color__sage-deep:         #5E7A63;
+  --color__sage-lit:          #8FAE93;
+  --color__umber:             #2B2724;
+  --color__umber-deep:        #1A1715;
+  --color__void-plum:         #150E12;
+
+  /* -- Vibrant-only phosphors. Loud on purpose, dark-ground only. -- */
+  --color__neon-lime:         #8FFF3D;
+  --color__neon-cyan:         #3DF0FF;
+  --color__neon-coral:        #FF6B4A;
+  --color__neon-magenta:      #FF3DA5;
+
+  /* -- Neutrals -- */
+  --color__white:             #FFFFFF;
+  --color__black:             #000000;
+  --color__grey-100:          #ECEFEE;
+  --color__grey-400:          #9AA5A2;
+  --color__grey-700:          #4A5553;
+
+  /* -- Type families --
+   * One display face per direction so the three read as different publications
+   * rather than three skins of one. Inter and Plex Mono are shared utility. */
+  --font__newsreader:    'Newsreader', 'Iowan Old Style', Georgia, serif;
+  --font__archivo:       'Archivo', 'Helvetica Neue', system-ui, sans-serif;
+  --font__fraunces:      'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font__inter:         'Inter', system-ui, -apple-system, sans-serif;
+  --font__karla:         'Karla', system-ui, -apple-system, sans-serif;
+  --font__plex-mono:     'IBM Plex Mono', 'SF Mono', ui-monospace, monospace;
+}
+
+/* ============================================================================
+ * Global ground + motion contract
+ * ========================================================================== */
+html {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+html.theme-transition,
+html.theme-transition * {
+  transition: background-color 260ms ease, color 260ms ease, border-color 260ms ease;
+}
+
+body {
+  background-color: var(--color-background);
+  min-height: 100vh;
+  /* Nothing on this site is allowed to bleed horizontally.
+   * See: Guarantee-Text-Wrapping-and-No-Horizontal-Bleed-at-Any-Width.md */
+  overflow-x: hidden;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+img, svg, video { max-width: 100%; height: auto; }
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Screen-reader-only, used by every direction's skip link. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* Every animated component must honour this. Static fallback, no exceptions. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Numbers are never set in the body face -- prices, values, deltas, runtimes. */
+.tabular {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}

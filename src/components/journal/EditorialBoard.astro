@@ -1,0 +1,142 @@
+---
+/* ============================================================================
+ * EditorialBoard — the people, set as a journal's masthead listing.
+ *
+ * This is the section that has to carry the client's authority without asking
+ * her to perform it. So: no photographs, no "meet the team", no first-person
+ * bio. Names, post-nominals, the chair each holds, and the field each works
+ * in — the same four facts a real masthead gives, in the same order, with the
+ * credentials set as footnote marks and expanded once at the foot.
+ * ========================================================================== */
+import SectionHead from './SectionHead.astro';
+
+export interface Props {
+  people: { name: string; credential: string; role: string; focus: string }[];
+  /** Post-nominal → what it actually stands for. Rendered as the footnote. */
+  glossary: { mark: string; expansion: string }[];
+}
+
+const { people, glossary } = Astro.props;
+---
+
+<section class="jr-section" id="board" aria-labelledby="board-title">
+  <div class="jr-sheet">
+    <SectionHead
+      num="02"
+      eyebrow="Masthead"
+      title="Who reads your results"
+      titleId="board-title"
+      standfirst="Every report published here is read by a licensed clinician before it reaches you, and every article carries the byline of the person who is accountable for it."
+      meta={`${people.length} named`}
+    />
+
+    <ol class="board">
+      {
+        people.map((p) => (
+          <li class="member">
+            <h3 class="name">
+              {p.name}
+              <sup class="mark tabular">{p.credential}</sup>
+            </h3>
+            <p class="role jr-eyebrow">{p.role}</p>
+            <p class="focus">{p.focus}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <!-- The footnote the credential marks point at. Used once on the page. -->
+    <dl class="glossary" aria-label="Credentials in full">
+      {
+        glossary.map((g) => (
+          <div class="gloss-row">
+            <dt class="tabular">{g.mark}</dt>
+            <dd>{g.expansion}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .board {
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .member {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem 1.5rem;
+    padding-block: clamp(1.25rem, 3vw, 1.75rem);
+    border-bottom: 1px solid var(--color-grid);
+    align-items: baseline;
+  }
+  @media (min-width: 52rem) {
+    .member {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) minmax(0, 1fr);
+      column-gap: clamp(1.5rem, 4vw, 3rem);
+    }
+  }
+
+  .name {
+    font-size: clamp(1.25rem, 2.4vw, 1.5rem);
+    line-height: 1.2;
+    min-width: 0;
+  }
+
+  .mark {
+    font-size: 0.5em;
+    letter-spacing: 0.08em;
+    margin-left: 0.4em;
+    color: var(--color-primary);
+    vertical-align: super;
+    line-height: 0;
+    white-space: nowrap;
+  }
+
+  .role {
+    color: var(--color-text);
+    min-width: 0;
+  }
+
+  .focus {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    min-width: 0;
+  }
+
+  /* ----------------------------------------------------------- footnote -- */
+  .glossary {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    max-width: var(--measure-prose);
+  }
+
+  .gloss-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem 0.85rem;
+  }
+  @media (min-width: 38rem) {
+    .gloss-row {
+      grid-template-columns: 9.5rem minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+
+  .gloss-row dt {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+  }
+  .gloss-row dd {
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--color-text-faint);
+  }
+</style>

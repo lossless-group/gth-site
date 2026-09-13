@@ -1,0 +1,126 @@
+---
+/* ============================================================================
+ * PortraitFrame — a warm placeholder where a real photograph goes.
+ *
+ * There is no photography for this prototype, and the two wrong answers are
+ * (a) hotlinking a stranger's face and (b) leaving a grey box. So this is a
+ * deliberately finished-looking object: an arched frame, a tonal wash built
+ * from the theme's own tokens, and a monogram set in the display face.
+ *
+ * It is labelled in two places so the client cannot mistake it for a design
+ * decision: a visible caption under the frame, and the accessible name on the
+ * frame itself. Replacing it should be a one-line swap for an <img>.
+ *
+ * Pure CSS. No image request, no external asset, nothing to 404.
+ * ========================================================================== */
+
+export interface Props {
+  name: string;
+  initials: string;
+  /* `lead` is the large portrait; `support` is the small one in a row. */
+  variant?: 'lead' | 'support';
+  /* The visible "a photo goes here" caption. Off for the small ones, where the
+   * single caption on the lead portrait already makes the point. */
+  note?: boolean;
+}
+
+const { name, initials, variant = 'support', note = false } = Astro.props;
+---
+
+<figure class={`portrait portrait--${variant}`}>
+  <div
+    class="frame"
+    role="img"
+    aria-label={`Placeholder portrait frame for ${name}. A commissioned photograph will replace this.`}
+  >
+    <span class="wash" aria-hidden="true"></span>
+    <span class="ring" aria-hidden="true"></span>
+    <span class="monogram" aria-hidden="true">{initials}</span>
+  </div>
+
+  {
+    note && (
+      <figcaption class="note">
+        Photograph pending — a commissioned portrait of {name} sits in this
+        frame.
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  .portrait { margin: 0; }
+
+  .frame {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    /* The arch: a rounded top, a settled bottom. Reads as a framed portrait
+       rather than as a missing image. */
+    border-radius: 999px 999px var(--radius-control) var(--radius-control);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .portrait--lead .frame { aspect-ratio: 4 / 5; }
+  .portrait--support .frame { aspect-ratio: 1 / 1; width: 5.5rem; }
+
+  /* Soft tonal wash — warm at the top where the light would be. */
+  .wash {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(
+        120% 80% at 50% 8%,
+        var(--color-primary-soft) 0%,
+        transparent 62%
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-surface-raised) 70%, transparent) 0%,
+        transparent 70%
+      );
+  }
+
+  /* One faint concentric line, so the frame has a made object's detail in it
+     instead of reading as an empty field. */
+  .ring {
+    position: absolute;
+    inset: 0.6rem;
+    z-index: 1;
+    border: 1px solid var(--color-grid);
+    border-radius: 999px 999px calc(var(--radius-control) * 0.6) calc(var(--radius-control) * 0.6);
+  }
+
+  .monogram {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144;
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    /* The only --color-text-faint in this direction. Everything else that was
+     * once faint has been promoted to --color-text-muted, because on the warm
+     * sand-deep surface the faint tier cannot clear AA and every other use of
+     * it carried real meaning. A monogram standing in for a photograph is the
+     * one thing here that is genuinely decorative. */
+    color: var(--color-text-faint);
+    user-select: none;
+  }
+  .portrait--lead .monogram { font-size: clamp(3.5rem, 12vw, 6rem); }
+  .portrait--support .monogram { font-size: 1.75rem; }
+
+  .note {
+    margin: 0.85rem 0 0;
+    max-width: 34ch;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+</style>

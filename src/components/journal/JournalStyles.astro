@@ -1,0 +1,123 @@
+---
+/* ============================================================================
+ * JournalStyles — the page furniture for Direction A.
+ *
+ * A publication has ONE set of column rules, one eyebrow, one measure. Rather
+ * than restate them in eleven scoped blocks, they live here once. Everything
+ * is prefixed `jr-` so nothing can collide with a sibling direction, and this
+ * file only ships on the route that imports it.
+ *
+ * Tier 2 semantic tokens only. No `__` token, no hex, anywhere below.
+ * ========================================================================== */
+---
+
+<style is:global>
+  /* --------------------------------------------------------------- shell -- */
+  /* The page column. Centred, but everything INSIDE it hangs off the left
+   * edge — the asymmetry is internal, which is what a printed page does. */
+  .jr-sheet {
+    width: 100%;
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  /* -------------------------------------------------------------- typeset -- */
+  .jr-page {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Tailwind preflight flattens headings and strips lists. Restate the
+   * publication's own defaults at a specificity that clears it (0,1,1). */
+  .jr-page h1,
+  .jr-page h2,
+  .jr-page h3,
+  .jr-page h4 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: -0.011em;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
+  }
+
+  .jr-page p,
+  .jr-page dl,
+  .jr-page dd,
+  .jr-page dt,
+  .jr-page figure,
+  .jr-page blockquote {
+    margin: 0;
+  }
+
+  .jr-page ul,
+  .jr-page ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .jr-page a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .jr-page :is(p, li, dd) {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  /* --------------------------------------------------------------- devices -- */
+  /* The small-caps eyebrow. One typeface, one size, used everywhere a section
+   * needs naming — repetition is what makes it read as apparatus. */
+  .jr-eyebrow {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+
+  .jr-measure { max-width: var(--measure-prose); }
+  .jr-note    { max-width: var(--measure-note); }
+
+  /* Body copy at editorial scale. Used for any run of real prose. */
+  .jr-lede {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 1.6vw, 1.3125rem);
+    line-height: 1.62;
+    color: var(--color-text);
+  }
+
+  /* --------------------------------------------------------------- columns -- */
+  /* Body column plus a narrow right margin for apparatus: contents lists,
+   * marginal notes, pull quotes. Collapses to one column with the margin
+   * material following the prose it annotates. */
+  .jr-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 3rem);
+    align-items: start;
+  }
+  @media (min-width: 62rem) {
+    .jr-cols {
+      grid-template-columns: minmax(0, 1fr) 16rem;
+      gap: clamp(2.5rem, 6vw, 5rem);
+    }
+  }
+
+  /* --------------------------------------------------------------- section -- */
+  /* Sections are separated by rules and air, never by cards. */
+  .jr-section {
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+  }
+  .jr-section + .jr-section {
+    border-top: 1px solid var(--color-grid);
+  }
+</style>

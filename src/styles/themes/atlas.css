@@ -1,0 +1,162 @@
+/* ============================================================================
+ * DIRECTION B — "Atlas" · theme slug `atlas`
+ *
+ * TIER 2 semantic tokens. kebab-case only. Tier 1 `--color__*` / `--font__*`
+ * live in global.css and may be referenced ONLY from inside this file.
+ * No component under src/components/atlas/ reads a `__` token.
+ *
+ * The premise: the page is an anatomical plate. One axis runs top to bottom —
+ * mouth, throat, stomach, small intestine, colon — and every section docks to
+ * a stop on it. Scrolling is travelling down the tract. The client's whole
+ * thesis ("the gut begins in the mouth") is therefore carried by the STRUCTURE
+ * of the page, not only by its sentences.
+ *
+ * ---------------------------------------------------------------------------
+ * THE COLOUR GRAMMAR — one line, and it is held everywhere:
+ *
+ *   --color-primary  = ALIVE.    Bacteria, tissue, anything biological, and
+ *                                the actions that get you a reading of it.
+ *                                This is the client's real brand green.
+ *   --color-accent   = HARMFUL.  Amber. The strains we are looking for, the
+ *                                flagged row, the thing to act on.
+ *   everything else  = the INSTRUMENT. Petrol and teal are the ground and the
+ *                                rules; cool bone is the ink. Structure never
+ *                                borrows the colour of biology.
+ *
+ * A reader can therefore decode the diagram without reading the legend, and
+ * the legend just confirms what they already guessed. That is the point: an
+ * atlas that makes a worried person feel oriented, not outclassed.
+ *
+ * ---------------------------------------------------------------------------
+ * THE TOKEN CONTRACT. Identical set to journal.css and practice.css.
+ *
+ *   type      --font-display  --font-body  --font-data  --font-eyebrow
+ *   ground    --color-background  --color-surface  --color-surface-raised
+ *   ink       --color-text  --color-text-muted  --color-text-faint
+ *   signal    --color-primary  --color-primary-soft  --color-accent
+ *   lines     --color-border  --color-rule  --color-grid
+ *   shape     --radius-control  --page-measure  --page-gutter
+ *   effects   --fx-grain-opacity  --fx-glow-opacity
+ *
+ * Plus four direction-local geometry tokens (`--atlas-*`) that describe the
+ * rail, not the palette. They are mode-invariant and live with the type block.
+ *
+ * Mode intent
+ *   light   — the plate printed on cool bone stock. Petrol ink, hairline
+ *             rules. Green and amber are darkened so they hold contrast on a
+ *             pale ground without ceasing to be green and amber.
+ *   dark    — the AUTHORED DEFAULT. An atlas of the interior is a lit
+ *             instrument in a dark room; the brand green finally sits at full
+ *             strength because the ground can carry it.
+ *   vibrant — the same interior under a fluorescence scope. DARK-BASED; every
+ *             ground, surface, text and border is set explicitly so nothing
+ *             inherits from light. Green becomes lime, amber becomes coral —
+ *             the grammar survives, the register gets louder.
+ * ========================================================================== */
+
+[data-theme="atlas"] {
+  /* Archivo set tight is a grotesque with enough width variation to carry a
+   * display line, and no warmth to it — the voice of a plate caption rather
+   * than of an essay. Plex Mono does ALL the labelling: node names, figure
+   * numbers, runtimes, measurements, axis ticks. That split is what makes
+   * this read as an atlas instead of as a brochure. */
+  --font-display:  var(--font__archivo);
+  --font-body:     var(--font__inter);
+  --font-data:     var(--font__plex-mono);
+  --font-eyebrow:  var(--font__plex-mono);
+
+  --radius-control: 0.1875rem;   /* instrument panels are barely radiused */
+  --page-measure:   78rem;       /* wide enough that the rail costs nothing */
+  --page-gutter:    clamp(1.1rem, 4vw, 3.5rem);
+
+  /* -- rail geometry (direction-local, not part of the shared contract) -- */
+  --atlas-rail:   2.5rem;   /* width of the axis column                    */
+  --atlas-tube-x: 1rem;     /* x of the tube centre inside that column     */
+  --atlas-tube-w: 0.6rem;   /* distance between the two tube walls         */
+  --atlas-node:   1.375rem; /* node glyph box                              */
+}
+
+@media (min-width: 64rem) {
+  [data-theme="atlas"] {
+    --atlas-rail:   11rem;
+    --atlas-tube-x: 1.75rem;
+    --atlas-tube-w: 1.1rem;
+    --atlas-node:   2.25rem;
+  }
+}
+
+/* --------------------------------------------------------------- light --- */
+/* The plate printed. Cool bone stock, petrol ink. */
+[data-theme="atlas"][data-mode="light"] {
+  --color-background:     var(--color__bone-cool);
+  --color-surface:        color-mix(in srgb, var(--color__petrol) 7%, var(--color__bone-cool));
+  --color-surface-raised: var(--color__white);
+
+  --color-text:           var(--color__petrol);
+  --color-text-muted:     color-mix(in srgb, var(--color__petrol) 64%, var(--color__bone-cool));
+  --color-text-faint:     color-mix(in srgb, var(--color__petrol) 38%, var(--color__bone-cool));
+
+  /* Raw signal green reads at ~2.2:1 on bone — unusable as ink. Deepened
+   * toward petrol it clears AA and is still unmistakably the same green. */
+  --color-primary:        color-mix(in srgb, var(--color__signal-green) 66%, var(--color__petrol));
+  --color-primary-soft:   color-mix(in srgb, var(--color__signal-green) 18%, transparent);
+  --color-accent:         color-mix(in srgb, var(--color__amber-warn) 72%, var(--color__petrol));
+
+  --color-border:         color-mix(in srgb, var(--color__teal-mid) 30%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__teal-mid) 55%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__teal-mid) 15%, transparent);
+
+  --fx-grain-opacity: 0.03;
+  --fx-glow-opacity:  0;
+}
+
+/* ---------------------------------------------------------------- dark --- */
+/* The authored default for this direction. */
+[data-theme="atlas"][data-mode="dark"] {
+  --color-background:     var(--color__petrol-deep);
+  --color-surface:        var(--color__petrol);
+  --color-surface-raised: color-mix(in srgb, var(--color__teal-mid) 42%, var(--color__petrol));
+
+  --color-text:           var(--color__bone-cool);
+  --color-text-muted:     color-mix(in srgb, var(--color__teal-ice) 74%, var(--color__petrol-deep));
+  --color-text-faint:     color-mix(in srgb, var(--color__teal-ice) 46%, var(--color__petrol-deep));
+
+  /* On petrol-deep the brand green clears 7:1 unmodified. Use it raw — this
+   * is the one mode where the client's actual colour needs no apology. */
+  --color-primary:        var(--color__signal-green);
+  --color-primary-soft:   color-mix(in srgb, var(--color__signal-green) 24%, transparent);
+  --color-accent:         var(--color__amber-warn);
+
+  --color-border:         color-mix(in srgb, var(--color__teal-lit) 32%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__teal-lit) 58%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__teal-lit) 18%, transparent);
+
+  --fx-grain-opacity: 0.05;
+  --fx-glow-opacity:  0.22;
+}
+
+/* ------------------------------------------------------------- vibrant --- */
+/* DARK-BASED. Ground, surface, text and border are all set here so that a
+ * viewer arriving from light mode never sees one frame of pale ground. */
+[data-theme="atlas"][data-mode="vibrant"] {
+  --color-background:     var(--color__void-teal);
+  --color-surface:        color-mix(in srgb, var(--color__teal-mid) 36%, var(--color__void-teal));
+  --color-surface-raised: color-mix(in srgb, var(--color__teal-lit) 30%, var(--color__void-teal));
+
+  --color-text:           var(--color__white);
+  --color-text-muted:     color-mix(in srgb, var(--color__neon-cyan) 60%, var(--color__teal-ice));
+  --color-text-faint:     color-mix(in srgb, var(--color__neon-cyan) 42%, transparent);
+
+  /* The grammar is unchanged; only the register is louder. Alive goes lime,
+   * harmful goes coral — amber is invisible next to a phosphor cyan rule. */
+  --color-primary:        var(--color__neon-lime);
+  --color-primary-soft:   color-mix(in srgb, var(--color__neon-lime) 26%, transparent);
+  --color-accent:         var(--color__neon-coral);
+
+  --color-border:         color-mix(in srgb, var(--color__neon-cyan) 34%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__neon-cyan) 62%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__neon-cyan) 18%, transparent);
+
+  --fx-grain-opacity: 0.07;
+  --fx-glow-opacity:  0.6;
+}

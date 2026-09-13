@@ -1,0 +1,418 @@
+---
+/* ============================================================================
+ * SymptomEntry — the hero, and the whole argument of Direction C.
+ *
+ * The site this replaces opened with "the gut lining is a single cell layer
+ * thick and its permeability can cause a whole host of chronic ailments", and
+ * then sold something called an Orobiome panel. Both of those sentences assume
+ * the reader already knows why they are here.
+ *
+ * They don't. They are here because their gums bleed and they are tired.
+ *
+ * So the order is: RECOGNISE yourself → then be told these are readings from
+ * one system → then, and only then, get the orientation spine (what this is /
+ * what you do / what you get back). The coined word does not appear on this
+ * component at all; TheTerm.astro introduces it afterwards, once it has
+ * something to name.
+ *
+ * The checklist is a recognition device, not a quiz and not a funnel:
+ *   - nothing on the page is gated behind ticking anything
+ *   - it works with JavaScript disabled (the boxes still tick; the summary
+ *     line just keeps its written-in fallback sentence)
+ *   - the tiny inline script only rewrites one sentence
+ * ========================================================================== */
+import { ORIENTATION, PRACTITIONERS } from '../../lib/site';
+
+/* Lifted from the complaints the client's own copy leads with. Kept in the
+ * first person, because that is how they arrive in the chair. */
+const SYMPTOMS = [
+  'I wake up tired after a full night in bed.',
+  'My gums bleed when I brush or floss.',
+  'My breath is bad, and brushing does not fix it.',
+  'It is cavity after cavity, and I do brush.',
+  'I feel drained, and there is no obvious reason.',
+  'My gut will not settle, whatever I cut out.',
+];
+
+const FALLBACK_TALLY =
+  'Tick them or do not — the page reads the same either way. They are listed because most people arrive with three or four of them and assume they are three or four separate problems.';
+
+const SPINE = [
+  { label: 'What this is', body: ORIENTATION.what },
+  { label: 'What you do', body: ORIENTATION.do },
+  { label: 'What you get back', body: ORIENTATION.get },
+];
+
+const her = PRACTITIONERS.dental;
+---
+
+<section class="entry" aria-labelledby="entry-title">
+  <div class="wrap">
+    <p class="eyebrow">Start here</p>
+
+    <h1 id="entry-title">
+      If nobody has been able to tell you why you feel like this,{' '}
+      <em>start with your mouth.</em>
+    </h1>
+
+    <p class="lede">
+      I am a dentist. Twenty years of looking in mouths taught me that the mouth
+      is usually reporting on the rest of the body — and that almost nobody is
+      reading the report.
+    </p>
+
+    <!-- ------------------------------------------------ the recognition -->
+    <div class="check">
+      <h2 class="check-title">Any of these sound like you?</h2>
+
+      <ul class="symptoms" id="symptom-list">
+        {
+          SYMPTOMS.map((text) => (
+            <li>
+              <label class="sx">
+                <input type="checkbox" class="sx-input" />
+                <span class="sx-box" aria-hidden="true" />
+                <span class="sx-text">{text}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="tally" id="symptom-tally" data-rest={FALLBACK_TALLY} aria-live="polite">
+        {FALLBACK_TALLY}
+      </p>
+
+      <p class="turn">
+        Here is the part nobody told you: those are not six complaints. They are
+        six readings from the same place. Your mouth is the top of your digestive
+        tract, and it is full of bacteria — some of which protect you, and some
+        of which quietly make you ill.
+      </p>
+    </div>
+
+    <!-- -------------------------------------------------- the whole thing -->
+    <div class="spine" id="what">
+      <h2 class="spine-title">So, plainly, before any of the words get long:</h2>
+      <ol class="steps">
+        {
+          SPINE.map((step, i) => (
+            <li class="step">
+              <span class="step-n tabular">{i + 1}</span>
+              <span class="step-body">
+                <span class="step-label">{step.label}</span>
+                <span class="step-text">{step.body}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <p class="close">
+        That is the entire thing. If you stop reading here, you already know what
+        we do.
+      </p>
+
+      <p class="sign">
+        <span class="sign-name">{her.name}</span>
+        <span class="sign-cred">{her.credential} &middot; {her.focus}</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  /* Rewrites exactly one sentence. If this never runs, the sentence already in
+   * the HTML is a complete, true thing to say. */
+  (function () {
+    var list = document.getElementById('symptom-list');
+    var tally = document.getElementById('symptom-tally');
+    if (!list || !tally) return;
+
+    var WORD = ['none', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+
+    list.addEventListener('change', function () {
+      var n = list.querySelectorAll('input[type="checkbox"]:checked').length;
+      if (n === 0) {
+        tally.textContent = tally.getAttribute('data-rest') || '';
+      } else if (n === 1) {
+        tally.textContent =
+          'One is enough to be worth looking at. In my experience it rarely stays one.';
+      } else {
+        var w = WORD[n] || String(n);
+        tally.textContent =
+          w +
+          ' of them. That is not ' +
+          w.toLowerCase() +
+          ' separate problems — it is one system, read ' +
+          w.toLowerCase() +
+          ' ways.';
+      }
+    });
+  })();
+</script>
+
+<style>
+  .entry {
+    padding-block: clamp(2.5rem, 7vw, 5rem) clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 20ch;
+    font-family: var(--font-display);
+    /* Fraunces at full optical size and a soft weight: the display face doing
+     * warmth rather than authority. Never all-caps, never condensed. */
+    font-variation-settings: 'opsz' 144;
+    font-weight: 380;
+    font-size: clamp(2.1rem, 6.2vw, 4rem);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--color-primary);
+  }
+
+  .lede {
+    margin: 1.4rem 0 0;
+    max-width: 46ch;
+    font-size: clamp(1.0625rem, 1.9vw, 1.25rem);
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+
+  /* ------------------------------------------------------------ check -- */
+  .check {
+    margin-top: clamp(2.25rem, 5vw, 3.25rem);
+    padding: clamp(1.25rem, 3.5vw, 2rem);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .check-title {
+    margin: 0 0 1.1rem;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 96;
+    font-weight: 460;
+    font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+    line-height: 1.25;
+    color: var(--color-text);
+  }
+
+  .symptoms {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  @media (min-width: 44rem) {
+    .symptoms { grid-template-columns: 1fr 1fr; gap: 0.5rem 0.75rem; }
+  }
+
+  .sx {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.7rem 0.95rem;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    background: var(--color-background);
+    transition: border-color 160ms ease, background-color 160ms ease;
+  }
+  .sx:hover { border-color: var(--color-primary); }
+  .sx:has(.sx-input:checked) {
+    background: var(--color-primary-soft);
+    border-color: var(--color-primary);
+  }
+
+  /* Visually hidden but still a real, focusable checkbox. */
+  .sx-input {
+    position: absolute;
+    width: 1px; height: 1px;
+    opacity: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  .sx-box {
+    flex: 0 0 auto;
+    position: relative;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.15rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: 0.45rem;
+    background: transparent;
+    transition: background-color 160ms ease, border-color 160ms ease;
+  }
+  /* Sibling selectors, not :has() — these are the load-bearing state cues and
+     must work even where :has() does not. */
+  .sx-input:checked ~ .sx-box {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+  .sx-box::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 0.3rem;
+    height: 0.58rem;
+    border: solid var(--color-background);
+    border-width: 0 2px 2px 0;
+    transform: translateY(-0.06rem) rotate(45deg) scale(0.6);
+    opacity: 0;
+    transition: opacity 140ms ease, transform 140ms ease;
+  }
+  .sx-input:checked ~ .sx-box::after {
+    opacity: 1;
+    transform: translateY(-0.06rem) rotate(45deg) scale(1);
+  }
+  .sx-input:focus-visible ~ .sx-box {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+
+  .sx-text {
+    font-size: 0.9875rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    transition: color 160ms ease;
+  }
+  .sx-input:checked ~ .sx-text { color: var(--color-text); }
+
+  .tally {
+    margin: 1.1rem 0 0;
+    max-width: 62ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .turn {
+    margin: 1.4rem 0 0;
+    padding-top: 1.4rem;
+    max-width: 58ch;
+    border-top: 1px solid var(--color-grid);
+    font-size: clamp(1rem, 1.7vw, 1.125rem);
+    line-height: 1.62;
+    color: var(--color-text);
+  }
+
+  /* ------------------------------------------------------------ spine -- */
+  .spine { margin-top: clamp(2.5rem, 6vw, 4rem); scroll-margin-top: 2rem; }
+
+  .spine-title {
+    margin: 0 0 1.5rem;
+    max-width: 30ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 120;
+    font-weight: 400;
+    font-size: clamp(1.4rem, 3.2vw, 2rem);
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 52rem) {
+    .steps { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1.15rem 1.25rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-control);
+  }
+
+  .step-n {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 999px;
+    background: var(--color-primary);
+    color: var(--color-background);
+    font-size: 0.8125rem;
+  }
+
+  .step-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+  .step-label {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+  .step-text {
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--color-text);
+  }
+
+  .close {
+    margin: 1.75rem 0 0;
+    max-width: 46ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 72;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(1.125rem, 2.2vw, 1.375rem);
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  .sign {
+    margin: 1.25rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .sign-name {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 40;
+    font-weight: 500;
+    font-size: 1.0625rem;
+    color: var(--color-text);
+  }
+  .sign-cred {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+</style>

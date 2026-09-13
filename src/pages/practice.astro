@@ -1,0 +1,182 @@
+---
+/* ============================================================================
+ * DIRECTION C — "Practice"
+ *
+ * The reader did not arrive curious about the oral microbiome. They arrived
+ * tired, with bleeding gums, having been told nothing useful by anybody. So
+ * this page is a consultation: first person, conversational volume, one doctor
+ * talking to one person.
+ *
+ * The order of the page IS the argument:
+ *   recognise yourself  →  these are one system  →  what this is / what you do
+ *   / what you get back  →  and only then, the words for it.
+ *
+ * No term of art appears before the everyday thing it names. The coined word
+ * "Orobiome" does not appear until TheTerm, by which point it has something to
+ * be the name OF.
+ * ========================================================================== */
+import BaseThemeLayout from '../layouts/BaseThemeLayout.astro';
+import PracticeChrome from '../components/practice/PracticeChrome.astro';
+import SymptomEntry from '../components/practice/SymptomEntry.astro';
+import TheTerm from '../components/practice/TheTerm.astro';
+import WhyItMatters from '../components/practice/WhyItMatters.astro';
+import ThePeople from '../components/practice/ThePeople.astro';
+import PullQuote from '../components/practice/PullQuote.astro';
+import ArticleShelf from '../components/practice/ArticleShelf.astro';
+import SeriesShelf from '../components/practice/SeriesShelf.astro';
+import TheKit from '../components/practice/TheKit.astro';
+import PracticeFooter from '../components/practice/PracticeFooter.astro';
+
+import BundleLadder from '../components/cart/BundleLadder.svelte';
+import Plate from '../components/basics/Plate.astro';
+import { getCollection } from 'astro:content';
+import { TESTIMONIALS } from '../lib/site';
+
+const bundles = (await getCollection('bundles')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const [tina, brian, vivian] = TESTIMONIALS;
+---
+
+<BaseThemeLayout
+  title="Threshold — if nobody has told you why you feel like this, start with your mouth"
+  description="Your mouth is full of bacteria. Some protect you; some quietly make you ill. Spit in a tube at home, mail it back, and get a report naming which ones you have — plus a dentist who explains what to do about it."
+  theme="practice"
+  mode="light"
+>
+  <!-- Paper tooth and lamplight. Both are token-driven and both go to zero in
+       light mode, so this costs nothing where it is not wanted. -->
+  <div class="veil" aria-hidden="true">
+    <span class="grain"></span>
+    <span class="glow"></span>
+  </div>
+
+  <div class="page">
+    <PracticeChrome />
+
+    <main id="main">
+      <SymptomEntry />
+
+      <TheTerm />
+
+      <div class="pr-plate">
+        <Plate
+          src="/img/illustration__Threshold--Arch.jpg"
+          alt="A stone archway with fine particles drifting through the opening, drawn in ink hatching."
+          ratio="21 / 9"
+          caption="The mouth is the doorway. Almost everything that gets into you comes through it."
+          tint={0.4}
+        />
+      </div>
+
+      <PullQuote
+        quote={tina.quote}
+        who={tina.who}
+        context="A patient wrote this to me eight months after her results came back. I am putting it here rather than in a wall of testimonials because it is the plainest description of the thing I am trying to explain."
+      />
+
+      <WhyItMatters />
+
+      <ThePeople />
+
+      <PullQuote
+        quote={brian.quote}
+        who={brian.who}
+        context="And this is what it looks like when the mouth end gets sorted out first."
+      />
+
+      <ArticleShelf />
+
+      <SeriesShelf />
+
+      <PullQuote
+        quote={vivian.quote}
+        who={vivian.who}
+        context="Two ends of one tube, which is why the largest kit tests both."
+      />
+
+      <TheKit>
+        <div class="pr-plate pr-plate--tight">
+          <Plate
+            src="/img/illustration__Threshold--Vial.jpg"
+            alt="A small sealed laboratory collection vial standing upright, drawn in ink hatching."
+            ratio="3 / 2"
+            caption="This is the whole thing. One tube, four minutes, before you brush."
+            tint={0.4}
+          />
+        </div>
+        <BundleLadder
+          client:visible
+          layout="steps"
+          tiers={bundles.map((b) => b.data)}
+          cta="Start with the test"
+          orientation="Three rungs, same test at the bottom of all of them — the only thing that changes is how much help you get reading your results. Pick a rung, or click any line you want and it will move you to the cheapest one that includes it."
+        />
+      </TheKit>
+    </main>
+
+    <PracticeFooter />
+  </div>
+</BaseThemeLayout>
+
+<style>
+  /* The veil is fixed and inert; the page rides above it. Neither can produce
+     a horizontal scrollbar — the veil never exceeds the viewport, and every
+     section inside .page is width-constrained by --page-measure. */
+  .veil {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .veil span {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+
+  /* Paper tooth: a very fine dot field in the ink colour. */
+  .grain {
+    background-image: radial-gradient(var(--color-text) 0.5px, transparent 0.5px);
+    background-size: 3px 3px;
+    opacity: var(--fx-grain-opacity);
+  }
+
+  /* Lamplight: one warm source off the top-right corner. Zero in light mode,
+     which is what keeps warm-light from sliding into beige-on-beige. */
+  .glow {
+    background:
+      radial-gradient(
+        58rem 40rem at 82% -10%,
+        var(--color-primary) 0%,
+        transparent 62%
+      ),
+      radial-gradient(
+        44rem 34rem at 6% 104%,
+        var(--color-accent) 0%,
+        transparent 64%
+      );
+    opacity: var(--fx-glow-opacity);
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+  }
+</style>
+
+<style>
+  /* Plates in this direction sit inside the reading measure and keep the
+     page's soft corner language rather than printing edge-to-edge. */
+  .pr-plate {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: 0 var(--page-gutter) clamp(2rem, 5vw, 3.5rem);
+  }
+  .pr-plate :global(.plate-frame) {
+    border-radius: var(--radius-control);
+    overflow: hidden;
+  }
+  .pr-plate--tight { padding: 0 0 2rem; max-width: 34rem; }
+</style>

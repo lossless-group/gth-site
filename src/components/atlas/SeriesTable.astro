@@ -1,0 +1,262 @@
+---
+/* ============================================================================
+ * SeriesTable — eight episodes as a measured list rather than as eight
+ * marketing cards. Episode number, runtime and access are set in mono and
+ * aligned, so the reader can scan the shape of the whole series in one pass.
+ *
+ * The "what you'll find out" lists are inside <details>. That is deliberate:
+ * they are long, they are the client's own copy, and they must be readable
+ * with JavaScript switched off — which <details> is and a custom accordion
+ * is not.
+ * ========================================================================== */
+
+interface Episode {
+  order: number;
+  title: string;
+  promise?: string;
+  runtime_minutes?: number;
+  discoveries?: string[];
+  featuring?: string[];
+  free?: boolean;
+}
+
+interface Props {
+  episodes: Episode[];
+}
+
+const { episodes } = Astro.props;
+
+const totalMinutes = episodes.reduce((n, e) => n + (e.runtime_minutes ?? 0), 0);
+const hours = Math.floor(totalMinutes / 60);
+const minutes = totalMinutes % 60;
+const freeCount = episodes.filter((e) => e.free).length;
+---
+
+<div class="series">
+  <dl class="series__readout">
+    <div>
+      <dt>Episodes</dt>
+      <dd>{episodes.length}</dd>
+    </div>
+    <div>
+      <dt>Total runtime</dt>
+      <dd>{hours}h {String(minutes).padStart(2, '0')}m</dd>
+    </div>
+    <div>
+      <dt>Free to watch</dt>
+      <dd>{freeCount}</dd>
+    </div>
+  </dl>
+
+  <ol class="series__list">
+    {episodes.map((ep) => (
+      <li class="ep">
+        <div class="ep__head">
+          <span class="ep__no">EP {String(ep.order).padStart(2, '0')}</span>
+          <h3 class="ep__title">{ep.title}</h3>
+          <span class="ep__run">{ep.runtime_minutes ?? '--'} min</span>
+          <span class:list={['ep__access', ep.free && 'ep__access--free']}>
+            {ep.free ? 'Free' : 'In every package'}
+          </span>
+        </div>
+
+        {ep.promise && <p class="ep__promise">{ep.promise}</p>}
+
+        {ep.discoveries && ep.discoveries.length > 0 && (
+          <details class="ep__more">
+            <summary>
+              <span>What you find out</span>
+              <span class="ep__count">{ep.discoveries.length}</span>
+            </summary>
+            <ul>
+              {ep.discoveries.map((d) => <li>{d}</li>)}
+            </ul>
+            {ep.featuring && ep.featuring.length > 0 && (
+              <p class="ep__featuring">
+                <span>With</span>
+                {ep.featuring.join(' · ')}
+              </p>
+            )}
+          </details>
+        )}
+      </li>
+    ))}
+  </ol>
+</div>
+
+<style>
+  .series { container-type: inline-size; }
+
+  /* ----------------------------------------------------------- readout -- */
+  .series__readout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2.5rem;
+    margin: 0 0 1.75rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .series__readout div { min-width: 0; }
+  .series__readout dt {
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .series__readout dd {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-data);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.25rem;
+    color: var(--color-text);
+  }
+
+  /* -------------------------------------------------------------- list -- */
+  .series__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ep {
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-grid);
+  }
+  .ep:first-child { border-top: 0; }
+
+  .ep__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.9rem;
+  }
+
+  .ep__no {
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    color: var(--color-text-faint);
+    flex: 0 0 auto;
+    width: 3.75rem;
+  }
+
+  .ep__title {
+    margin: 0;
+    flex: 1 1 14rem;
+    min-width: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+    color: var(--color-text);
+  }
+
+  .ep__run {
+    font-family: var(--font-data);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .ep__access {
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    padding: 0.1rem 0.4rem;
+    white-space: nowrap;
+  }
+  .ep__access--free {
+    color: var(--color-text);
+    border-color: var(--color-rule);
+  }
+
+  .ep__promise {
+    margin: 0.6rem 0 0 0;
+    padding-left: 4.65rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    max-width: 62ch;
+  }
+
+  /* ------------------------------------------------------------ details -- */
+  .ep__more { margin: 0.6rem 0 0; padding-left: 4.65rem; }
+
+  .ep__more summary {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    list-style: none;
+    transition: color 150ms ease;
+  }
+  .ep__more summary::-webkit-details-marker { display: none; }
+  .ep__more summary::before {
+    content: '+';
+    display: inline-block;
+    width: 1rem;
+    text-align: center;
+    color: var(--color-text-faint);
+  }
+  .ep__more[open] summary::before { content: '\2212'; }
+  .ep__more summary:hover { color: var(--color-primary); }
+
+  .ep__count {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-faint);
+  }
+
+  .ep__more ul {
+    margin: 0.7rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ep__more ul li {
+    position: relative;
+    padding: 0.4rem 0 0.4rem 1rem;
+    border-top: 1px solid var(--color-grid);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    max-width: 62ch;
+  }
+  .ep__more ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.1rem;
+    width: 0.35rem;
+    height: 1px;
+    background: var(--color-rule);
+  }
+
+  .ep__featuring {
+    margin: 0.8rem 0 0;
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    color: var(--color-text-faint);
+  }
+  .ep__featuring span {
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-right: 0.5rem;
+  }
+
+  @container (max-width: 34rem) {
+    .ep__promise,
+    .ep__more { padding-left: 0; }
+    .ep__no { width: auto; }
+  }
+</style>

@@ -1,0 +1,150 @@
+---
+/* ============================================================================
+ * TermBridge — where the words of art are finally allowed in.
+ *
+ * The site this replaces opened with "Orobiome" and left the reader to work
+ * out what it meant. Here the coined word arrives on plate 02, after the
+ * reader has already seen the mouth, the dots and the swallow, and it arrives
+ * as a DEFINITION rather than as a headline. Everything below this point on
+ * the page may use the terms freely, because every reader has now been given
+ * them.
+ * ========================================================================== */
+import { ORIENTATION } from '../../lib/site';
+
+const glossary = [
+  {
+    term: 'Oral microbiome',
+    who: 'What clinicians call it',
+    plain:
+      'The whole community of bacteria living in your mouth, counted as one thing rather than as a list of germs.',
+  },
+  {
+    term: 'Orobiome panel',
+    who: 'What we call our test',
+    plain:
+      'The saliva test that reads that community and names which species you are carrying, and in what proportion.',
+  },
+  {
+    term: 'The oral-gut axis',
+    who: 'What the rest of this page is about',
+    plain:
+      'Your mouth and your gut are two ends of one tube, trading bacteria every time you swallow.',
+  },
+];
+---
+
+<div class="bridge">
+  <h2 class="bridge__h">
+    Everything living in there, taken together, is one community. It has a name.
+  </h2>
+
+  <p class="bridge__lede">{ORIENTATION.then_the_term}</p>
+
+  <dl class="gloss">
+    {glossary.map((g, i) => (
+      <div class="gloss__row">
+        <dt class="gloss__dt">
+          <span class="gloss__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="gloss__term">{g.term}</span>
+          <span class="gloss__who">{g.who}</span>
+        </dt>
+        <dd class="gloss__dd">{g.plain}</dd>
+      </div>
+    ))}
+  </dl>
+
+  <p class="bridge__note">
+    Those three phrases are the only specialist language on this page. You will
+    see them again further down; you did not need any of them to understand
+    the first plate, and that is on purpose.
+  </p>
+</div>
+
+<style>
+  .bridge { container-type: inline-size; }
+
+  .bridge__h {
+    margin: 0 0 1rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3.6vw, 2.35rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    max-width: 26ch;
+    text-wrap: balance;
+  }
+
+  .bridge__lede {
+    margin: 0 0 2rem;
+    font-size: clamp(1.0625rem, 1.8vw, 1.25rem);
+    line-height: 1.55;
+    color: var(--color-text-muted);
+    max-width: 54ch;
+  }
+
+  /* ---------------------------------------------------------- glossary -- */
+  .gloss {
+    margin: 0;
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .gloss__row {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-grid);
+  }
+  @container (min-width: 44rem) {
+    .gloss__row {
+      grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+      gap: 1.75rem;
+      align-items: start;
+    }
+  }
+
+  .gloss__dt {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    column-gap: 0.6rem;
+    row-gap: 0.15rem;
+    min-width: 0;
+  }
+  .gloss__no {
+    grid-row: 1 / span 2;
+    font-family: var(--font-data);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    color: var(--color-text-faint);
+    padding-top: 0.2rem;
+  }
+  .gloss__term {
+    font-family: var(--font-data);
+    font-size: 0.9375rem;
+    letter-spacing: -0.005em;
+    color: var(--color-primary);
+  }
+  .gloss__who {
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  .gloss__dd {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    max-width: 56ch;
+  }
+
+  .bridge__note {
+    margin: 1.75rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 54ch;
+  }
+</style>

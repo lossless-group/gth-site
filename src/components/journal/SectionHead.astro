@@ -1,0 +1,84 @@
+---
+/* The standing section head. A heavy rule, a hanging numeral in the left
+ * rail, an eyebrow, a title, and an optional standfirst. Every section on the
+ * page uses it, which is what makes the page read as one publication rather
+ * than as a stack of unrelated blocks. */
+
+export interface Props {
+  num: string;
+  eyebrow: string;
+  title: string;
+  /** So the owning <section> can point aria-labelledby at the real heading. */
+  titleId?: string;
+  standfirst?: string;
+  /** Right-aligned apparatus: counts, dates, runtimes. Always tabular. */
+  meta?: string;
+}
+
+const { num, eyebrow, title, titleId, standfirst, meta } = Astro.props;
+---
+
+<header class="head">
+  <p class="num tabular" aria-hidden="true">{num}</p>
+  <div class="body">
+    <p class="jr-eyebrow">{eyebrow}</p>
+    <h2 class="title" id={titleId}>{title}</h2>
+    {standfirst && <p class="standfirst jr-measure">{standfirst}</p>}
+  </div>
+  {meta && <p class="meta tabular">{meta}</p>}
+</header>
+
+<style>
+  .head {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.35rem 1.5rem;
+    border-top: 2px solid var(--color-text);
+    padding-top: 0.85rem;
+    margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+  }
+
+  @media (min-width: 45rem) {
+    .head {
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+      align-items: start;
+    }
+  }
+
+  .num {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-text-faint);
+    letter-spacing: 0.06em;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .title {
+    font-size: clamp(1.5rem, 3.4vw, 2.125rem);
+    line-height: 1.12;
+  }
+
+  .standfirst {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .meta {
+    font-size: 0.6875rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    line-height: 1.5;
+    white-space: normal;
+  }
+  @media (min-width: 45rem) {
+    .meta { text-align: right; }
+  }
+</style>

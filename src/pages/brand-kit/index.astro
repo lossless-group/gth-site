@@ -1,0 +1,173 @@
+---
+/* Required per the astro-knots convention: every site ships /brand-kit and
+ * /design-system. This one is for stakeholders — the brand experience
+ * essentials, legible without reading any CSS. */
+import BaseThemeLayout from '../../layouts/BaseThemeLayout.astro';
+import Wordmark from '../../components/basics/Wordmark.astro';
+import ModeToggle from '../../components/ui/ModeToggle.astro';
+import Plate from '../../components/basics/Plate.astro';
+
+const semantic = [
+  { token: '--color-background', role: 'The page itself' },
+  { token: '--color-surface', role: 'A panel sitting on the page' },
+  { token: '--color-surface-raised', role: 'A panel on top of that' },
+  { token: '--color-text', role: 'Body and headline ink' },
+  { token: '--color-text-muted', role: 'Supporting prose' },
+  { token: '--color-text-faint', role: 'Metadata, timestamps' },
+  { token: '--color-primary', role: 'The brand act: links, marks, calls to action' },
+  { token: '--color-accent', role: 'Scarce. The one thing that matters most on screen' },
+  { token: '--color-border', role: 'Quiet division' },
+  { token: '--color-rule', role: 'Structural division' },
+];
+
+/* AUDIT EXCEPTION — this is the ONE surface allowed to name Tier 1 tokens.
+ * Documenting the raw palette is this page's entire job. They are referenced
+ * here as swatch values for display, never as a component's colour source. */
+const named = [
+  { token: '--color__signal-green', note: 'Extracted from the live site. 24 occurrences.' },
+  { token: '--color__gateway-blue', note: 'Extracted from the live site. 7 occurrences.' },
+  { token: '--color__clinical-green', note: 'Journal — the deep publication green' },
+  { token: '--color__petrol', note: 'Atlas — the ground of the interior' },
+  { token: '--color__terracotta', note: 'Practice — the warm human accent' },
+  { token: '--color__neon-lime', note: 'Vibrant only. Never on a light ground.' },
+];
+
+const type = [
+  { token: '--font-display', label: 'Display', sample: 'Heal your mouth.' },
+  { token: '--font-body', label: 'Body', sample: 'Your mouth is full of bacteria. Some protect you.' },
+  { token: '--font-data', label: 'Data', sample: '$399 · 8 episodes · 42 min' },
+];
+
+const plates = [
+  { src: '/img/illustration__Threshold--Arch.jpg', alt: 'A stone archway with particles drifting through it.', cap: 'The threshold' },
+  { src: '/img/illustration__Threshold--Colony.jpg', alt: 'A dense field of microorganisms among filaments.', cap: 'The colony' },
+  { src: '/img/illustration__Threshold--Vial.jpg', alt: 'A sealed laboratory collection vial.', cap: 'The sample' },
+  { src: '/img/illustration__Threshold--Axis.jpg', alt: 'A branching channel descending through tissue.', cap: 'The axis' },
+];
+---
+
+<BaseThemeLayout title="Brand kit — Threshold" description="Colour, type, mark and imagery, in all three modes." theme="journal" mode="light">
+  <header class="chrome">
+    <Wordmark size={28} />
+    <nav class="nav"><a href="/">Directions</a><a href="/design-system">Design system</a></nav>
+    <ModeToggle />
+  </header>
+
+  <main class="wrap" id="main">
+    <p class="eyebrow">Brand kit</p>
+    <h1>The pieces, and what each one is for.</h1>
+    <p class="lede">
+      Toggle the mode control above. Every swatch, every typeface and every plate
+      on this page re-resolves. Nothing here is a screenshot — it is the live
+      system, which is the point.
+    </p>
+
+    <section>
+      <h2>The mark</h2>
+      <p class="note">
+        A threshold: an opening you pass through, with the base left open. The
+        aperture is the brand green — the one thing worth keeping from the
+        current site.
+      </p>
+      <div class="mark-row">
+        <Wordmark size={64} showText={false} href="/brand-kit" />
+        <Wordmark size={40} href="/brand-kit" />
+        <Wordmark size={24} href="/brand-kit" />
+      </div>
+    </section>
+
+    <section>
+      <h2>Semantic colour <span class="h2-note">what components read</span></h2>
+      <ul class="swatches">
+        {semantic.map((s) => (
+          <li>
+            <span class="chip" style={`background:var(${s.token})`}></span>
+            <span class="chip-meta">
+              <code>{s.token}</code>
+              <span>{s.role}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Named colour <span class="h2-note">raw values, never read by a component</span></h2>
+      <ul class="swatches swatches--named">
+        {named.map((s) => (
+          <li>
+            <span class="chip" style={`background:var(${s.token})`}></span>
+            <span class="chip-meta">
+              <code>{s.token}</code>
+              <span>{s.note}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p class="note">
+        When the client wants a different primary, we add one named token and
+        re-point one semantic token. No component changes.
+      </p>
+    </section>
+
+    <section>
+      <h2>Type</h2>
+      <ul class="type">
+        {type.map((t) => (
+          <li>
+            <span class="type-k"><code>{t.token}</code> {t.label}</span>
+            <span class="type-s" style={`font-family:var(${t.token})`}>{t.sample}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Imagery <span class="h2-note">one family, nine appearances</span></h2>
+      <p class="note">
+        Seven ink-on-paper plates generated as a single family off one locked seed.
+        There is no light set and no dark set — the ground is dissolved with a blend
+        mode and the ink tinted toward the active <code>--color-primary</code>, so the
+        same files read as native in every direction and every mode.
+      </p>
+      <ul class="plates">
+        {plates.map((p) => (
+          <li><Plate src={p.src} alt={p.alt} ratio="4 / 3" caption={p.cap} tint={0.45} /></li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</BaseThemeLayout>
+
+<style>
+  .chrome { display:flex; align-items:center; gap:1.5rem; padding:1.4rem var(--page-gutter); border-bottom:1px solid var(--color-border); }
+  .nav { display:flex; gap:1.25rem; margin-left:auto; font-size:0.8125rem; }
+  .nav a { color:var(--color-text-muted); text-decoration:none; }
+  .nav a:hover { color:var(--color-primary); }
+  .wrap { max-width:var(--page-measure); margin:0 auto; padding:clamp(2.5rem,7vw,5rem) var(--page-gutter) 5rem; }
+  .eyebrow { margin:0 0 1rem; font-family:var(--font-eyebrow); font-size:0.6875rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-primary); }
+  h1 { margin:0; font-family:var(--font-display); font-weight:400; font-size:clamp(2rem,5vw,3.25rem); line-height:1.08; letter-spacing:-0.02em; }
+  .lede { margin:1.25rem 0 0; max-width:60ch; font-size:1.0625rem; line-height:1.65; color:var(--color-text-muted); }
+  section { margin-top:3.5rem; padding-top:2rem; border-top:1px solid var(--color-rule); }
+  h2 { margin:0 0 1.25rem; font-family:var(--font-display); font-weight:400; font-size:1.5rem; display:flex; flex-wrap:wrap; gap:0.75rem; align-items:baseline; }
+  .h2-note { font-family:var(--font-eyebrow); font-size:0.625rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-faint); }
+  .note { margin:0 0 1.5rem; max-width:60ch; font-size:0.9375rem; line-height:1.65; color:var(--color-text-muted); }
+  .note code, .chip-meta code, .type-k code { font-family:var(--font-data); font-size:0.8125em; color:var(--color-primary); }
+
+  .mark-row { display:flex; align-items:center; gap:2.5rem; flex-wrap:wrap; }
+
+  .swatches { list-style:none; margin:0; padding:0; display:grid; gap:0.75rem; grid-template-columns:1fr; }
+  @media (min-width:44rem){ .swatches { grid-template-columns:repeat(2,1fr); } }
+  .swatches li { display:flex; gap:0.85rem; align-items:center; }
+  .chip { width:3rem; height:3rem; flex:0 0 auto; border:1px solid var(--color-border); }
+  .chip-meta { display:flex; flex-direction:column; gap:0.15rem; min-width:0; }
+  .chip-meta span { font-size:0.8125rem; color:var(--color-text-muted); }
+  .swatches--named .chip { border-radius:0; }
+
+  .type { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:1.75rem; }
+  .type-k { display:block; font-size:0.75rem; color:var(--color-text-faint); margin-bottom:0.4rem; }
+  .type-s { display:block; font-size:clamp(1.375rem,3.5vw,2rem); line-height:1.25; }
+
+  .plates { list-style:none; margin:0; padding:0; display:grid; gap:1.75rem; grid-template-columns:repeat(2,1fr); }
+  @media (min-width:52rem){ .plates { grid-template-columns:repeat(4,1fr); } }
+</style>

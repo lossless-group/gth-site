@@ -1,0 +1,210 @@
+---
+/* ============================================================================
+ * SeriesShelf — the documentary, eight episodes in order.
+ *
+ * `promise` leads, not the episode title, for the same reason plain_question
+ * leads on an article card: "You will understand why the state of your mouth
+ * is a health issue and not a grooming issue" tells you whether to watch.
+ * "Mouth Matters" does not.
+ *
+ * Discoveries are capped at three per episode on this page. The full list is
+ * in the collection and belongs on the episode page; forty bullets here would
+ * turn the section into a wall and undo the whole point of the direction.
+ * ========================================================================== */
+import { getCollection } from 'astro:content';
+
+const episodes = (await getCollection('series')).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+const totalMinutes = episodes.reduce(
+  (n, e) => n + (e.data.runtime_minutes ?? 0),
+  0
+);
+const hours = Math.round((totalMinutes / 60) * 10) / 10;
+---
+
+<section class="series" id="series" aria-labelledby="series-title">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Watch</p>
+      <h2 id="series-title">Gateway to Health</h2>
+      <p class="sub">
+        Eight episodes, about {hours} hours in total, made because this is
+        easier to show than to describe. The first three are free to watch;
+        the rest come with any kit below.
+      </p>
+    </div>
+
+    <ol class="episodes">
+      {
+        episodes.map((e) => (
+          <li class="ep">
+            <span class="ep-n tabular" aria-hidden="true">
+              {String(e.data.order).padStart(2, '0')}
+            </span>
+
+            <div class="ep-body">
+              <p class="ep-promise">{e.data.promise ?? e.data.title}</p>
+
+              <p class="ep-meta">
+                <span class="ep-title">{e.data.title}</span>
+                {e.data.runtime_minutes && (
+                  <span class="tabular">{e.data.runtime_minutes} min</span>
+                )}
+                {e.data.free ? (
+                  <span class="ep-free">Free to watch</span>
+                ) : (
+                  <span class="ep-kit">Included with a kit</span>
+                )}
+              </p>
+
+              {e.data.discoveries?.length && (
+                <ul class="ep-finds">
+                  {e.data.discoveries.slice(0, 3).map((d) => (
+                    <li>{d}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .series {
+    padding-block: clamp(3rem, 7vw, 5rem);
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-grid);
+    scroll-margin-top: 1.5rem;
+  }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .eyebrow {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144;
+    font-weight: 370;
+    font-size: clamp(1.75rem, 5vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+  }
+
+  .sub {
+    margin: 1.1rem 0 0;
+    max-width: 48ch;
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+
+  /* --------------------------------------------------------- episodes -- */
+  .episodes {
+    list-style: none;
+    margin: clamp(2rem, 4vw, 2.75rem) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+  }
+  @media (min-width: 58rem) {
+    .episodes {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 2.5rem;
+    }
+  }
+
+  .ep {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.35rem 0;
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  .ep-n {
+    flex: 0 0 auto;
+    width: 2.15rem;
+    padding-top: 0.15rem;
+    font-size: 0.8125rem;
+    color: var(--color-primary);
+  }
+
+  .ep-body { min-width: 0; }
+
+  .ep-promise {
+    margin: 0;
+    max-width: 42ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 72;
+    font-weight: 430;
+    font-size: 1.0625rem;
+    line-height: 1.42;
+    color: var(--color-text);
+    text-wrap: pretty;
+  }
+
+  .ep-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.85rem;
+    margin: 0.55rem 0 0;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+  .ep-title {
+    font-family: var(--font-eyebrow);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .ep-free { color: var(--color-accent); }
+  .ep-kit { color: var(--color-text-muted); }
+
+  .ep-finds {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .ep-finds li {
+    position: relative;
+    padding-left: 0.95rem;
+    max-width: 46ch;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+  .ep-finds li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.3rem;
+    height: 0.3rem;
+    border-radius: 999px;
+    background: var(--color-primary);
+  }
+</style>

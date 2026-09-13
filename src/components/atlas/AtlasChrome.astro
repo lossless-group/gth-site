@@ -1,0 +1,168 @@
+---
+/* ============================================================================
+ * AtlasChrome — site chrome for the Atlas direction.
+ *
+ * The wordmark carries a miniature of the page's own organising device: a
+ * vertical axis with five stops. It is the same idea at 20px that the page is
+ * at 6000px, which is the cheapest way to tell a reader what kind of document
+ * they have opened.
+ *
+ * Carries the required exits: back to `/` (the direction chooser) and out to
+ * `/articles`, plus the three-mode toggle.
+ * ========================================================================== */
+import ModeToggle from '../ui/ModeToggle.astro';
+
+const jumps = [
+  { href: '#throat', label: 'What it is' },
+  { href: '#stomach', label: 'Why it matters' },
+  { href: '#people', label: 'Who reads it' },
+  { href: '#panel', label: 'What it costs' },
+];
+---
+
+<header class="chrome">
+  <div class="chrome__inner">
+    <a class="mark" href="#main">
+      <svg class="mark__glyph" viewBox="0 0 12 24" aria-hidden="true" focusable="false">
+        <path d="M6 2v20" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round" />
+        <circle cx="6" cy="3.5" r="2" fill="currentColor" />
+        <circle cx="6" cy="9" r="1.25" fill="currentColor" />
+        <circle cx="6" cy="14" r="1.25" fill="currentColor" />
+        <circle cx="6" cy="19" r="1.25" fill="currentColor" />
+      </svg>
+      <span class="mark__name">Threshold</span>
+      <span class="mark__sub">Atlas</span>
+    </a>
+
+    <nav class="jumps" aria-label="Sections of this page">
+      <ul>
+        {jumps.map((j) => (
+          <li><a href={j.href}>{j.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="tail">
+      <a class="out" href="/articles">All articles</a>
+      <a class="out out--back" href="/">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 3 5 8l5 5" />
+        </svg>
+        <span>All three directions</span>
+      </a>
+      <ModeToggle />
+    </div>
+  </div>
+</header>
+
+<style>
+  .chrome {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: color-mix(in srgb, var(--color-background) 90%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .chrome__inner {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding: 0.65rem var(--page-gutter);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+  }
+
+  /* -------------------------------------------------------------- mark -- */
+  .mark {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--color-text);
+    margin-right: auto;
+  }
+  .mark__glyph {
+    width: 0.6rem;
+    height: 1.4rem;
+    color: var(--color-primary);
+    flex: 0 0 auto;
+  }
+  .mark__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+  }
+  .mark__sub {
+    font-family: var(--font-data);
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    border-left: 1px solid var(--color-border);
+    padding-left: 0.6rem;
+  }
+
+  /* ------------------------------------------------------------- jumps -- */
+  .jumps { min-width: 0; }
+  .jumps ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+  }
+  .jumps a {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: color 150ms ease;
+  }
+  .jumps a:hover { color: var(--color-primary); }
+
+  /* Below the breakpoint the jump list is noise next to the contents strip
+     in the hero, which says the same thing better. */
+  @media (max-width: 63.99rem) {
+    .jumps { display: none; }
+  }
+
+  /* -------------------------------------------------------------- tail -- */
+  .tail {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .out {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: color 150ms ease;
+    white-space: nowrap;
+  }
+  .out:hover { color: var(--color-primary); }
+  .out svg { width: 0.8rem; height: 0.8rem; }
+
+  .out--back {
+    padding: 0.3rem 0.6rem 0.3rem 0.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+  }
+  .out--back:hover { border-color: var(--color-primary); }
+
+  @media (max-width: 30rem) {
+    .out--back span { display: none; }
+  }
+</style>

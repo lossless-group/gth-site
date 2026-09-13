@@ -1,0 +1,187 @@
+---
+/* ============================================================================
+ * TheKit — the frame around the cart. The cart itself is slotted in from the
+ * page so the BundleLadder integration stays literal and in one place.
+ *
+ * This section is the correction to the old site's offer page. There is no
+ * value stack, no struck-through "retail price" theatre beyond the honest
+ * list value the cart already carries, no countdown, and no second CTA
+ * shouting after the first. The kit is presented as the obvious next step
+ * from everything above it — you have read what this is, here is how you
+ * actually do it — and then the page gets out of the way.
+ *
+ * The "what happens next" list is here for the same reason: the biggest
+ * reason people do not order a test is that they cannot picture what ordering
+ * one involves.
+ * ========================================================================== */
+
+const NEXT = [
+  {
+    when: 'Within a week',
+    what: 'A small box arrives. Inside is a tube, a swab and one page of instructions.',
+  },
+  {
+    when: 'One morning',
+    what: 'Before you brush, before coffee, you spit in the tube. It takes about four minutes. You post it back in the packaging it came in.',
+  },
+  {
+    when: 'About three weeks later',
+    what: 'You get a report. Plain-English findings first, the strain-by-strain data after it, and no login to read either.',
+  },
+];
+---
+
+<section class="kit" id="kit" aria-labelledby="kit-title">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">If you want to know</p>
+      <h2 id="kit-title">The next step is a tube of spit.</h2>
+      <p class="sub">
+        Not a consultation you have to book, not a programme you have to join.
+        You find out what is actually living in your mouth, and then you decide
+        what you want to do about it. Everything below is the same test — what
+        changes is how much help you want reading it.
+      </p>
+    </div>
+
+    <div class="cart">
+      <slot />
+    </div>
+
+    <div class="after">
+      <h3>What actually happens</h3>
+      <ol class="next">
+        {
+          NEXT.map((n) => (
+            <li>
+              <span class="when">{n.when}</span>
+              <span class="what">{n.what}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="calm">
+        There is no countdown on this page and there will not be one in your
+        inbox. The test is the same price next month.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .kit {
+    padding-block: clamp(3rem, 7vw, 5rem);
+    scroll-margin-top: 1.5rem;
+  }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+
+  .eyebrow {
+    margin: 0 0 0.9rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  h2 {
+    margin: 0;
+    max-width: 20ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 144;
+    font-weight: 370;
+    font-size: clamp(1.75rem, 5vw, 2.9rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+
+  .sub {
+    margin: 1.1rem 0 0;
+    max-width: 52ch;
+    font-size: clamp(1rem, 1.8vw, 1.0625rem);
+    line-height: 1.68;
+    color: var(--color-text-muted);
+  }
+
+  /* The cart sits on a raised card so the control reads as an instrument you
+     are handed, not as a checkout bolted to the bottom of an article. */
+  .cart {
+    margin-top: clamp(2rem, 4vw, 2.75rem);
+    padding: clamp(1.25rem, 3.5vw, 2.25rem);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* ------------------------------------------------------------ after -- */
+  .after {
+    margin-top: clamp(2rem, 4vw, 2.75rem);
+    padding-top: clamp(1.75rem, 3.5vw, 2.25rem);
+    border-top: 1px solid var(--color-grid);
+  }
+
+  h3 {
+    margin: 0 0 1.25rem;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 60;
+    font-weight: 450;
+    font-size: 1.25rem;
+    color: var(--color-text);
+  }
+
+  .next {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 52rem) {
+    .next { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  }
+
+  .next li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-top: 0.85rem;
+    border-top: 2px solid var(--color-primary-soft);
+  }
+
+  .when {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+
+  .what {
+    max-width: 42ch;
+    font-size: 0.9375rem;
+    line-height: 1.62;
+    color: var(--color-text-muted);
+  }
+
+  .calm {
+    margin: 1.75rem 0 0;
+    max-width: 46ch;
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 60;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+</style>

@@ -1,0 +1,32 @@
+---
+import BoilerPlateHTML from './BoilerPlateHTML.astro';
+import type { Direction, Mode } from './BoilerPlateHTML.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  theme?: Direction;
+  mode?: Mode;
+  /* Only the design-system page lets a viewer cycle DIRECTIONS at runtime.
+   * On the three real pages the direction is the route, so the theme switcher
+   * stays off and cannot stomp the pinned palette on DOMContentLoaded. */
+  themeSwitchable?: boolean;
+}
+
+const {
+  title,
+  description,
+  theme = 'journal',
+  mode = 'light',
+  themeSwitchable = false,
+} = Astro.props;
+---
+
+<BoilerPlateHTML title={title} description={description} theme={theme} mode={mode}>
+  <slot />
+  <script>
+    import '../utils/mode-switcher.js';
+  </script>
+  {themeSwitchable && <script>import '../utils/theme-switcher.js';</script>}
+</BoilerPlateHTML>

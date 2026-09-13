@@ -1,0 +1,193 @@
+---
+/* The corpus. This page is the thought-leadership argument: twelve pieces,
+ * two bylines, four subject areas, set as a table of contents rather than as
+ * a feed. The plain question leads every row; the clinical title is the
+ * subtitle. That inversion is the whole information-hierarchy thesis. */
+import { getCollection } from 'astro:content';
+import BaseThemeLayout from '../../layouts/BaseThemeLayout.astro';
+import Wordmark from '../../components/basics/Wordmark.astro';
+import ModeToggle from '../../components/ui/ModeToggle.astro';
+import { CATEGORY_LABELS } from '../../lib/site';
+
+const articles = (await getCollection('articles')).sort((a, b) => {
+  const da = a.data.date_published ? new Date(a.data.date_published).getTime() : 0;
+  const db = b.data.date_published ? new Date(b.data.date_published).getTime() : 0;
+  return db - da;
+});
+
+const authors = [...new Set(articles.map((a) => a.data.author).filter(Boolean))] as string[];
+const cats = [...new Set(articles.flatMap((a) => a.data.categories ?? []))];
+
+const fmt = (d?: Date) =>
+  d ? new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) : '';
+---
+
+<BaseThemeLayout
+  title="Articles — Threshold"
+  description="Twelve pieces on the mouth, the gut, and what connects them, written by the two clinicians behind the panel."
+  theme="journal"
+  mode="light"
+>
+  <header class="chrome">
+    <Wordmark size={28} />
+    <nav class="chrome-nav">
+      <a href="/">Directions</a>
+      <a href="/journal">Journal</a>
+      <a href="/atlas">Atlas</a>
+      <a href="/practice">Practice</a>
+    </nav>
+    <ModeToggle />
+  </header>
+
+  <main class="wrap" id="main">
+    <p class="eyebrow">The library</p>
+    <h1>What we have written down.</h1>
+    <p class="lede">
+      Every piece starts from a question somebody actually asked out loud, and
+      answers it in the first three sentences. The clinical title is there so you
+      can cite it; the question is there so you can find it.
+    </p>
+
+    <dl class="meta">
+      <div><dt>Pieces</dt><dd class="tabular">{articles.length}</dd></div>
+      <div><dt>Authors</dt><dd>{authors.join(' · ')}</dd></div>
+      <div><dt>Subjects</dt><dd>{cats.map((c) => CATEGORY_LABELS[c] ?? c).join(' · ')}</dd></div>
+    </dl>
+
+    <ol class="list">
+      {articles.map((a, i) => (
+        <li class="row" class:list={[{ 'is-featured': a.data.featured }]}>
+          <a href={`/articles/${a.id}`}>
+            <span class="num tabular">{String(i + 1).padStart(2, '0')}</span>
+            <span class="body">
+              {/* Plain question first. Always. */}
+              <span class="q">{a.data.plain_question ?? a.data.title}</span>
+              <span class="t">{a.data.title}</span>
+              {a.data.lede && <span class="l">{a.data.lede}</span>}
+              {a.data.term_of_art && a.data.term_in_plain_english && (
+                <span class="term">
+                  <span class="term-k">{a.data.term_of_art}</span>
+                  <span class="term-v">{a.data.term_in_plain_english}</span>
+                </span>
+              )}
+            </span>
+            <span class="side">
+              <span class="by">
+                {a.data.author}
+                {a.data.author_credential && <span class="cred">, {a.data.author_credential}</span>}
+              </span>
+              <span class="tags">
+                {(a.data.categories ?? []).map((c) => (
+                  <span class="tag">{CATEGORY_LABELS[c] ?? c}</span>
+                ))}
+              </span>
+              <span class="when tabular">
+                {fmt(a.data.date_published)}
+                {a.data.read_minutes ? ` · ${a.data.read_minutes} min` : ''}
+              </span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </main>
+</BaseThemeLayout>
+
+<style>
+  .chrome {
+    display: flex; align-items: center; gap: 1.5rem;
+    padding: 1.4rem var(--page-gutter);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .chrome-nav { display: flex; gap: 1.25rem; margin-left: auto; font-size: 0.8125rem; flex-wrap: wrap; }
+  .chrome-nav a { color: var(--color-text-muted); text-decoration: none; }
+  .chrome-nav a:hover { color: var(--color-primary); }
+
+  .wrap {
+    max-width: var(--page-measure);
+    margin: 0 auto;
+    padding: clamp(2.5rem, 7vw, 5rem) var(--page-gutter) 5rem;
+  }
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  h1 {
+    margin: 0; font-family: var(--font-display); font-weight: 400;
+    font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.08; letter-spacing: -0.02em;
+  }
+  .lede {
+    margin: 1.25rem 0 0; max-width: 60ch;
+    font-size: 1.0625rem; line-height: 1.65; color: var(--color-text-muted);
+  }
+
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 2rem;
+    margin: 2.5rem 0 0; padding: 1.25rem 0;
+    border-top: 1px solid var(--color-rule);
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .meta div { display: flex; gap: 0.6rem; align-items: baseline; }
+  .meta dt {
+    font-family: var(--font-eyebrow); font-size: 0.625rem;
+    letter-spacing: 0.11em; text-transform: uppercase; color: var(--color-text-faint);
+  }
+  .meta dd { margin: 0; font-size: 0.875rem; color: var(--color-text-muted); }
+
+  .list { list-style: none; margin: 0; padding: 0; }
+  .row { border-bottom: 1px solid var(--color-grid); }
+  .row a {
+    display: grid; gap: 0.6rem 1.5rem;
+    grid-template-columns: 2.5rem 1fr;
+    padding: 1.6rem 0;
+    text-decoration: none; color: inherit;
+  }
+  @media (min-width: 60rem) {
+    .row a { grid-template-columns: 2.5rem minmax(0, 1fr) 15rem; }
+  }
+  .row a:hover .q { color: var(--color-primary); }
+
+  .num { font-size: 0.75rem; color: var(--color-text-faint); padding-top: 0.45rem; }
+
+  .body { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+  .q {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+    line-height: 1.2; letter-spacing: -0.01em;
+    transition: color 150ms ease;
+  }
+  .t { font-size: 0.8125rem; color: var(--color-text-faint); }
+  .l { font-size: 0.9375rem; line-height: 1.6; color: var(--color-text-muted); max-width: 56ch; margin-top: 0.2rem; }
+
+  /* A term of art never appears without its translation beside it. */
+  .term {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline;
+    margin-top: 0.5rem; padding-left: 0.75rem;
+    border-left: 2px solid var(--color-primary-soft);
+    font-size: 0.8125rem;
+  }
+  .term-k { color: var(--color-primary); }
+  .term-v { color: var(--color-text-muted); }
+
+  .side {
+    display: flex; flex-direction: column; gap: 0.35rem;
+    grid-column: 2 / -1;
+    font-size: 0.8125rem; color: var(--color-text-muted);
+  }
+  @media (min-width: 60rem) { .side { grid-column: 3; text-align: right; align-items: flex-end; } }
+  .cred { color: var(--color-text-faint); }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag {
+    font-family: var(--font-eyebrow); font-size: 0.625rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-faint);
+  }
+  .when { font-size: 0.75rem; color: var(--color-text-faint); }
+
+  .row.is-featured .q { color: var(--color-text); }
+  .row.is-featured::marker { content: none; }
+</style>

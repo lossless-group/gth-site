@@ -1,0 +1,127 @@
+/* ============================================================================
+ * DIRECTION A — "Journal" · theme slug `journal`
+ *
+ * TIER 2 semantic tokens. kebab-case only. Tier 1 `--color__*` / `--font__*`
+ * live in global.css and may be referenced ONLY from inside this file.
+ * No component under src/components/journal/ reads a `__` token.
+ *
+ * The premise: the site is a clinical publication that happens to sell the
+ * instrument its research is built on. Authority comes from the corpus, not
+ * from volume — which is the whole point for a client who is shy about
+ * stepping into thought leadership.
+ *
+ * ---------------------------------------------------------------------------
+ * THE TOKEN CONTRACT. All three directions define exactly this set. Anything
+ * a component needs that is not here is a missing token, not a licence to
+ * reach for a `__` value or a hex literal.
+ *
+ *   type      --font-display  --font-body  --font-data  --font-eyebrow
+ *   ground    --color-background  --color-surface  --color-surface-raised
+ *   ink       --color-text  --color-text-muted  --color-text-faint
+ *   signal    --color-primary  --color-primary-soft  --color-accent
+ *   lines     --color-border  --color-rule  --color-grid
+ *   shape     --radius-control  --page-measure  --page-gutter
+ *   effects   --fx-grain-opacity  --fx-glow-opacity
+ *
+ * Mode intent
+ *   light   — the journal printed. Bone stock, ink, clinical green. Default.
+ *   dark    — the same journal read at night. Near-black green-black ground.
+ *   vibrant — the journal under a plate reader. DARK-BASED; every ground,
+ *             surface, text and border below is set explicitly so nothing
+ *             inherits from light.
+ * ========================================================================== */
+
+[data-theme="journal"] {
+  /* Type is mode-invariant. Newsreader is a text serif with real optical
+   * sizing — it sets a 60-character measure and a 12px byline with the same
+   * voice, which is exactly what an article system needs. */
+  --font-display:  var(--font__newsreader);
+  --font-body:     var(--font__inter);
+  --font-data:     var(--font__plex-mono);
+  --font-eyebrow:  var(--font__plex-mono);
+
+  --radius-control: 0.125rem;   /* print has no rounded corners */
+  --page-measure:   72rem;
+  --page-gutter:    clamp(1.25rem, 5vw, 4rem);
+
+  /* Added for Direction A. Mode-invariant, so every mode block above stays
+   * complete without restating them. In a type-led direction the MEASURE is
+   * as much a part of the contract as the palette: prose sets to a real
+   * editorial line length, marginal notes to a narrower one so the eye reads
+   * them as apparatus rather than as body copy. */
+  --measure-prose:  66ch;
+  --measure-note:   40ch;
+}
+
+/* --------------------------------------------------------------- light --- */
+/* The default. A journal is a printed object first. */
+[data-theme="journal"][data-mode="light"] {
+  --color-background:     var(--color__bone);
+  --color-surface:        var(--color__bone-warm);
+  --color-surface-raised: var(--color__white);
+
+  --color-text:           var(--color__ink-slate);
+  --color-text-muted:     color-mix(in srgb, var(--color__ink-slate) 66%, var(--color__bone));
+  --color-text-faint:     color-mix(in srgb, var(--color__ink-slate) 42%, var(--color__bone));
+
+  --color-primary:        var(--color__clinical-green);
+  --color-primary-soft:   color-mix(in srgb, var(--color__clinical-green) 14%, transparent);
+  --color-accent:         var(--color__oxblood);
+
+  --color-border:         color-mix(in srgb, var(--color__ink-slate) 18%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__ink-slate) 40%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__ink-slate) 10%, transparent);
+
+  --fx-grain-opacity: 0.035;
+  --fx-glow-opacity:  0;
+}
+
+/* ---------------------------------------------------------------- dark --- */
+[data-theme="journal"][data-mode="dark"] {
+  --color-background:     var(--color__ink-deep);
+  --color-surface:        var(--color__ink-slate);
+  --color-surface-raised: color-mix(in srgb, var(--color__clinical-green) 16%, var(--color__ink-slate));
+
+  --color-text:           var(--color__bone);
+  --color-text-muted:     color-mix(in srgb, var(--color__sage-pale) 82%, var(--color__ink-deep));
+  --color-text-faint:     color-mix(in srgb, var(--color__sage-pale) 50%, var(--color__ink-deep));
+
+  /* Deep clinical green dies on a near-black ground; lift it to the lit
+   * variant so it stays the same colour idea while clearing AA on body text. */
+  --color-primary:        var(--color__clinical-lit);
+  --color-primary-soft:   color-mix(in srgb, var(--color__clinical-lit) 22%, transparent);
+  --color-accent:         color-mix(in srgb, var(--color__oxblood) 52%, var(--color__bone));
+
+  --color-border:         color-mix(in srgb, var(--color__sage-pale) 22%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__sage-pale) 40%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__sage-pale) 12%, transparent);
+
+  --fx-grain-opacity: 0.05;
+  --fx-glow-opacity:  0.18;
+}
+
+/* ------------------------------------------------------------- vibrant --- */
+/* DARK-BASED. The single most common mistake is letting vibrant inherit the
+ * light ground; every ground/surface/text/border is therefore set here. */
+[data-theme="journal"][data-mode="vibrant"] {
+  --color-background:     var(--color__void-green);
+  --color-surface:        color-mix(in srgb, var(--color__clinical-green) 26%, var(--color__void-green));
+  --color-surface-raised: color-mix(in srgb, var(--color__clinical-lit) 24%, var(--color__void-green));
+
+  --color-text:           var(--color__white);
+  --color-text-muted:     color-mix(in srgb, var(--color__neon-lime) 58%, var(--color__sage-pale));
+  --color-text-faint:     color-mix(in srgb, var(--color__neon-lime) 40%, transparent);
+
+  /* The brand green, finally allowed to be as loud as it was on the old site
+   * — but only on a ground that can carry it. */
+  --color-primary:        var(--color__neon-lime);
+  --color-primary-soft:   color-mix(in srgb, var(--color__neon-lime) 26%, transparent);
+  --color-accent:         var(--color__neon-coral);
+
+  --color-border:         color-mix(in srgb, var(--color__neon-lime) 34%, transparent);
+  --color-rule:           color-mix(in srgb, var(--color__neon-lime) 60%, transparent);
+  --color-grid:           color-mix(in srgb, var(--color__neon-lime) 16%, transparent);
+
+  --fx-grain-opacity: 0.07;
+  --fx-glow-opacity:  0.55;
+}

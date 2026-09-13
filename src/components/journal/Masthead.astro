@@ -1,0 +1,205 @@
+---
+/* ============================================================================
+ * Masthead — the publication's identity, in the order a printed journal puts
+ * it: a running rail of apparatus, the wordmark, the editorial line, then a
+ * standing dateline and the contents nav.
+ *
+ * The client is a practising dentist who is shy about stepping forward as a
+ * thought leader. Nothing here asks her to. The authority is asserted by the
+ * form — a masthead, a volume number, a dateline — not by a photograph of
+ * anybody, and not by a claim.
+ * ========================================================================== */
+import ModeToggle from '../ui/ModeToggle.astro';
+
+export interface Props {
+  issue: string;
+  issueDate: string;
+  editorialLine: string;
+}
+
+const { issue, issueDate, editorialLine } = Astro.props;
+
+const contents = [
+  { href: '#orientation', label: 'Orientation' },
+  { href: '#evidence', label: 'Evidence' },
+  { href: '#board', label: 'The board' },
+  { href: '#library', label: 'The library' },
+  { href: '#series', label: 'The series' },
+  { href: '#panel', label: 'The panel' },
+];
+---
+
+<header class="masthead">
+  <div class="glow" aria-hidden="true"></div>
+
+  <div class="jr-sheet">
+    <!-- Running rail: where you are, and the two ways out. -->
+    <div class="rail">
+      <p class="jr-eyebrow rail-left">Threshold &middot; {issue}</p>
+      <div class="rail-right">
+        <a class="rail-link" href="/">
+          <span aria-hidden="true">&larr;</span> All three directions
+        </a>
+        <a class="rail-link" href="/articles">Full library</a>
+        <ModeToggle />
+      </div>
+    </div>
+
+    <!-- The wordmark. Set once, at a size print would use, and never again. -->
+    <p class="wordmark"><a href="/journal">Threshold</a></p>
+
+    <p class="line">{editorialLine}</p>
+
+    <!-- Standing dateline. -->
+    <p class="dateline">
+      <span class="tabular">{issue}</span>
+      <span class="sep" aria-hidden="true">&middot;</span>
+      <span class="tabular">{issueDate}</span>
+      <span class="sep" aria-hidden="true">&middot;</span>
+      <span>Austin, Texas</span>
+      <span class="sep" aria-hidden="true">&middot;</span>
+      <span>Published continuously</span>
+    </p>
+
+    <nav class="contents" aria-label="Contents of this issue">
+      <ul>
+        {
+          contents.map((c) => (
+            <li>
+              <a href={c.href}>{c.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .masthead {
+    position: relative;
+    padding-top: clamp(1rem, 3vw, 1.75rem);
+    padding-bottom: clamp(1.25rem, 3vw, 2rem);
+    border-bottom: 3px double var(--color-rule);
+    isolation: isolate;
+  }
+
+  /* Dark and vibrant get a faint bloom behind the wordmark; light sets
+   * --fx-glow-opacity to 0, so this disappears entirely on paper. */
+  .glow {
+    position: absolute;
+    inset: -30% -10% auto -10%;
+    height: 24rem;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--fx-glow-opacity, 0);
+    background: radial-gradient(
+      60% 70% at 22% 40%,
+      var(--color-primary-soft),
+      transparent 70%
+    );
+  }
+
+  /* ------------------------------------------------------------- rail -- */
+  .rail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  .rail-left {
+    margin: 0;
+  }
+
+  .rail-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .rail-link {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding-bottom: 0.15rem;
+    border-bottom: 1px solid transparent;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .rail-link:hover {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+
+  /* --------------------------------------------------------- wordmark -- */
+  .wordmark {
+    margin-top: clamp(1.5rem, 4vw, 2.75rem);
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(3rem, 13vw, 8.5rem);
+    line-height: 0.86;
+    letter-spacing: -0.035em;
+    color: var(--color-text);
+  }
+  .wordmark a {
+    display: inline-block;
+  }
+
+  .line {
+    margin-top: clamp(0.75rem, 2vw, 1.25rem);
+    max-width: 52ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1rem, 1.9vw, 1.1875rem);
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  /* --------------------------------------------------------- dateline -- */
+  .dateline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: clamp(1.25rem, 3vw, 1.75rem);
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-grid);
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .sep {
+    color: var(--color-text-faint);
+  }
+
+  /* --------------------------------------------------------- contents -- */
+  .contents {
+    margin-top: 0.85rem;
+  }
+  .contents ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.5rem;
+  }
+  .contents a {
+    font-family: var(--font-eyebrow);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.1rem;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+  .contents a:hover {
+    color: var(--color-text);
+    border-bottom-color: var(--color-text);
+  }
+</style>

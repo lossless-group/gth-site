@@ -1,0 +1,89 @@
+---
+/* ============================================================================
+ * Correspondence — the testimonials, set as letters to the editor.
+ *
+ * The form does the arguing. A testimonial in a rounded card with five gold
+ * stars reads as marketing; the same sentence set as correspondence, in the
+ * text face, with an initialled sign-off and a hairline above it, reads as
+ * something a reader sent in. Nothing has been added to the quotes and
+ * nothing has been dressed up around them.
+ * ========================================================================== */
+import SectionHead from './SectionHead.astro';
+
+export interface Props {
+  letters: { quote: string; who: string }[];
+}
+
+const { letters } = Astro.props;
+---
+
+<section class="jr-section" id="correspondence" aria-labelledby="letters-title">
+  <div class="jr-sheet">
+    <SectionHead
+      num="06"
+      eyebrow="Correspondence"
+      title="What readers wrote back"
+      titleId="letters-title"
+      standfirst="Unedited, and deliberately unremarkable. People do not write in about their microbiome. They write in about sleeping through the night."
+      meta={`${letters.length} letters`}
+    />
+
+    <ol class="letters">
+      {
+        letters.map((l) => (
+          <li class="letter">
+            <figure>
+              <blockquote class="quote">{l.quote}</blockquote>
+              <figcaption class="sign jr-eyebrow">&mdash; {l.who}</figcaption>
+            </figure>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .letters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    border-top: 1px solid var(--color-rule);
+  }
+  @media (min-width: 52rem) {
+    .letters {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: clamp(1.5rem, 4vw, 3rem);
+    }
+  }
+
+  .letter {
+    min-width: 0;
+    padding-block: clamp(1.5rem, 3vw, 2.25rem);
+    border-bottom: 1px solid var(--color-grid);
+  }
+  @media (min-width: 52rem) {
+    .letter {
+      border-bottom: 0;
+      padding-inline-end: clamp(1.5rem, 4vw, 3rem);
+      border-inline-end: 1px solid var(--color-grid);
+    }
+    .letter:last-child {
+      border-inline-end: 0;
+      padding-inline-end: 0;
+    }
+  }
+
+  .quote {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 2.1vw, 1.375rem);
+    line-height: 1.42;
+    color: var(--color-text);
+    text-wrap: pretty;
+    max-width: 30ch;
+  }
+
+  .sign {
+    margin-top: 1rem;
+    color: var(--color-text-faint);
+  }
+</style>

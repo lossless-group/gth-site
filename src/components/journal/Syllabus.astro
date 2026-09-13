@@ -1,0 +1,226 @@
+---
+/* ============================================================================
+ * Syllabus — the documentary series, set as a course outline rather than as a
+ * row of video thumbnails.
+ *
+ * A syllabus has three things a thumbnail grid does not: a number, a promise
+ * of what you will be able to do afterwards, and an extent. All three are in
+ * the content already (`order`, `promise`, `runtime_minutes`), so the only
+ * design decision is to trust them and to set them as a numbered list with
+ * the outcomes hanging in the margin.
+ *
+ * ========================================================================== */
+import SectionHead from './SectionHead.astro';
+
+export interface Episode {
+  id: string;
+  order: number;
+  title: string;
+  promise?: string;
+  runtimeMinutes?: number;
+  discoveries: string[];
+  featuring: string[];
+  free?: boolean;
+}
+
+export interface Props {
+  episodes: Episode[];
+  totalRuntime: number;
+}
+
+const { episodes, totalRuntime } = Astro.props;
+
+const hours = Math.floor(totalRuntime / 60);
+const mins = totalRuntime % 60;
+const extent = hours > 0 ? `${hours} hr ${mins} min` : `${mins} min`;
+---
+
+<section class="jr-section" id="series" aria-labelledby="series-title">
+  <div class="jr-sheet">
+    <SectionHead
+      num="04"
+      eyebrow="The series"
+      title="Gateway to Health"
+      titleId="series-title"
+      standfirst="A documentary in parts, filmed with the clinicians named on the masthead. Listed the way a course is listed: what each part is for, who is in it, and how long it takes."
+      meta={`${episodes.length} ${episodes.length === 1 ? 'part' : 'parts'} · ${extent}`}
+    />
+
+    <ol class="syllabus">
+      {
+        episodes.map((ep) => (
+          <li class="ep">
+            <div class="ep-head">
+              <p class="ord tabular" aria-hidden="true">
+                {String(ep.order).padStart(2, '0')}
+              </p>
+              <div class="ep-title-block">
+                <h3 class="ep-title">{ep.title}</h3>
+                {ep.promise && <p class="promise">{ep.promise}</p>}
+                {ep.featuring.length > 0 && (
+                  <p class="featuring">With {ep.featuring.join(' and ')}</p>
+                )}
+              </div>
+              <p class="ep-meta">
+                {ep.runtimeMinutes && (
+                  <span class="runtime tabular">{ep.runtimeMinutes} min</span>
+                )}
+                {ep.free ? (
+                  <span class="flag flag--free">Free to watch</span>
+                ) : (
+                  <span class="flag">Included in the panel</span>
+                )}
+              </p>
+            </div>
+
+            {ep.discoveries.length > 0 && (
+              <ul class="discoveries">
+                {ep.discoveries.slice(0, 3).map((d) => (
+                  <li>{d}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .syllabus {
+    border-top: 1px solid var(--color-rule);
+  }
+
+  .ep {
+    padding-block: clamp(1.35rem, 3vw, 1.9rem);
+    border-bottom: 1px solid var(--color-grid);
+  }
+
+  .ep-head {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    grid-template-areas:
+      'ord title'
+      '.   meta';
+    gap: 0.5rem 1rem;
+    align-items: start;
+  }
+  @media (min-width: 52rem) {
+    .ep-head {
+      grid-template-columns: 3.5rem minmax(0, 1fr) minmax(0, 11rem);
+      grid-template-areas: 'ord title meta';
+      column-gap: clamp(1.25rem, 3vw, 2.5rem);
+    }
+  }
+
+  .ord {
+    grid-area: ord;
+    font-size: clamp(1.125rem, 2.2vw, 1.5rem);
+    line-height: 1.15;
+    color: var(--color-text-faint);
+    letter-spacing: -0.02em;
+  }
+
+  .ep-title-block {
+    grid-area: title;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .ep-title {
+    font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+    line-height: 1.16;
+  }
+
+  .promise {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    line-height: 1.58;
+    color: var(--color-text-muted);
+    max-width: 52ch;
+  }
+
+  .featuring {
+    font-family: var(--font-eyebrow);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--color-text-faint);
+    line-height: 1.5;
+  }
+
+  .ep-meta {
+    grid-area: meta;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 0.85rem;
+    min-width: 0;
+  }
+  @media (min-width: 52rem) {
+    .ep-meta {
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+    }
+  }
+
+  .runtime {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .flag {
+    font-family: var(--font-eyebrow);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    white-space: nowrap;
+  }
+  /* Three of the eight episodes are free, so this flag is NOT the place to
+     spend the oxblood — an accent that appears three times is not an accent.
+     It wears the clinical green instead, which is the page's colour for
+     living things and for anything you can have. The whole page budget for
+     --color-accent is two appearances: the drop cap that opens the issue,
+     and the one coined word the reader is asked to learn. */
+  .flag--free {
+    color: var(--color-primary);
+    border-bottom: 1px solid var(--color-primary);
+    padding-bottom: 0.1rem;
+  }
+
+  /* Outcomes, hanging in the body column under the promise. */
+  .discoveries {
+    margin-top: 0.85rem;
+    margin-left: 2.75rem;
+    max-width: var(--measure-prose);
+    display: grid;
+    gap: 0.3rem;
+  }
+  @media (min-width: 52rem) {
+    .discoveries { margin-left: calc(3.5rem + clamp(1.25rem, 3vw, 2.5rem)); }
+  }
+
+  .discoveries li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+  .discoveries li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.5rem;
+    height: 1px;
+    background: var(--color-rule);
+  }
+</style>

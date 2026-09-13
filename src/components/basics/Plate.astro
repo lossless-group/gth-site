@@ -1,0 +1,127 @@
+---
+/* ============================================================================
+ * Plate — the shared treatment for the illustration family.
+ *
+ * Every illustration in public/img/ is black ink hatching on a cream ground,
+ * generated as one family off a single locked seed. Rather than ship a light
+ * set and a dark set, the ground is dissolved with a blend mode:
+ *
+ *   light   → multiply. White/cream goes transparent, ink stays. The plate
+ *             sits on the page's own paper instead of on its own rectangle.
+ *   dark    → invert + screen. Black goes transparent, ink becomes light.
+ *   vibrant → same as dark, with the tint pushed harder.
+ *
+ * The tint layer then pulls the whole plate toward --color-primary, so the
+ * same seven JPEGs read as native in all three directions and all three
+ * modes. One asset family, nine appearances, zero duplicated files.
+ *
+ * Consumed by every direction. Reads semantic tokens only.
+ * ========================================================================== */
+export interface Props {
+  src: string;
+  alt: string;
+  /** CSS aspect-ratio, e.g. "16 / 9". Omit to let the image set its own. */
+  ratio?: string;
+  /** Figure label, e.g. "Fig. 3". Rendered in the data face. */
+  figure?: string;
+  caption?: string;
+  /** 0 = untinted grayscale, 1 = fully pulled to --color-primary. */
+  tint?: number;
+  loading?: 'lazy' | 'eager';
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  ratio,
+  figure,
+  caption,
+  tint = 0.4,
+  loading = 'lazy',
+  class: className = '',
+} = Astro.props;
+
+const hasCaption = Boolean(figure || caption);
+const Tag = hasCaption ? 'figure' : 'div';
+---
+
+<Tag class={`plate ${className}`} style={`--plate-tint:${tint};`}>
+  <div class="plate-frame" style={ratio ? `aspect-ratio:${ratio};` : undefined}>
+    <img class="plate-img" src={src} alt={alt} loading={loading} decoding="async" />
+    <span class="plate-tint" aria-hidden="true"></span>
+  </div>
+  {hasCaption && (
+    <figcaption class="plate-caption">
+      {figure && <span class="plate-figure tabular">{figure}</span>}
+      {caption && <span class="plate-text">{caption}</span>}
+    </figcaption>
+  )}
+</Tag>
+
+<style>
+  .plate { margin: 0; display: block; }
+
+  .plate-frame {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    /* No border, no card. The plate is printed ON the page, not pasted onto it. */
+    background: transparent;
+  }
+
+  .plate-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* light: the cream ground multiplies away into the page's own paper */
+    filter: grayscale(1) contrast(1.04);
+    mix-blend-mode: multiply;
+  }
+
+  .plate-tint {
+    position: absolute;
+    inset: 0;
+    background: var(--color-primary);
+    mix-blend-mode: color;
+    opacity: var(--plate-tint, 0.4);
+    pointer-events: none;
+  }
+
+  /* dark + vibrant: invert so ink becomes light, and screen so the now-black
+   * ground drops out against the page. */
+  :global(html[data-mode='dark']) .plate-img,
+  :global(html[data-mode='vibrant']) .plate-img {
+    filter: grayscale(1) invert(1) contrast(1.08) brightness(0.92);
+    mix-blend-mode: screen;
+  }
+
+  :global(html[data-mode='vibrant']) .plate-tint {
+    opacity: calc(var(--plate-tint, 0.4) * 1.6);
+  }
+
+  /* Forced-colors and print both break blend modes; fall back to plain art. */
+  @media (forced-colors: active), print {
+    .plate-img { filter: none; mix-blend-mode: normal; }
+    .plate-tint { display: none; }
+  }
+
+  .plate-caption {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    margin-top: 0.6rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+  .plate-figure {
+    flex: 0 0 auto;
+    font-size: 0.6875rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .plate-text { max-width: 52ch; }
+</style>

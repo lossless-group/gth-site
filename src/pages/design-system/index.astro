@@ -1,0 +1,184 @@
+---
+/* Required per the astro-knots convention. This one is for developers and
+ * agents: the component catalogue, live, inside the site's own runtime. The
+ * only page on the site where the DIRECTION is switchable at runtime — use it
+ * to see a component under all three palettes without leaving the page. */
+import { getCollection } from 'astro:content';
+import BaseThemeLayout from '../../layouts/BaseThemeLayout.astro';
+import Wordmark from '../../components/basics/Wordmark.astro';
+import ModeToggle from '../../components/ui/ModeToggle.astro';
+import Plate from '../../components/basics/Plate.astro';
+import BundleLadder from '../../components/cart/BundleLadder.svelte';
+
+const bundles = (await getCollection('bundles')).sort((a, b) => a.data.order - b.data.order);
+const tiers = bundles.map((b) => b.data);
+
+/* `as const` so `key` narrows to the island's literal union rather than
+ * widening to `string` — otherwise astro check flags the prop below. */
+const layouts = [
+  { key: 'ledger', dir: 'Journal', note: 'Hairline rules, no fill. The order is a printed ledger filling in line by line.' },
+  { key: 'compare', dir: 'Atlas', note: 'Column headers over a tinted table. Reads as a set of measurements.' },
+  { key: 'steps', dir: 'Practice', note: 'A staircase — each rung indents further. The ladder is legible as a ladder.' },
+] as const;
+---
+
+<BaseThemeLayout
+  title="Design system — Threshold"
+  description="The live component catalogue, switchable across all three directions and all three modes."
+  theme="journal"
+  mode="light"
+  themeSwitchable={true}
+>
+  <header class="chrome">
+    <Wordmark size={28} />
+    <div class="controls">
+      <div class="theme-pick" role="group" aria-label="Direction">
+        <button type="button" data-set-theme="journal">Journal</button>
+        <button type="button" data-set-theme="atlas">Atlas</button>
+        <button type="button" data-set-theme="practice">Practice</button>
+      </div>
+      <ModeToggle />
+    </div>
+  </header>
+
+  <main class="wrap" id="main">
+    <p class="eyebrow">Design system</p>
+    <h1>Every component, under every palette.</h1>
+    <p class="lede">
+      Switch direction and mode with the controls above. Nine combinations, one set
+      of components. If something only looks right in one of them, it is not done.
+    </p>
+
+    <section>
+      <h2>BundleLadder <span class="h2-note">the upgrade cart · Svelte island</span></h2>
+      <p class="note">
+        One component, three presentations. The mechanic: each tier is a strict
+        superset of the one below, so the cart shows the <em>delta</em> rather than
+        swapping in a new cart. Click any greyed line item and you are moved to the
+        cheapest tier that contains it.
+      </p>
+      {layouts.map((l) => (
+        <div class="specimen">
+          <p class="spec-k"><code>layout="{l.key}"</code> <span>{l.dir}</span></p>
+          <p class="spec-n">{l.note}</p>
+          <div class="spec-stage">
+            <BundleLadder
+              client:visible
+              layout={l.key}
+              tiers={tiers}
+              cta="Continue"
+              orientation="Pick how far you want to go. You can move up or down at any point — nothing is removed when you upgrade."
+            />
+          </div>
+        </div>
+      ))}
+    </section>
+
+    <section>
+      <h2>Plate <span class="h2-note">illustration treatment</span></h2>
+      <p class="note">
+        Blend-mode-based. In light the cream ground multiplies away; in dark and
+        vibrant the art inverts and screens. The tint layer pulls it toward the
+        active <code>--color-primary</code>. One family, every mode.
+      </p>
+      <ul class="plates">
+        <li><Plate src="/img/illustration__Threshold--Spot-immune.jpg" alt="Overlapping cells forming a barrier wall." ratio="1 / 1" figure="Fig. 1" caption="Immune function" /></li>
+        <li><Plate src="/img/illustration__Threshold--Spot-mind.jpg" alt="A seed pod cross-section with radiating filaments." ratio="1 / 1" figure="Fig. 2" caption="Mental wellbeing" /></li>
+        <li><Plate src="/img/illustration__Threshold--Spot-digest.jpg" alt="A coiled tube folding back on itself." ratio="1 / 1" figure="Fig. 3" caption="Digestive health" /></li>
+      </ul>
+      <p class="note">
+        <code>tint</code> at 0, 0.4 and 0.9 on the same asset:
+      </p>
+      <ul class="plates">
+        <li><Plate src="/img/illustration__Threshold--Vial.jpg" alt="A sealed collection vial." ratio="1 / 1" tint={0} caption="tint 0" /></li>
+        <li><Plate src="/img/illustration__Threshold--Vial.jpg" alt="A sealed collection vial." ratio="1 / 1" tint={0.4} caption="tint 0.4" /></li>
+        <li><Plate src="/img/illustration__Threshold--Vial.jpg" alt="A sealed collection vial." ratio="1 / 1" tint={0.9} caption="tint 0.9" /></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Wordmark</h2>
+      <div class="mark-row">
+        <Wordmark size={48} href="/design-system" />
+        <Wordmark size={28} href="/design-system" />
+        <Wordmark size={28} showText={false} href="/design-system" />
+      </div>
+    </section>
+
+    <section>
+      <h2>Token contract</h2>
+      <p class="note">
+        All three directions define exactly this set. A component that needs
+        something not on this list has found a missing token, not a licence to
+        reach for a raw <code>__</code> value.
+      </p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Group</th><th>Tokens</th></tr></thead>
+          <tbody>
+            <tr><td>type</td><td><code>--font-display --font-body --font-data --font-eyebrow</code></td></tr>
+            <tr><td>ground</td><td><code>--color-background --color-surface --color-surface-raised</code></td></tr>
+            <tr><td>ink</td><td><code>--color-text --color-text-muted --color-text-faint</code></td></tr>
+            <tr><td>signal</td><td><code>--color-primary --color-primary-soft --color-accent</code></td></tr>
+            <tr><td>lines</td><td><code>--color-border --color-rule --color-grid</code></td></tr>
+            <tr><td>shape</td><td><code>--radius-control --page-measure --page-gutter</code></td></tr>
+            <tr><td>effects</td><td><code>--fx-grain-opacity --fx-glow-opacity</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script is:inline>
+    document.querySelectorAll('[data-set-theme]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var t = b.getAttribute('data-set-theme');
+        if (window.themeSwitcher) window.themeSwitcher.setTheme(t);
+        document.querySelectorAll('[data-set-theme]').forEach(function (o) {
+          o.setAttribute('aria-pressed', String(o === b));
+        });
+      });
+    });
+  </script>
+</BaseThemeLayout>
+
+<style>
+  .chrome { display:flex; align-items:center; gap:1.5rem; padding:1.4rem var(--page-gutter); border-bottom:1px solid var(--color-border); }
+  .controls { display:flex; align-items:center; gap:1rem; margin-left:auto; }
+  .theme-pick { display:flex; gap:-1px; }
+  .theme-pick button {
+    font: inherit; font-size:0.75rem; cursor:pointer;
+    padding:0.4rem 0.7rem;
+    background:transparent; color:var(--color-text-muted);
+    border:1px solid var(--color-border);
+  }
+  .theme-pick button + button { border-left:0; }
+  .theme-pick button:hover { color:var(--color-primary); border-color:var(--color-primary); }
+  .theme-pick button[aria-pressed='true'] { color:var(--color-background); background:var(--color-primary); border-color:var(--color-primary); }
+
+  .wrap { max-width:var(--page-measure); margin:0 auto; padding:clamp(2.5rem,7vw,5rem) var(--page-gutter) 5rem; }
+  .eyebrow { margin:0 0 1rem; font-family:var(--font-eyebrow); font-size:0.6875rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--color-primary); }
+  h1 { margin:0; font-family:var(--font-display); font-weight:400; font-size:clamp(2rem,5vw,3.25rem); line-height:1.08; letter-spacing:-0.02em; }
+  .lede { margin:1.25rem 0 0; max-width:60ch; font-size:1.0625rem; line-height:1.65; color:var(--color-text-muted); }
+
+  section { margin-top:3.5rem; padding-top:2rem; border-top:1px solid var(--color-rule); }
+  h2 { margin:0 0 1.25rem; font-family:var(--font-display); font-weight:400; font-size:1.5rem; display:flex; flex-wrap:wrap; gap:0.75rem; align-items:baseline; }
+  .h2-note { font-family:var(--font-eyebrow); font-size:0.625rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-faint); }
+  .note { margin:0 0 1.5rem; max-width:62ch; font-size:0.9375rem; line-height:1.65; color:var(--color-text-muted); }
+  code { font-family:var(--font-data); font-size:0.8125em; color:var(--color-primary); }
+
+  .specimen { margin-top:2.5rem; }
+  .spec-k { margin:0; display:flex; gap:0.75rem; align-items:baseline; }
+  .spec-k span { font-family:var(--font-eyebrow); font-size:0.625rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-faint); }
+  .spec-n { margin:0.3rem 0 1.25rem; font-size:0.875rem; color:var(--color-text-muted); max-width:60ch; }
+  .spec-stage { padding:1.5rem; border:1px solid var(--color-border); background:var(--color-background); }
+
+  .plates { list-style:none; margin:0 0 2rem; padding:0; display:grid; gap:1.5rem; grid-template-columns:repeat(3,1fr); }
+  .mark-row { display:flex; align-items:center; gap:2.5rem; flex-wrap:wrap; }
+
+  .table-scroll { overflow-x:auto; }
+  table { border-collapse:collapse; width:100%; min-width:34rem; font-size:0.875rem; }
+  th, td { text-align:left; padding:0.6rem 0.75rem; border-bottom:1px solid var(--color-grid); vertical-align:top; }
+  th { font-family:var(--font-eyebrow); font-size:0.625rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--color-text-faint); border-bottom-color:var(--color-rule); }
+  td:first-child { color:var(--color-text-muted); white-space:nowrap; }
+</style>
