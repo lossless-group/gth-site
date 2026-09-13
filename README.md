@@ -1,4 +1,4 @@
-# GTH — Practitioner-Led Testing &amp; Content Site
+# GTH — Practitioner-Led Testing & Content Site
 
 <p align="center">
   <span style="font-size: 18px; font-weight: 500; color: #374151;">A design spike built with</span>
@@ -23,17 +23,131 @@
 
 ***
 
-## First — what is Astro Knots?
+# Your Site, Built by Astro Knots
+
+> **[Astro Knots](https://lossless-group.github.io/astro-knots/)** is The Lossless Group's set of systems, context, patterns, and conventions for building blazing fast, modern, elegant, responsive, content-rich, kick-ass websites.
+>
+> Astro Knots sites default to [Astro](https://astro.build), the most loved framework for building such kick-ass sites. Any dynamic interactivity is either pure vanilla JS, [HTMX](https://htmx.org), or [Svelte](https://svelte.dev) (the most loved framework for building interactive interfaces). Rich markdown content is supported through our own markdown parser, [Lossless Flavored Markdown (LFM)](https://github.com/lossless-group/lossless-flavored-markdown-package/).
+
+***
+
+# For You
+
+## Three versions of your homepage
+
+Same words, same articles, same episodes, same products — arranged three
+different ways. Open each one, see which feels like you, and tell us. The other
+two get deleted and nothing else changes.
+
+Everything on these pages is already on your live site. Nothing has been
+invented about the practice, the science, or the people. The one exception is
+priced below, called out plainly.
+
+| Open this | It's the version where… |
+|---|---|
+| **`/`** | The chooser. Start here. |
+| **`/journal`** | The site is a clinical publication that happens to sell the test its research is built on. Your writing is the front page. |
+| **`/atlas`** | The science is the structure. A mouth-to-gut axis runs down the page and every section attaches to a point on it. |
+| **`/practice`** | It opens on the symptom, in your voice. A consultation, not a keynote. |
+| **`/articles`** | The twelve pieces, with a page for each. |
+| **`/brand-kit`** | Colour, type and imagery, for you and anyone doing your marketing. |
+| **`/design-system`** | The parts catalogue, for whoever builds on this next. |
+
+**Three things worth trying while you look:**
+
+1. **The mode toggle, top right.** Light, dark and a third "vibrant" mode. Same
+   page, same content, three moods — and all three are finished, not an
+   afterthought.
+2. **On any version, scroll to the packages and click a greyed-out line.** Say
+   the gut panel. It moves you to the cheapest bundle that includes it and shows
+   you only what changed, instead of swapping in a whole new cart.
+3. **Compare the first screen to your current one.** Your site says "Orobiome"
+   by the fifth word. These hold it past the 200th, after you already know what
+   the thing is and what to do.
+
+### One honest flag
+
+There is **no checkout**, and the three price points are ours, not yours. Every
+*item* inside each tier is a real line from your own offer page — the kit, the
+sequencing, the dentist call, the protocol, the gut panel. The three prices are
+invented to show how a step-up works. Don't read them as a pricing
+recommendation. Every version says so on the page itself.
+
+## Why this is different from being handed a design
+
+A design comp is a picture. You still have to hire someone to turn it into a
+website, and the picture usually loses an argument with the code somewhere along
+the way.
+
+This is the website. You can choose a direction, change your mind, change a
+colour, add an article, and ship — without a rebuild in between.
+
+That works because the agent that built it wasn't improvising. **Astro Knots is a
+conceptual map we hand a coding agent before it writes anything** — the stack,
+the conventions, the constraints, the things we've learned not to do. So instead
+of getting creative *and* unpredictable, it gets creative *within rails*: real
+design range on top of good code, a current stack, and practices a professional
+team would recognise.
+
+The test of that is the handoff. Give your favourite of these three to a
+marketing team, an engineering team, or a different coding agent, and they can
+keep going the same afternoon. They'll find the content in plain markdown, the
+colours in one file, a parts catalogue at `/design-system`, and written
+explanations of why things are the way they are sitting next to the code.
+
+Two years ago, this was two jobs: pay for designs, then pay engineers to build
+them. Skip the rails and you get the modern version of the same trap — a real,
+working site that becomes a time sink the first time you want to change
+something. Here, choosing, iterating and going live are one continuous motion,
+and maintenance stops being the thing you dread.
+
+## What the redesign is actually fixing
+
+1. **You get oriented before you get educated.** Your live site's first real
+   sentence is about the permeability of a single-cell-thick membrane, and it
+   sells a coined word before anything explains it. Every version here answers
+   *what this is → what you do → what you get back* in plain words first, and
+   earns the terminology afterward. That isn't a style note — each article
+   carries the everyday question a worried person actually types, and every card
+   shows it above the clinical title.
+
+2. **The packages became a ladder you can climb.** One take-it-or-leave-it price
+   became three tiers where each one contains everything below it. Because
+   nothing is ever removed by upgrading, the cart can show you the two lines
+   you're adding instead of making you re-read a whole new list.
+
+3. **Authority without having to be loud.** Persistent bylines and credentials on
+   a real body of work, so the writing does the asserting. You never have to
+   perform to have a point of view.
+
+## Why it stays easy to change
+
+- **One content layer.** All three versions read the same files. Editing means
+  markdown and a few labelled fields — never a component.
+- **Re-brand in one line.** A colour change is one new value plus one
+  re-pointing. Components don't change.
+- **Retiring a direction is a delete.** The three never share code, so removing
+  two folders removes two directions.
+- **The catalogue can't drift**, because `/design-system` is built from the same
+  components the live pages use.
+
+# For the Handoff (to whoever builds on this next)
+
+Hi! Welcome to the handoff. This is a quick overview of the project and some context about why things are the way they are. It's built on about two years of experience **vibe coding** then **context engineering** then **agentic engineering** then **loop engineering** then **graph engineering**, then **harness engineering** and now **orchestration engineering**. By the time you see this, we will have another three buzz words that we will have lived through.
+
+## Under the hood
+
+### What Astro Knots is
 
 **[Astro Knots](https://lossless-group.github.io/astro-knots/)** is The Lossless
-Group's *pseudomonorepo*: a small lattice of independent Astro sites — client
-work, personal sites, and one published package — developed side by side in a
-single workspace so patterns can be compared and shared deliberately.
+Group's *pseudomonorepo*: a lattice of independent Astro sites — client work,
+personal sites, and one published package — developed side by side so patterns
+can be compared and shared deliberately.
 
 It is **not** a true monorepo. Every site is its own git repository with its own
-lockfile, and deploys on its own from its own repo. Nothing here requires a
-client to adopt our infrastructure, our build server, or our umbrella project.
-What the sites share is not runtime code — it is a set of **conventions**:
+lockfile and deploys on its own. Nothing here requires anyone to adopt our
+infrastructure or our umbrella project. What the sites share is not runtime code
+— it is a set of conventions:
 
 | Shared convention | What it buys |
 |---|---|
@@ -47,82 +161,15 @@ The workspace-level story — what worked, what didn't, and why we stopped
 pretending everything should be a shared package — is on the
 [Astro Knots splash page](https://lossless-group.github.io/astro-knots/).
 
-## Why this repo exists
+Worth noting what solving this site produced: problems 1 and 2 above became a
+**reminder** and a **blueprint** in the shared `context-v/` —
+[Orient Before You Introduce a Term of Art](https://github.com/lossless-group/astro-knots/blob/master/context-v/reminders/Orient-Before-You-Introduce-a-Term-of-Art.md)
+and
+[Build an Upgrade Ladder Cart from Superset Tiers](https://github.com/lossless-group/astro-knots/blob/master/context-v/blueprints/Build-an-Upgrade-Ladder-Cart-from-Superset-Tiers.md).
+A one-off fix becomes a reusable pattern for the next site, without anyone
+remembering to write it down later.
 
-This is a **speculative pitch**, not commissioned work. It was built for a
-prospective client to demonstrate something specific:
-
-> Give a coding agent good rails, and it will get genuinely *creative* — while
-> still handing you something a team can maintain and iterate on afterward.
-
-The rails are our agent skills — **`pseudomonorepos`**, **`context-vigilance`**,
-and **`astro-knots`** — loaded into Claude Code at the start of the session.
-They encode the token architecture, the three-mode contract, the documentation
-conventions, and the hard prohibitions (no React, no JSX, no MDX, no UI
-libraries, pnpm only).
-
-This is the most demanding of the three spikes in the set, because the site has
-real work to do: a twelve-article library, an eight-episode series, a three-tier
-product ladder, and a cart — rendered **three different ways** off one content
-layer. Same twelve articles, same eight episodes, same three bundles, same cart
-component. Only the argument changes.
-
-You pick one. The other two are deleted. Nothing else changes.
-
-> **This is a prototype.** There is no checkout, and the three-tier price ladder
-> is illustrative — the tier *contents* are real line items from the client's own
-> offer page, but the per-tier prices are invented to demonstrate the upgrade
-> mechanic. Do not quote them to the client as recommended pricing.
-
-## The three directions
-
-| Route | Direction | Premise | Cart layout |
-|---|---|---|---|
-| `/` | — | The chooser. Start here. | — |
-| `/journal` | **Journal** | A clinical publication that happens to sell the instrument its research is built on. | `ledger` |
-| `/atlas` | **Atlas** | An anatomical axis runs down the page; every section docks to a point on it. | `compare` |
-| `/practice` | **Practice** | Opens on the symptom, in her voice. A consultation, not a keynote. | `steps` |
-| `/articles` | — | The corpus, plus a detail page per piece. | — |
-| `/brand-kit` | — | Stakeholder-facing: colour, type, mark, imagery. | — |
-| `/design-system` | — | Developer-facing catalogue. Direction *and* mode switchable at runtime. | all three |
-
-## The three problems the redesign is solving
-
-1. **Orient before you educate.** The live site's first substantive sentence is
-   about the permeability of a single-cell-thick membrane, and its product is a
-   coined word introduced before anyone knows what it is. Every direction here
-   answers *what this is → what you do → what you get* in plain words first.
-   Enforced in the data model: `articles` carries `plain_question`, and every
-   index card renders it **above** the clinical title. The plain-language spine
-   lives in code as `ORIENTATION` in `src/lib/site.ts`, not as a note in a doc.
-   Generalised as a reusable rule in
-   [`context-v/reminders/Orient-Before-You-Introduce-a-Term-of-Art.md`](https://github.com/lossless-group/astro-knots/blob/master/context-v/reminders/Orient-Before-You-Introduce-a-Term-of-Art.md).
-2. **A ladder you can climb.** One take-it-or-leave-it price became three tiers,
-   each a **strict superset** of the one below. That constraint is what lets the
-   cart show a *delta* instead of swapping in a whole new cart. Written up as
-   [`context-v/blueprints/Build-an-Upgrade-Ladder-Cart-from-Superset-Tiers.md`](https://github.com/lossless-group/astro-knots/blob/master/context-v/blueprints/Build-an-Upgrade-Ladder-Cart-from-Superset-Tiers.md).
-3. **Authority without volume.** A byline system rather than a personal brand,
-   for a clinician who is shy about thought leadership.
-
-Note what happened to problems 1 and 2: solving them for this client produced a
-**reminder** and a **blueprint** in the shared `context-v/`. That is the
-`context-vigilance` skill doing its job — a one-off client fix becomes a reusable
-pattern for the next site, without anyone remembering to write it down later.
-
-## Why it stays maintainable after the pitch
-
-- **One content layer.** All three directions read the same collections. The
-  client edits YAML frontmatter and markdown — never a component.
-- **Re-brand in one line.** Two-tier tokens mean a colour change is a new named
-  token plus one re-pointed semantic token.
-- **Retiring a direction is a delete.** Per-direction components never
-  cross-import, so removing two folders and two routes removes two directions.
-- **One cart, three layouts.** `BundleLadder.svelte` is a single island with a
-  `layout` prop, not three forked carts.
-- **The catalogue ships with the site.** `/design-system` is generated from the
-  same components the site uses, so it cannot drift.
-
-## Stack
+### Stack
 
 Astro 7 · Tailwind 4 (via `@tailwindcss/vite`) · Svelte 5 (one island) · pnpm.
 No React, no JSX, no MDX — per the `astro-knots` skill.
@@ -134,18 +181,15 @@ pnpm build
 pnpm exec astro check
 ```
 
-This site is **not** a member of the astro-knots pnpm workspace; it installs
-standalone with its own lockfile so it can deploy independently.
-
-To run this alongside the two sibling spikes on auto-assigned ports — from an
-[astro-knots](https://github.com/lossless-group/astro-knots) workspace checkout,
-where all three are present:
+Not a member of the astro-knots pnpm workspace; it installs standalone with its
+own lockfile so it can deploy independently. To run all three spikes side by side
+from an [astro-knots](https://github.com/lossless-group/astro-knots) checkout:
 
 ```bash
 ../../scripts/dev-sites.sh
 ```
 
-## Architecture
+### Architecture
 
 ```
 src/
@@ -166,44 +210,38 @@ src/
 
 ### Two-tier tokens
 
-Tier 1 (`--color__bone`, `--font__newsreader`) are raw values in `global.css`, and
-may be referenced **only** from `src/styles/themes/*.css`. Tier 2 (`--color-primary`,
+Tier 1 (`--color__bone`, `--font__newsreader`) are raw values in `global.css`,
+referenced **only** from `src/styles/themes/*.css`. Tier 2 (`--color-primary`,
 `--font-body`) are what components and Tailwind utilities read. The full contract
 is documented at the top of `src/styles/themes/journal.css`.
 
-To change a colour for the client: add one named token, re-point one semantic
-token. No component changes.
-
 ### Three modes, per direction
 
-Light, dark and vibrant, for all three directions — nine combinations. Vibrant is
-**dark-based** and each theme file sets its ground, surface, text and border
-explicitly rather than inheriting from light. Direction is determined by the
-**route** and is deliberately not restored from `localStorage`; mode is a viewer
-preference and is. `/design-system` is the one page where direction is switchable
-at runtime.
+Light, dark and vibrant across three directions — nine combinations. Vibrant is
+**dark-based**; each theme file sets ground, surface, text and border explicitly
+rather than inheriting from light. Direction is set by the **route** and is
+deliberately not restored from `localStorage`; mode is a viewer preference and
+is. `/design-system` is the one page where direction switches at runtime.
 
 ### Imagery
 
 Seven ink-on-paper plates in `public/img/`, generated as one family off a single
 locked seed. There is no light set and no dark set: `Plate.astro` dissolves the
 ground with a blend mode (`multiply` in light, `invert` + `screen` in dark and
-vibrant) and tints toward the active `--color-primary`. One family, nine
-appearances. Raw candidates are archived in `.ideogram-candidates/`, outside
-`public/` so the build never ships them.
+vibrant) and tints toward the active `--color-primary`. Raw candidates are
+archived in `.ideogram-candidates/`, outside `public/` so the build never ships
+them.
 
-## Known gaps
+### Known gaps
 
 - **No LFM.** Article bodies render through Astro's native markdown pipeline, not
-  `@lossless-group/lfm`. Fine for a spike; wiring LFM in is the first follow-up if
-  this goes anywhere, since the rest of the estate uses it.
-- **No checkout.** The cart is a configurator resolving to a single CTA.
+  `@lossless-group/lfm`. Fine here; first follow-up if this goes anywhere.
+- **No checkout.** The cart is a configurator resolving to a single call to action.
 - **No photography.** Practice's portrait slot is a CSS/SVG treatment with a
   labelled space where a real portrait goes.
 
-## Status
+### Provenance
 
-Speculative. Not commissioned, not deployed, not endorsed by the practitioners
-named in `src/lib/site.ts`, whose details and disclaimer are transcribed verbatim
-from the public live site. Prices are illustrative. Medical claims are the
-client's own, reproduced, not authored here.
+Practitioner names, contact details and the medical disclaimer are transcribed
+verbatim from the public live site. Medical claims are the client's own,
+reproduced rather than authored here. Prices are illustrative, as noted above.
