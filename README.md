@@ -96,11 +96,11 @@ You pick one. The other two are deleted. Nothing else changes.
    index card renders it **above** the clinical title. The plain-language spine
    lives in code as `ORIENTATION` in `src/lib/site.ts`, not as a note in a doc.
    Generalised as a reusable rule in
-   [`context-v/reminders/Orient-Before-You-Introduce-a-Term-of-Art.md`](../../context-v/reminders/Orient-Before-You-Introduce-a-Term-of-Art.md).
+   [`context-v/reminders/Orient-Before-You-Introduce-a-Term-of-Art.md`](https://github.com/lossless-group/astro-knots/blob/master/context-v/reminders/Orient-Before-You-Introduce-a-Term-of-Art.md).
 2. **A ladder you can climb.** One take-it-or-leave-it price became three tiers,
    each a **strict superset** of the one below. That constraint is what lets the
    cart show a *delta* instead of swapping in a whole new cart. Written up as
-   [`context-v/blueprints/Build-an-Upgrade-Ladder-Cart-from-Superset-Tiers.md`](../../context-v/blueprints/Build-an-Upgrade-Ladder-Cart-from-Superset-Tiers.md).
+   [`context-v/blueprints/Build-an-Upgrade-Ladder-Cart-from-Superset-Tiers.md`](https://github.com/lossless-group/astro-knots/blob/master/context-v/blueprints/Build-an-Upgrade-Ladder-Cart-from-Superset-Tiers.md).
 3. **Authority without volume.** A byline system rather than a personal brand,
    for a clinician who is shy about thought leadership.
 
@@ -137,7 +137,9 @@ pnpm exec astro check
 This site is **not** a member of the astro-knots pnpm workspace; it installs
 standalone with its own lockfile so it can deploy independently.
 
-To run this alongside the two sibling spikes on auto-assigned ports:
+To run this alongside the two sibling spikes on auto-assigned ports — from an
+[astro-knots](https://github.com/lossless-group/astro-knots) workspace checkout,
+where all three are present:
 
 ```bash
 ../../scripts/dev-sites.sh
