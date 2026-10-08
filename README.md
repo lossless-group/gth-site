@@ -35,13 +35,20 @@
 
 ## Three versions of your homepage
 
+**See it live:** https://lossless-group.github.io/gth-site/
+
 Same words, same articles, same episodes, same products — arranged three
 different ways. Open each one, see which feels like you, and tell us. The other
 two get deleted and nothing else changes.
 
-Everything on these pages is already on your live site. Nothing has been
-invented about the practice, the science, or the people. The one exception is
-priced below, called out plainly.
+**Updated October 2026 to your new Gateway site.** The copy, the three ways to
+begin, your whole blog (all 61 articles), the team, the three series, the
+practitioner programme, your starting-point guide and your four test kits at
+their real prices are all lifted from the site you are building now. The three
+visual directions are unchanged — only what they say.
+
+Everything on these pages is already on your live site or your shop. Nothing
+has been invented about the practice, the science, or the people.
 
 | Open this | It's the version where… |
 |---|---|
@@ -49,7 +56,11 @@ priced below, called out plainly.
 | **`/journal`** | The site is a clinical publication that happens to sell the test its research is built on. Your writing is the front page. |
 | **`/atlas`** | The science is the structure. A mouth-to-gut axis runs down the page and every section attaches to a point on it. |
 | **`/practice`** | It opens on the symptom, in your voice. A consultation, not a keynote. |
-| **`/articles`** | The twelve pieces, with a page for each. |
+| **`/<direction>/start`** | Your starting-point guide, in that direction's style. |
+| **`/<direction>/about`** | The team: founders, oral health experts, health coaches. |
+| **`/<direction>/series`** | Gateway to Health, Interconnected, GutCheck. |
+| **`/<direction>/practitioners`** | The affiliate programme for dentists. |
+| **`/blog`** | All 61 articles, at the same addresses as your live blog. |
 | **`/brand-kit`** | Colour, type and imagery, for you and anyone doing your marketing. |
 | **`/design-system`** | The parts catalogue, for whoever builds on this next. |
 
@@ -58,20 +69,27 @@ priced below, called out plainly.
 1. **The mode toggle, top right.** Light, dark and a third "vibrant" mode. Same
    page, same content, three moods — and all three are finished, not an
    afterthought.
-2. **On any version, scroll to the packages and click a greyed-out line.** Say
-   the gut panel. It moves you to the cheapest bundle that includes it and shows
-   you only what changed, instead of swapping in a whole new cart.
-3. **Compare the first screen to your current one.** Your site says "Orobiome"
-   by the fifth word. These hold it past the 200th, after you already know what
-   the thing is and what to do.
+2. **On any version, scroll to the test kits and click a greyed-out line.** Say
+   the GI-MAP. It moves you to the cheapest kit that includes it, and tells you
+   plainly if that switch leaves anything out — your kits are different mixes,
+   not a ladder, and the cart says so instead of pretending.
+3. **Take the starting-point guide on any direction.** Your answers stay on
+   screen as you go, and you can change any one of them without starting over.
 
-### One honest flag
+### Honest flags
 
-There is **no checkout**, and the three price points are ours, not yours. Every
-*item* inside each tier is a real line from your own offer page — the kit, the
-sequencing, the dentist call, the protocol, the gut panel. The three prices are
-invented to show how a step-up works. Don't read them as a pricing
-recommendation. Every version says so on the page itself.
+- There is **no checkout**. Every kit button goes to its product page on your
+  shop.
+- **Your guide's rule for mixed answers isn't visible from outside.** We
+  matched every combination we could observe; when answers are mixed, ours goes
+  with the path chosen most often (ties go to "How would you like to begin?").
+  Tell us your real rule and we'll match it.
+- **Two numbers on your shop disagree.** The Orobiome page says the Explore
+  tier is $1,450; the Explore page says $1,780. We used $1,780.
+- **One byline to check:** "How Gut Health and Weight Loss Actually Work
+  Together" is credited to Dr. Pedram but ends with Dr. Elmira's bio.
+- Your blog posts carry edit dates, not publish dates, so the library is
+  ordered by last edit.
 
 ## Why this is different from being handed a design
 
@@ -111,10 +129,10 @@ and maintenance stops being the thing you dread.
    carries the everyday question a worried person actually types, and every card
    shows it above the clinical title.
 
-2. **The packages became a ladder you can climb.** One take-it-or-leave-it price
-   became three tiers where each one contains everything below it. Because
-   nothing is ever removed by upgrading, the cart can show you the two lines
-   you're adding instead of making you re-read a whole new list.
+2. **The kits became something you can compare.** Every line in every kit is on
+   one list. Pick the line you care about and the cart moves you to the cheapest
+   kit that has it, saying what you gain *and* what you drop — so nobody has to
+   cross-read four product pages to work out which one they want.
 
 3. **Authority without having to be loud.** Persistent bylines and credentials on
    a real body of work, so the writing does the asserting. You never have to
@@ -130,6 +148,69 @@ and maintenance stops being the thing you dread.
   two folders removes two directions.
 - **The catalogue can't drift**, because `/design-system` is built from the same
   components the live pages use.
+
+# For Manus (or any agent building Elmira's site)
+
+You are welcome to take anything here: copy it, adapt it, or just use it as a
+reference. This repo exists so the site Elmira is building can pull in whatever
+she likes from these three directions. Everything is public and written to be
+read by an agent.
+
+**Live preview:** https://lossless-group.github.io/gth-site/
+(the chooser; then `/journal`, `/atlas`, `/practice`, plus `/<direction>/start`,
+`/about`, `/series`, `/practitioners`, and `/blog`).
+
+## 1. Get the code
+
+```bash
+git clone https://github.com/lossless-group/gth-site.git
+cd gth-site
+pnpm install          # Node 22+, pnpm 10
+pnpm dev              # http://localhost:4321
+```
+
+Already cloned? `git pull origin main` brings in whatever changed since.
+
+To borrow without cloning, every file has a raw URL:
+`https://raw.githubusercontent.com/lossless-group/gth-site/main/<path>`
+
+## 2. Know what you are looking at
+
+This site is **Astro 7 + Svelte 5 + Tailwind 4**. Elmira's site is
+**React + TypeScript (Vite)**. Nothing here needs to be installed into her
+site. Port patterns, don't import packages. The pieces map like this:
+
+| What Elmira might want | Where it lives here | How to bring it across |
+|---|---|---|
+| **Any copy** (headlines, paths, team bios, series, practitioner page, start-guide questions and results) | `src/lib/site.ts` | Plain typed objects. Copy the ones you need into a `content.ts` in her app. It is her own copy, already organised. |
+| **The 61 blog articles** | `src/content/articles/*.md` | Markdown + YAML frontmatter, one file per slug, same slugs as her `/blog/<slug>`. Extra fields she does not have yet: `plain_question` (the everyday question the piece answers) and `lede`. |
+| **The test kits as data** | `src/content/bundles/*.md` | Real products, real prices, product URLs and every line item. Load with any frontmatter parser. |
+| **The kit chooser** (click a line → cheapest kit that has it; says what a switch adds *and* drops) | `src/components/cart/BundleLadder.svelte` | The logic is about 60 lines of plain TypeScript in the `<script>` block: `rows`, `diff()`, `claim()`. Svelte `$state` maps to React `useState`, and `$derived` maps to `useMemo`. The markup is a radiogroup plus a list. |
+| **The starting-point guide** with an editable answer trail | `src/components/shared/StartGuide.svelte` | Same port: `answers`/`step` state, a `path` reducer, a result lookup into `START_GUIDE` in `site.ts`. |
+| **A whole direction's look** | `src/styles/themes/{journal,atlas,practice}.css` + `src/styles/global.css` | CSS custom properties. Tier 1 raw values (`--color__*`) in `global.css`; Tier 2 semantic tokens (`--color-primary`, `--font-display`, …) per direction. Copy one theme file's variables into her `:root` and point her components at the semantic names. Each has light, dark and vibrant. |
+| **A single section** (e.g. Journal's masthead, Atlas's anatomical axis, Practice's symptom checklist) | `src/components/{journal,atlas,practice}/*.astro` | `.astro` files are HTML with a frontmatter script. The markup and scoped `<style>` translate to JSX + CSS modules almost line for line. |
+| **Illustrations and team photos** | `public/img/` | Plain files. The `illustration__Threshold--*.jpg` set was made for these directions; team photos and series posters are copies of hers. |
+| **Fonts** | `src/layouts/BoilerPlateHTML.astro` | One Google Fonts link: Newsreader, Archivo, Fraunces, Inter, Karla, IBM Plex Mono. |
+
+## 3. Rules of the road
+
+- **Copy is Elmira's.** Everything client-facing was lifted from
+  gatewaytohealth.com or the shop. Don't rewrite her claims; do keep the
+  plain-language-first order (what this is, then what you do, then what you
+  get, and only then the term of art).
+- **Prices and products come from the shop**, `shop.theurbanmonk.com`. If a
+  price changes there, change `src/content/bundles/` here. Never invent one.
+- **No checkout lives here.** Every buy button links to the product page.
+- **Known open questions** are listed under *Honest flags* above. Resolve them
+  with Elmira, not by guessing.
+
+## 4. Telling us what she picked
+
+If Elmira says "the Atlas hero" or "the Journal library", that is enough for us
+to know exactly which component she means. Open an issue on this repo, or
+reply to whoever sent you the preview link.
+
+***
 
 # For the Handoff (to whoever builds on this next)
 
@@ -195,7 +276,7 @@ from an [astro-knots](https://github.com/lossless-group/astro-knots) checkout:
 src/
   content/{articles,series,bundles}/   # the shared content layer — all 3 read this
   content.config.ts                    # permissive schemas; document shape, don't gatekeep
-  lib/site.ts                          # practitioners, testimonials, ORIENTATION spine
+  lib/site.ts                          # brand, team, paths, series, start guide, ORIENTATION spine
   styles/
     global.css                         # Tier 1 named tokens (--color__*) + resets
     themes/{journal,atlas,practice}.css# Tier 2 semantic tokens, one file per direction
@@ -203,9 +284,13 @@ src/
   components/
     basics/     Plate, Wordmark        # shared
     ui/         ModeToggle             # shared
-    cart/       BundleLadder.svelte    # shared — the upgrade cart, 3 layouts
+    cart/       BundleLadder.svelte    # shared — the kit chooser, 3 layouts
+    shared/     Paths, StartGuide, TeamGrid, SeriesCards, DirectionShell
+                                       # shared — the secondary pages' parts
     journal/ atlas/ practice/          # per-direction sections, no cross-imports
   pages/
+    [direction]/[page].astro           # start · about · series · practitioners, ×3
+    blog/                              # her 61 articles at her own /blog/<slug> paths
 ```
 
 ### Two-tier tokens
