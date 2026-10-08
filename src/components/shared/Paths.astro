@@ -1,0 +1,160 @@
+---
+/* ============================================================================
+ * Paths — the three ways in: data, guided support, or a self-paced system.
+ *
+ * Her rebuilt homepage is organised around this choice, so all three
+ * directions carry it, each wrapped in its own section furniture (a journal
+ * section head, an atlas plate, a practice heading). This component is only
+ * the cards and the "not sure?" bridge to the start guide.
+ *
+ * Shared, not per-direction, because the only differences between directions
+ * are corner radius, rule weight and type — all of which arrive through the
+ * Tier 2 tokens the page has already set. `variant` adjusts composition only.
+ * ========================================================================== */
+import { PATHS } from '../../lib/site';
+
+interface Props {
+  variant?: 'journal' | 'atlas' | 'practice';
+  /** where "Find your starting point" goes, e.g. /journal/start */
+  startHref: string;
+}
+const { variant = 'journal', startHref } = Astro.props;
+---
+
+<div class={`paths paths--${variant}`}>
+  <ol class="cards">
+    {PATHS.map((p, i) => (
+      <li class="card">
+        <a class="card-link" href={p.href} rel="noopener">
+          <span class="n tabular" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <span class="note">{p.note}</span>
+          <span class="title">{p.title}</span>
+          <span class="body">{p.body}</span>
+          <span class="cta">{p.cta} <span aria-hidden="true">&rarr;</span></span>
+        </a>
+      </li>
+    ))}
+  </ol>
+
+  <div class="bridge">
+    <p class="bridge-q">
+      <strong>Not sure where to start?</strong>
+      Start with the story your body is telling. A short guide — about 90
+      seconds — points you to the path that fits.
+    </p>
+    <a class="bridge-go" href={startHref}>Find your starting point</a>
+  </div>
+</div>
+
+<style>
+  .paths { display: flex; flex-direction: column; gap: 1.75rem; container-type: inline-size; }
+
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  @container (min-width: 46rem) {
+    .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .card { min-width: 0; display: flex; }
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 1.4rem 1.3rem 1.3rem;
+    text-decoration: none;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control, 0.5rem);
+    transition: border-color 160ms ease, transform 160ms ease;
+  }
+  .card-link:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+
+  .n {
+    font-family: var(--font-data);
+    font-size: 0.75rem;
+    color: var(--color-primary);
+  }
+  .note {
+    font-family: var(--font-eyebrow, var(--font-data));
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .title {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .body {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    flex: 1 1 auto;
+  }
+  .cta {
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    color: var(--color-primary);
+  }
+
+  .bridge {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding: 1.1rem 0 0;
+    border-top: 1px solid var(--color-rule, var(--color-border));
+  }
+  .bridge-q {
+    margin: 0;
+    flex: 1 1 26rem;
+    min-width: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+  .bridge-q strong { color: var(--color-text); font-weight: 600; margin-right: 0.3rem; }
+  .bridge-go {
+    display: inline-flex;
+    padding: 0.75rem 1.3rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    text-decoration: none;
+    color: var(--color-background);
+    background: var(--color-primary);
+    border-radius: var(--radius-control, 0.5rem);
+    transition: filter 150ms ease, transform 150ms ease;
+  }
+  .bridge-go:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+  /* ---------------------------------------------------- variant tweaks -- */
+  /* Journal: hairlines, no fill — a table of three, not three tiles. */
+  .paths--journal .card-link {
+    background: none;
+    border-width: 0 0 0 1px;
+    border-color: var(--color-rule);
+    border-radius: 0;
+    padding: 0.25rem 0 0.25rem 1.25rem;
+  }
+  .paths--journal .card-link:hover { transform: none; border-color: var(--color-primary); }
+  .paths--journal .title { font-weight: 400; }
+  .paths--journal .bridge-go { border-radius: 0; }
+
+  /* Atlas: instrument readout — square corners, mono numerals, raised panel. */
+  .paths--atlas .card-link { border-radius: 0; background: var(--color-surface-raised); }
+  .paths--atlas .title { font-weight: 600; }
+
+  /* Practice: soft, rounded, conversational. */
+  .paths--practice .card-link { border-radius: 1.25rem; box-shadow: var(--shadow-soft, none); }
+  .paths--practice .bridge-go { border-radius: 999px; }
+</style>

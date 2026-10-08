@@ -7,8 +7,13 @@
  * DISCLAIMER verbatim (it is the client's regulated wording and is not ours
  * to soften) and the postal address.
  * ========================================================================== */
-import { DISCLAIMER } from '../../lib/site';
+import { BRAND, DISCLAIMER, LINKS, SUBPAGES } from '../../lib/site';
 
+interface Props {
+  home?: boolean;
+}
+const { home = true } = Astro.props;
+const base = home ? '' : '/atlas';
 const year = new Date().getFullYear();
 ---
 
@@ -25,16 +30,13 @@ const year = new Date().getFullYear();
 
     <div class="foot__cols">
       <div class="foot__col">
-        <p class="foot__mark">Threshold</p>
-        <p class="foot__line">
-          A saliva test for the bacteria living in your mouth, read by a
-          dentist who explains what to do about it.
-        </p>
+        <p class="foot__mark">{BRAND.name}</p>
+        <p class="foot__line">{BRAND.tagline}. {BRAND.line}</p>
         <ul class="foot__links">
+          {SUBPAGES.map((p) => <li><a href={`/atlas/${p.slug}`}>{p.label}</a></li>)}
+          <li><a href="/blog">Blog</a></li>
+          <li><a href={`${base}#panel`}>Test kits</a></li>
           <li><a href="/">All three directions</a></li>
-          <li><a href="/articles">All articles</a></li>
-          <li><a href="#panel">What it costs</a></li>
-          <li><a href="#main">Back to the top</a></li>
         </ul>
       </div>
 
@@ -55,7 +57,7 @@ const year = new Date().getFullYear();
     </div>
 
     <p class="foot__rule">
-      <span>&copy; {year} Urban Monk Productions, Inc.</span>
+      <span>&copy; {year} {BRAND.name} &middot; <a href={LINKS.privacy}>Privacy</a> &middot; <a href={LINKS.terms}>Terms</a></span>
       <span class="foot__proto">Design prototype &mdash; direction B, &ldquo;Atlas&rdquo;</span>
     </p>
   </div>
@@ -176,4 +178,6 @@ const year = new Date().getFullYear();
     color: var(--color-text-faint);
   }
   .foot__proto { text-transform: uppercase; letter-spacing: 0.14em; }
+  .foot__rule a { color: inherit; }
+  .foot__rule a:hover { color: var(--color-primary); }
 </style>

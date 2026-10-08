@@ -1,7 +1,8 @@
 ---
-/* The mark: a threshold. An opening you pass through, with the base left
+/* The mark: a gateway. An opening you pass through, with the base left
  * deliberately open — you are meant to walk through it, not admire it.
  * Colour comes entirely from currentColor and one semantic token. */
+import { BRAND } from '../../lib/site';
 export interface Props {
   size?: number;
   showText?: boolean;
@@ -10,7 +11,7 @@ export interface Props {
 const { size = 30, showText = true, href = '/' } = Astro.props;
 ---
 
-<a class="wm" href={href} aria-label="Threshold, home">
+<a class="wm" href={href} aria-label={`${BRAND.name}, home`}>
   <svg
     class="wm-mark"
     width={size}
@@ -28,7 +29,7 @@ const { size = 30, showText = true, href = '/' } = Astro.props;
     />
     <circle cx="16" cy="15.5" r="2.4" class="wm-dot" />
   </svg>
-  {showText && <span class="wm-text">Threshold</span>}
+  {showText && <span class="wm-text">{BRAND.name}</span>}
 </a>
 
 <style>

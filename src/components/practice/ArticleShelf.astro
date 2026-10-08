@@ -20,7 +20,8 @@ const byDate = (a: (typeof all)[number], b: (typeof all)[number]) =>
   (b.data.date_published?.getTime() ?? 0) - (a.data.date_published?.getTime() ?? 0);
 
 const featured = all.filter((a) => a.data.featured).sort(byDate);
-const rest = all.filter((a) => !a.data.featured).sort(byDate);
+/* A shelf, not the whole library: the most recent handful, then the door. */
+const rest = all.filter((a) => !a.data.featured).sort(byDate).slice(0, 8);
 
 /* Dates are UTC at rest; render them in UTC so a reader in Auckland and a
  * reader in Austin see the same publication date. */
@@ -57,7 +58,7 @@ const cats = (list?: string[]) =>
       {
         featured.map((a) => (
           <li class="feature">
-            <a class="feature-link" href={`/articles/${a.id}`}>
+            <a class="feature-link" href={`/blog/${a.id}`}>
               <p class="q">{a.data.plain_question ?? a.data.title}</p>
               {a.data.plain_question && <p class="t">{a.data.title}</p>}
               {a.data.lede && <p class="lede">{a.data.lede}</p>}
@@ -81,12 +82,12 @@ const cats = (list?: string[]) =>
     </ul>
 
     <!-- ------------------------------------------------------------- rest -->
-    <h3 class="rest-title">The rest of it</h3>
+    <h3 class="rest-title">More recent pieces</h3>
     <ul class="rest">
       {
         rest.map((a) => (
           <li class="row">
-            <a class="row-link" href={`/articles/${a.id}`}>
+            <a class="row-link" href={`/blog/${a.id}`}>
               <span class="row-q">{a.data.plain_question ?? a.data.title}</span>
               {a.data.plain_question && <span class="row-t">{a.data.title}</span>}
             </a>
@@ -105,7 +106,7 @@ const cats = (list?: string[]) =>
     </ul>
 
     <p class="all">
-      <a href="/articles">All articles, with the categories laid out &rarr;</a>
+      <a href="/blog">All {all.length} articles, with the categories laid out &rarr;</a>
     </p>
   </div>
 </section>

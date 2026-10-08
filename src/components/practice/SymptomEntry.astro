@@ -23,15 +23,17 @@
  * ========================================================================== */
 import { ORIENTATION, PRACTITIONERS } from '../../lib/site';
 
-/* Lifted from the complaints the client's own copy leads with. Kept in the
- * first person, because that is how they arrive in the chair. */
+/* The patterns her rebuilt homepage leads with — low energy, disrupted
+ * sleep, digestive discomfort, inflammation, brain fog — plus the one the
+ * mouth reports directly. Kept in the first person, because that is how they
+ * arrive in the chair. */
 const SYMPTOMS = [
   'I wake up tired after a full night in bed.',
-  'My gums bleed when I brush or floss.',
-  'My breath is bad, and brushing does not fix it.',
-  'It is cavity after cavity, and I do brush.',
-  'I feel drained, and there is no obvious reason.',
+  'My energy is low, and there is no obvious reason.',
   'My gut will not settle, whatever I cut out.',
+  'Inflammation keeps coming back, somewhere new each time.',
+  'I lose words and focus — the fog comes and goes.',
+  'My gums bleed when I brush or floss.',
 ];
 
 const FALLBACK_TALLY =
@@ -51,14 +53,14 @@ const her = PRACTITIONERS.dental;
     <p class="eyebrow">Start here</p>
 
     <h1 id="entry-title">
-      If nobody has been able to tell you why you feel like this,{' '}
-      <em>start with your mouth.</em>
+      When you don’t feel like yourself,{' '}
+      <em>start looking upstream.</em>
     </h1>
 
     <p class="lede">
-      I am a dentist. Twenty years of looking in mouths taught me that the mouth
-      is usually reporting on the rest of the body — and that almost nobody is
-      reading the report.
+      I am a dentist. Eighteen years of looking in mouths taught me that the
+      mouth and the gut are part of the same conversation — and that almost
+      nobody is listening to both at once.
     </p>
 
     <!-- ------------------------------------------------ the recognition -->
@@ -84,10 +86,11 @@ const her = PRACTITIONERS.dental;
       </p>
 
       <p class="turn">
-        Here is the part nobody told you: those are not six complaints. They are
-        six readings from the same place. Your mouth is the top of your digestive
-        tract, and it is full of bacteria — some of which protect you, and some
-        of which quietly make you ill.
+        Here is the part nobody told you: those are not six complaints. They can
+        be six readings from one connected system. Your mouth is the top of your
+        digestive tract, your gut is the rest of it, and what lives in one ends
+        up in the other — some of it protecting you, some of it quietly making
+        you ill.
       </p>
     </div>
 

@@ -16,6 +16,8 @@
 import SectionHead from './SectionHead.astro';
 import BundleLadder from '../cart/BundleLadder.svelte';
 
+import { BRAND } from '../../lib/site';
+
 /* Mirrors the island's own `Tier` shape. Declared here rather than imported
  * because BundleLadder is a Svelte file and does not export its types — and
  * per the brief the island is not to be edited to add one. */
@@ -23,6 +25,8 @@ export interface Tier {
   tier_id: string;
   name: string;
   plain_name?: string;
+  focus?: string;
+  url?: string;
   one_liner?: string;
   best_for?: string;
   price: number;
@@ -48,11 +52,11 @@ const { tiers, priceFrom } = Astro.props;
 <section class="jr-section" id="panel" aria-labelledby="panel-title">
   <div class="jr-sheet">
     <SectionHead
-      num="05"
-      eyebrow="The instrument"
-      title="The panel this research is built on"
+      num="06"
+      eyebrow="The instruments"
+      title="The test kits this research is built on"
       titleId="panel-title"
-      standfirst="One saliva sample, sequenced, and a report written to be read by the person who spat in the tube. Choose how much help you want with what it says."
+      standfirst="Oral, gut, sleep, or paired test kits designed to make hidden patterns more visible. Each one is collected at home and read with you by a person."
       meta={`From ${priceFrom}`}
     />
 
@@ -62,8 +66,9 @@ const { tiers, priceFrom } = Astro.props;
           client:visible
           layout="ledger"
           tiers={tiers}
-          cta="Get the panel"
-          orientation="Pick how far you want to go. Every option includes the test and the report; the ones above it add a person to talk to, and then a second test for the other end of the tract."
+          cta="Get this kit"
+          initial="orobiome"
+          orientation="Four kits, one for each place you might want to start. Click any line you want and you will be moved to the cheapest kit that has it — and told plainly if switching leaves something out."
         />
       </div>
 
@@ -71,23 +76,23 @@ const { tiers, priceFrom } = Astro.props;
         <!-- The pull quote, in the margin, set once. -->
         <figure class="pull">
           <blockquote>
-            A result you cannot act on is just anxiety with a lab logo on it.
+            Stop guessing at what your body needs.
           </blockquote>
-          <figcaption class="jr-eyebrow">From the editors</figcaption>
+          <figcaption class="jr-eyebrow">{BRAND.name}</figcaption>
         </figure>
 
         <dl class="facts">
           <div class="fact">
             <dt class="jr-eyebrow">Collection</dt>
-            <dd>About four minutes, at home, before you brush.</dd>
+            <dd>At home: a saliva swab, a finger-prick, or a stool kit. No doctor's order.</dd>
           </div>
           <div class="fact">
-            <dt class="jr-eyebrow">Reading the report</dt>
-            <dd>Plain English first, the strain-by-strain data after. No login.</dd>
+            <dt class="jr-eyebrow">Results</dt>
+            <dd>From CLIA-certified labs, in roughly one to two weeks depending on the test.</dd>
           </div>
           <div class="fact">
             <dt class="jr-eyebrow">Who reviews it</dt>
-            <dd>A dentist licensed in your state, on the two upper options.</dd>
+            <dd>A certified health coach on every kit. Orobiome results are also reviewed by a licensed dentist.</dd>
           </div>
         </dl>
       </aside>

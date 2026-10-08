@@ -31,8 +31,9 @@ const hours = Math.round((totalMinutes / 60) * 10) / 10;
       <h2 id="series-title">Gateway to Health</h2>
       <p class="sub">
         Eight episodes, about {hours} hours in total, made because this is
-        easier to show than to describe. The first three are free to watch;
-        the rest come with any kit below.
+        easier to show than to describe. The full series comes with Orobiome
+        testing. <a href="/practice/series">Interconnected and GutCheck</a> pick
+        up the gut side of the story.
       </p>
     </div>
 
@@ -55,7 +56,7 @@ const hours = Math.round((totalMinutes / 60) * 10) / 10;
                 {e.data.free ? (
                   <span class="ep-free">Free to watch</span>
                 ) : (
-                  <span class="ep-kit">Included with a kit</span>
+                  <span class="ep-kit">With Orobiome testing</span>
                 )}
               </p>
 
@@ -75,6 +76,7 @@ const hours = Math.round((totalMinutes / 60) * 10) / 10;
 </section>
 
 <style>
+  .sub a { color: var(--color-primary); }
   .series {
     padding-block: clamp(3rem, 7vw, 5rem);
     background: var(--color-surface);

@@ -8,21 +8,33 @@
  * they have opened.
  *
  * Carries the required exits: back to `/` (the direction chooser) and out to
- * `/articles`, plus the three-mode toggle.
+ * `/blog`, plus the three-mode toggle. On the homepage the jump list is the
+ * page's own plates; on a secondary page it becomes the secondary pages.
  * ========================================================================== */
 import ModeToggle from '../ui/ModeToggle.astro';
+import { BRAND, SUBPAGES } from '../../lib/site';
 
-const jumps = [
-  { href: '#throat', label: 'What it is' },
-  { href: '#stomach', label: 'Why it matters' },
-  { href: '#people', label: 'Who reads it' },
-  { href: '#panel', label: 'What it costs' },
-];
+interface Props {
+  /** true on /atlas itself; false on /atlas/<page> */
+  home?: boolean;
+  /** the subpage slug currently open, for aria-current */
+  current?: string;
+}
+const { home = true, current } = Astro.props;
+
+const jumps = home
+  ? [
+      { href: '#throat', label: 'What it is' },
+      { href: '#ways', label: 'Ways to begin' },
+      { href: '#people', label: 'Who reads it' },
+      { href: '#panel', label: 'Test kits' },
+    ]
+  : SUBPAGES.map((p) => ({ href: `/atlas/${p.slug}`, label: p.label, slug: p.slug }));
 ---
 
 <header class="chrome">
   <div class="chrome__inner">
-    <a class="mark" href="#main">
+    <a class="mark" href={home ? '#main' : '/atlas'}>
       <svg class="mark__glyph" viewBox="0 0 12 24" aria-hidden="true" focusable="false">
         <path d="M6 2v20" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round" />
         <circle cx="6" cy="3.5" r="2" fill="currentColor" />
@@ -30,20 +42,25 @@ const jumps = [
         <circle cx="6" cy="14" r="1.25" fill="currentColor" />
         <circle cx="6" cy="19" r="1.25" fill="currentColor" />
       </svg>
-      <span class="mark__name">Threshold</span>
+      <span class="mark__name">{BRAND.short}</span>
       <span class="mark__sub">Atlas</span>
     </a>
 
     <nav class="jumps" aria-label="Sections of this page">
       <ul>
         {jumps.map((j) => (
-          <li><a href={j.href}>{j.label}</a></li>
+          <li>
+            <a href={j.href} aria-current={'slug' in j && j.slug === current ? 'page' : undefined}>
+              {j.label}
+            </a>
+          </li>
         ))}
       </ul>
     </nav>
 
     <div class="tail">
-      <a class="out" href="/articles">All articles</a>
+      {home && <a class="out out--start" href="/atlas/start">Find your starting point</a>}
+      <a class="out" href="/blog">Blog</a>
       <a class="out out--back" href="/">
         <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10 3 5 8l5 5" />
@@ -124,7 +141,8 @@ const jumps = [
     color: var(--color-text-muted);
     transition: color 150ms ease;
   }
-  .jumps a:hover { color: var(--color-primary); }
+  .jumps a:hover,
+  .jumps a[aria-current='page'] { color: var(--color-primary); }
 
   /* Below the breakpoint the jump list is noise next to the contents strip
      in the hero, which says the same thing better. */
@@ -153,6 +171,7 @@ const jumps = [
     white-space: nowrap;
   }
   .out:hover { color: var(--color-primary); }
+  .out--start { color: var(--color-primary); }
   .out svg { width: 0.8rem; height: 0.8rem; }
 
   .out--back {

@@ -33,12 +33,19 @@ import Offer from '../components/journal/Offer.astro';
 import Correspondence from '../components/journal/Correspondence.astro';
 import Colophon from '../components/journal/Colophon.astro';
 import FigurePlate from '../components/journal/FigurePlate.astro';
+import SectionHead from '../components/journal/SectionHead.astro';
+import Paths from '../components/shared/Paths.astro';
 
 import {
-  PRACTITIONERS,
+  BRAND,
+  FOUNDERS,
+  ORAL_EXPERTS,
+  CREDENTIALS,
   DISCLAIMER,
   TESTIMONIALS,
   ORIENTATION,
+  WHY_UPSTREAM,
+  PATHS_INTRO,
   CATEGORY_LABELS,
 } from '../lib/site.ts';
 
@@ -68,7 +75,7 @@ const articleEntries = await getCollection('articles');
 const articles = articleEntries
   .map((entry) => ({
     id: entry.id,
-    href: `/articles/${entry.id}`,
+    href: `/blog/${entry.id}`,
     /* The rule made visible: the plain question leads. Where an author has
      * not written one, the clinical title stands in rather than the card
      * rendering an empty headline. */
@@ -92,7 +99,8 @@ const articles = articleEntries
   .sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0));
 
 const featured = articles.filter((a) => a.featured);
-const rest = articles.filter((a) => !a.featured);
+/* The homepage carries a sample of the index; all of it lives at /blog. */
+const rest = articles.filter((a) => !a.featured).slice(0, 9);
 
 const totalMinutes = articles.reduce((sum, a) => sum + (a.readMinutes ?? 0), 0);
 
@@ -147,11 +155,7 @@ const issue = 'Vol. I, No. 1';
 const issueDate = newest ? longDate.format(newest) : longDate.format(new Date());
 
 /* -------------------------------------------------------------- the people -- */
-const board = [
-  PRACTITIONERS.dental,
-  PRACTITIONERS.medical,
-  PRACTITIONERS.hygiene,
-].map((p) => ({
+const board = [...FOUNDERS, ...ORAL_EXPERTS].map((p) => ({
   name: p.name,
   credential: p.credential,
   role: p.role,
@@ -159,41 +163,20 @@ const board = [
 }));
 
 /* Footnote marks, expanded once at the foot of the masthead listing. */
-const credentialGlossary = [
-  { mark: 'DDS', expansion: 'Doctor of Dental Surgery' },
-  { mark: 'OMD', expansion: 'Doctor of Oriental Medicine' },
-  {
-    mark: 'BSDH, RDH, EFDA',
-    expansion:
-      'Bachelor of Science in Dental Hygiene; Registered Dental Hygienist; Expanded Functions Dental Assistant',
-  },
-];
+const credentialGlossary = CREDENTIALS;
 
-/* ------------------------------------------------------- why it matters ---- */
-/* Client copy, verbatim. Not ours to rewrite. */
-const systems = [
-  {
-    numeral: 'I',
-    name: 'Immune Function',
-    claim:
-      'The majority of our immune system lines our gut. A leaky gut creates chaos and autoimmunity.',
-  },
-  {
-    numeral: 'II',
-    name: 'Mental Wellbeing',
-    claim: 'The downstream effects lead to mental health issues and brain fog.',
-  },
-  {
-    numeral: 'III',
-    name: 'Digestive Health',
-    claim:
-      'Our ability to digest and assimilate food is tied to our microbiome and gut ecology.',
-  },
-];
+/* ------------------------------------------------------ why start here ---- */
+/* Client copy, verbatim, from her "Why start here" section. */
+const systems = WHY_UPSTREAM.points.map((p, i) => ({
+  numeral: ['I', 'II', 'III'][i],
+  name: p.title,
+  claim: p.body,
+}));
 
 /* ------------------------------------------------------------ the contents -- */
 const contents = [
-  { href: '#evidence', label: 'Why it matters', value: '3 systems' },
+  { href: '#evidence', label: 'Why start here', value: '3 notes' },
+  { href: '#ways', label: 'Ways to begin', value: '3 paths' },
   { href: '#board', label: 'Masthead', value: `${board.length} named` },
   { href: '#library', label: 'The library', value: `${articles.length} entries` },
   {
@@ -201,7 +184,7 @@ const contents = [
     label: 'The series',
     value: `${episodes.length} ${episodes.length === 1 ? 'part' : 'parts'}`,
   },
-  { href: '#panel', label: 'The panel', value: `from ${priceFrom}` },
+  { href: '#panel', label: 'Test kits', value: `from ${priceFrom}` },
   {
     href: '#correspondence',
     label: 'Correspondence',
@@ -211,8 +194,8 @@ const contents = [
 ---
 
 <BaseThemeLayout
-  title="Threshold — a clinical journal of the mouth and the gut"
-  description="Your mouth is full of bacteria. Some protect you; some quietly make you ill. Spit in a tube at home, mail it back, and get a report naming which ones you have — plus a dentist who explains what to do about it."
+  title={`${BRAND.name} — a clinical journal of the mouth and the gut`}
+  description="Gateway brings oral health, gut health, and whole-body patterns into one connected conversation through advanced assessment, private programs, and clinician-led guidance."
   theme="journal"
   mode="light"
 >
@@ -222,7 +205,7 @@ const contents = [
     <Masthead
       issue={issue}
       issueDate={issueDate}
-      editorialLine="A clinical publication about the mouth, the gut, and what travels between them — written by the dentists and doctors who read the results."
+      editorialLine="A clinical publication about the mouth, the gut, and what travels between them — written by the dentists, doctors and coaches who read the results."
     />
 
     <main id="main">
@@ -244,9 +227,34 @@ const contents = [
         legend="Several hundred species, in proportions that differ from one mouth to the next. The panel measures which ones, and how much of each."
       />
 
-      <SystemsTable systems={systems} />
+      <SystemsTable
+        systems={systems}
+        eyebrow={WHY_UPSTREAM.eyebrow}
+        title={WHY_UPSTREAM.title}
+        standfirst={WHY_UPSTREAM.lead}
+        meta="Three notes"
+      />
 
-      <EditorialBoard people={board} glossary={credentialGlossary} />
+      <section class="jr-section" id="ways" aria-labelledby="ways-title">
+        <div class="jr-sheet">
+          <SectionHead
+            num="02"
+            eyebrow={PATHS_INTRO.eyebrow}
+            title={PATHS_INTRO.title}
+            titleId="ways-title"
+            standfirst={PATHS_INTRO.lead}
+            meta="Three paths"
+          />
+          <Paths variant="journal" startHref="/journal/start" />
+        </div>
+      </section>
+
+      <EditorialBoard
+        people={board}
+        glossary={credentialGlossary}
+        moreHref="/journal/about"
+        moreLabel="The full team, including twelve health coaches"
+      />
 
       <Library
         featured={featured}
@@ -257,7 +265,7 @@ const contents = [
         span={span}
       />
 
-      <Syllabus episodes={episodes} totalRuntime={totalRuntime} />
+      <Syllabus episodes={episodes} totalRuntime={totalRuntime} moreHref="/journal/series" />
 
       <FigurePlate
         src="/img/illustration__Threshold--Vial.jpg"
@@ -265,7 +273,7 @@ const contents = [
         ratio="3 / 2"
         number="II"
         title="What arrives in the post"
-        legend="One tube. Four minutes, before you brush. Everything on the next page proceeds from what is in it."
+        legend="Collected at home, returned in a prepaid envelope. Everything on the next page proceeds from what is in it."
       />
 
       <Offer tiers={bundles.map((b) => b.data)} priceFrom={priceFrom} />

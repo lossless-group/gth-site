@@ -10,48 +10,60 @@
  * anybody, and not by a claim.
  * ========================================================================== */
 import ModeToggle from '../ui/ModeToggle.astro';
+import { BRAND, SUBPAGES } from '../../lib/site';
 
 export interface Props {
   issue: string;
   issueDate: string;
   editorialLine: string;
+  /** false on /journal/<page>: the wordmark drops to running-head size and
+   *  the contents nav lists the secondary pages instead of this issue. */
+  home?: boolean;
+  current?: string;
 }
 
-const { issue, issueDate, editorialLine } = Astro.props;
+const { issue, issueDate, editorialLine, home = true, current } = Astro.props;
 
-const contents = [
-  { href: '#orientation', label: 'Orientation' },
-  { href: '#evidence', label: 'Evidence' },
-  { href: '#board', label: 'The board' },
-  { href: '#library', label: 'The library' },
-  { href: '#series', label: 'The series' },
-  { href: '#panel', label: 'The panel' },
-];
+const contents = home
+  ? [
+      { href: '#orientation', label: 'Orientation' },
+      { href: '#evidence', label: 'Why start here' },
+      { href: '#ways', label: 'Ways to begin' },
+      { href: '#board', label: 'The board' },
+      { href: '#library', label: 'The library' },
+      { href: '#series', label: 'The series' },
+      { href: '#panel', label: 'Test kits' },
+    ]
+  : [
+      { href: '/journal', label: 'This issue', slug: '' },
+      ...SUBPAGES.map((p) => ({ href: `/journal/${p.slug}`, label: p.label, slug: p.slug as string })),
+    ];
 ---
 
-<header class="masthead">
+<header class="masthead" class:list={[{ 'masthead--running': !home }]}>
   <div class="glow" aria-hidden="true"></div>
 
   <div class="jr-sheet">
     <!-- Running rail: where you are, and the two ways out. -->
     <div class="rail">
-      <p class="jr-eyebrow rail-left">Threshold &middot; {issue}</p>
+      <p class="jr-eyebrow rail-left">{BRAND.name} &middot; {issue}</p>
       <div class="rail-right">
         <a class="rail-link" href="/">
           <span aria-hidden="true">&larr;</span> All three directions
         </a>
-        <a class="rail-link" href="/articles">Full library</a>
+        {home && <a class="rail-link" href="/journal/start">Find your starting point</a>}
+        <a class="rail-link" href="/blog">Full library</a>
         <ModeToggle />
       </div>
     </div>
 
     <!-- The wordmark. Set once, at a size print would use, and never again. -->
-    <p class="wordmark"><a href="/journal">Threshold</a></p>
+    <p class="wordmark"><a href="/journal">{BRAND.short}</a></p>
 
-    <p class="line">{editorialLine}</p>
+    {home && <p class="line">{editorialLine}</p>}
 
     <!-- Standing dateline. -->
-    <p class="dateline">
+    {home && <p class="dateline">
       <span class="tabular">{issue}</span>
       <span class="sep" aria-hidden="true">&middot;</span>
       <span class="tabular">{issueDate}</span>
@@ -59,14 +71,19 @@ const contents = [
       <span>Austin, Texas</span>
       <span class="sep" aria-hidden="true">&middot;</span>
       <span>Published continuously</span>
-    </p>
+    </p>}
 
     <nav class="contents" aria-label="Contents of this issue">
       <ul>
         {
           contents.map((c) => (
             <li>
-              <a href={c.href}>{c.label}</a>
+              <a
+                href={c.href}
+                aria-current={'slug' in c && c.slug === (current ?? '') && !home ? 'page' : undefined}
+              >
+                {c.label}
+              </a>
             </li>
           ))
         }
@@ -151,6 +168,13 @@ const contents = [
     display: inline-block;
   }
 
+  /* Running-head size on secondary pages: same face, same masthead, a
+   * fraction of the height, so the page content arrives above the fold. */
+  .masthead--running .wordmark {
+    margin-top: 1rem;
+    font-size: clamp(2.25rem, 6vw, 3.75rem);
+  }
+
   .line {
     margin-top: clamp(0.75rem, 2vw, 1.25rem);
     max-width: 52ch;
@@ -197,6 +221,10 @@ const contents = [
     border-bottom: 1px solid var(--color-border);
     padding-bottom: 0.1rem;
     transition: color 150ms ease, border-color 150ms ease;
+  }
+  .contents a[aria-current='page'] {
+    color: var(--color-text);
+    border-bottom-color: var(--color-primary);
   }
   .contents a:hover {
     color: var(--color-text);

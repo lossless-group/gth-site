@@ -1,0 +1,96 @@
+---
+/* ============================================================================
+ * SeriesCards — her three series (Gateway to Health, Interconnected,
+ * GutCheck), poster beside copy. Used on every /<direction>/series page. The
+ * Gateway to Health episode list sits under it on that page, from the
+ * `series` collection.
+ * ========================================================================== */
+import { SERIES } from '../../lib/site';
+
+interface Props {
+  variant?: 'journal' | 'atlas' | 'practice';
+}
+const { variant = 'journal' } = Astro.props;
+---
+
+<ol class={`shows shows--${variant}`}>
+  {SERIES.map((s, i) => (
+    <li class="show" id={`series-${s.id}`}>
+      <div class="poster">
+        <img src={s.poster} alt={`${s.name} series poster`} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+      </div>
+      <div class="copy">
+        <p class="meta">{s.meta}</p>
+        <h2 class="name">{s.name}</h2>
+        <p class="sub">{s.subtitle}</p>
+        <p class="body">{s.body}</p>
+        <a class="go" href={s.href} rel="noopener">{s.cta} <span aria-hidden="true">&rarr;</span></a>
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .shows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: clamp(2.5rem, 6vw, 4rem); }
+
+  .show { display: grid; gap: 1.5rem 2.5rem; min-width: 0; }
+  @media (min-width: 48rem) {
+    .show { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); align-items: center; }
+    .show:nth-child(even) .poster { order: 2; }
+  }
+
+  .poster {
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control, 0.5rem);
+    background: var(--color-surface);
+  }
+  .poster img { display: block; width: 100%; height: auto; }
+
+  .copy { min-width: 0; }
+  .meta {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-eyebrow, var(--font-data));
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+  }
+  .sub {
+    margin: 0.5rem 0 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.125rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+  .body {
+    margin: 1rem 0 0;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    max-width: 58ch;
+  }
+  .go {
+    display: inline-block;
+    margin-top: 1.25rem;
+    font-size: 0.9375rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.15rem;
+  }
+  .go:hover { border-color: var(--color-primary); }
+
+  .shows--journal .poster, .shows--atlas .poster { border-radius: 0; }
+  .shows--practice .poster { border-radius: 1.25rem; }
+  .shows--atlas .sub { font-style: normal; }
+</style>

@@ -29,6 +29,12 @@ const articles = defineCollection({
        * so a term never appears on a card without its translation nearby. */
       term_of_art: z.string().optional(),
       term_in_plain_english: z.string().optional(),
+      /* Carried from her live blog so the library can match it one-to-one:
+       * the card summary, the hero image, and where the piece came from. */
+      description: z.string().optional(),
+      image: z.string().optional(),
+      image_alt: z.string().optional(),
+      source_url: z.string().optional(),
     })
     .passthrough(),
 });
@@ -52,13 +58,16 @@ const series = defineCollection({
 });
 
 /* ----------------------------------------------------------------- bundles --
- * The commerce ladder. Three tiers, each a strict superset of the one below,
- * which is what makes a one-click upgrade honest: upgrading never removes
- * anything, so the cart can present the delta rather than a whole new cart.
+ * The test kits, as sold on her shop. Real products at real prices.
  *
- * `includes` carries the FULL list for the tier (not just the delta) so the
- * renderer can diff adjacent tiers itself and no one has to keep two lists
- * in sync by hand. */
+ * These are NOT strict supersets of one another (Orobiome carries a dentist
+ * review the complete package does not list; the sleep kit swaps in a
+ * cortisol test), so the cart diffs tiers in both directions and says what a
+ * switch drops as well as what it adds. A line item is the same line item
+ * across kits only when its `label` matches exactly — keep labels identical.
+ *
+ * `includes` carries the FULL list for the kit, not a delta. `url` is the
+ * product page the cart's call to action sends you to. */
 const bundles = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/bundles' }),
   schema: z
@@ -67,6 +76,8 @@ const bundles = defineCollection({
       tier_id: z.string(),
       name: z.string(),
       plain_name: z.string().optional(),
+      focus: z.string().optional(),
+      url: z.string().optional(),
       one_liner: z.string().optional(),
       best_for: z.string().optional(),
       price: z.number(),

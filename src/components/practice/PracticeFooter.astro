@@ -7,30 +7,37 @@
  * rather than being set in 10px grey, because a disclaimer nobody can read is
  * not a disclaimer.
  * ========================================================================== */
-import { DISCLAIMER } from '../../lib/site';
+import { BRAND, DISCLAIMER, LINKS, SUBPAGES } from '../../lib/site';
+
+interface Props {
+  home?: boolean;
+}
+const { home = true } = Astro.props;
+const base = home ? '' : '/practice';
 ---
 
 <footer class="foot">
   <div class="wrap">
     <div class="top">
       <div class="ident">
-        <p class="mark">Threshold</p>
-        <p class="tag">
-          Oral and whole-body health, explained in the order a person actually
-          needs it.
-        </p>
+        <p class="mark">{BRAND.name}</p>
+        <p class="tag">{BRAND.tagline}.</p>
       </div>
 
       <nav class="links" aria-label="Footer">
         <ul>
-          <li><a href="#what">What this is</a></li>
-          <li><a href="#people">Who we are</a></li>
-          <li><a href="#library">Reading</a></li>
-          <li><a href="#series">Watch</a></li>
-          <li><a href="#kit">The kit</a></li>
+          <li><a href={`${base}#what`}>What this is</a></li>
+          <li><a href={`${base}#ways`}>Ways to begin</a></li>
+          <li><a href={`${base}#library`}>Reading</a></li>
+          <li><a href={`${base}#kit`}>Test kits</a></li>
         </ul>
         <ul>
-          <li><a href="/articles">All articles</a></li>
+          {SUBPAGES.map((p) => <li><a href={`/practice/${p.slug}`}>{p.label}</a></li>)}
+          <li><a href="/blog">Blog</a></li>
+        </ul>
+        <ul>
+          <li><a href={LINKS.privacy}>Privacy</a></li>
+          <li><a href={LINKS.terms}>Terms</a></li>
           <li><a href="/">Other design directions</a></li>
         </ul>
       </nav>

@@ -8,28 +8,49 @@
  * no announcement ribbon, no "BOOK NOW" in a contrasting pill.
  *
  * Carries the two required escape hatches — `/` back to the direction chooser
- * and `/articles` into the library — alongside the in-page anchors.
+ * and `/blog` into the library — alongside the in-page anchors (homepage) or
+ * the secondary pages (everywhere else).
  * ========================================================================== */
 import ModeToggle from '../ui/ModeToggle.astro';
+import { BRAND, SUBPAGES } from '../../lib/site';
+
+interface Props {
+  home?: boolean;
+  current?: string;
+}
+const { home = true, current } = Astro.props;
+
+const primary = home
+  ? [
+      { href: '#what', label: 'What this is' },
+      { href: '#ways', label: 'Ways to begin' },
+      { href: '#people', label: 'Who we are' },
+      { href: '#kit', label: 'Test kits' },
+    ]
+  : SUBPAGES.map((p) => ({ href: `/practice/${p.slug}`, label: p.label, slug: p.slug }));
 ---
 
 <header class="chrome">
   <div class="wrap">
-    <a class="mark" href="#main">
-      <span class="mark-word">Threshold</span>
-      <span class="mark-sub">Oral and whole-body health, explained plainly</span>
+    <a class="mark" href={home ? '#main' : '/practice'}>
+      <span class="mark-word">{BRAND.name}</span>
+      <span class="mark-sub">{BRAND.line}</span>
     </a>
 
     <nav class="nav" aria-label="Primary">
       <ul class="links">
-        <li><a href="#what">What this is</a></li>
-        <li><a href="#people">Who we are</a></li>
-        <li><a href="#library">Reading</a></li>
-        <li><a href="#kit">The kit</a></li>
+        {primary.map((l) => (
+          <li>
+            <a href={l.href} aria-current={'slug' in l && l.slug === current ? 'page' : undefined}>
+              {l.label}
+            </a>
+          </li>
+        ))}
       </ul>
       <span class="divider" aria-hidden="true"></span>
       <ul class="links links--aside">
-        <li><a href="/articles">All articles</a></li>
+        {home && <li><a href="/practice/start">Find your starting point</a></li>}
+        <li><a href="/blog">Blog</a></li>
         <li><a href="/" class="chooser">Other directions</a></li>
       </ul>
       <ModeToggle />
@@ -106,6 +127,10 @@ import ModeToggle from '../ui/ModeToggle.astro';
     color: var(--color-text-muted);
     border-bottom: 1px solid transparent;
     transition: color 160ms ease, border-color 160ms ease;
+  }
+  .links a[aria-current='page'] {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
   }
   .links a:hover {
     color: var(--color-primary);

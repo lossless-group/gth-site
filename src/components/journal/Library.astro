@@ -4,8 +4,8 @@
  *
  * Not "latest posts". A table of contents: three lead pieces given real
  * column inches, then the balance of the collection set as an index with
- * bylines, subjects and extents on one shared grid. Twelve entries laid out
- * this way look like a body of work, which is the entire argument the
+ * bylines, subjects and extents on one shared grid. Sixty-odd entries laid
+ * out this way look like a body of work, which is the entire argument the
  * publication is making about its author.
  * ========================================================================== */
 import SectionHead from './SectionHead.astro';
@@ -44,7 +44,7 @@ const [lead, ...pair] = featured;
 <section class="jr-section" id="library" aria-labelledby="library-title">
   <div class="jr-sheet">
     <SectionHead
-      num="03"
+      num="04"
       eyebrow="The library"
       title="What has been published here"
       titleId="library-title"
@@ -92,11 +92,13 @@ const [lead, ...pair] = featured;
     )}
 
     <!-- ------------------------------------------------------- index -- -->
+    {/* The homepage shows a sample of the index, not all of it; the full
+        library is one click away at /blog. */}
     <div class="jr-cols index-block">
       <div class="index-main">
         <div class="index-head">
           <p class="jr-eyebrow">The rest of the index</p>
-          <p class="jr-eyebrow count tabular">{rest.length} more</p>
+          <p class="jr-eyebrow count tabular">{rest.length} of {total - featured.length}</p>
         </div>
 
         <ol class="index">
@@ -116,7 +118,7 @@ const [lead, ...pair] = featured;
         </ol>
 
         <p class="more">
-          <a href="/articles">Browse the full library</a>
+          <a href="/blog">Browse all {total} in the full library</a>
         </p>
       </div>
 

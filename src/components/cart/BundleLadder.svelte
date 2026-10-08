@@ -1,18 +1,23 @@
 <script lang="ts">
   /* ==========================================================================
-   * BundleLadder — the upgrade cart.
+   * BundleLadder — the kit chooser.
    *
-   * The mechanic the old site lacked: three tiers where each is a strict
-   * SUPERSET of the one below, so upgrading never removes anything and the
-   * cart can therefore show a DELTA instead of swapping in a whole new cart
-   * the reader has to re-read.
+   * Built first as an upgrade ladder over invented strict-superset tiers. The
+   * client's real catalogue is not a ladder: four kits, each a different mix
+   * of tests and people (Orobiome carries a dentist review the complete
+   * package does not list; the sleep kit swaps in a cortisol test). So the
+   * mechanic is generalised rather than faked:
    *
-   * The list rendered is the UNION of every line item across all tiers, in
-   * tier order, always present in the DOM. Changing tier only changes each
-   * row's state class. Two things fall out of that:
-   *   - upgrading reads as the ledger filling in, not as a list replacement
-   *   - a locked row is a real, clickable affordance: click any line item you
-   *     want and you are moved to the cheapest tier that contains it
+   *   - the list rendered is still the UNION of every line item across every
+   *     kit, always present in the DOM; changing kit only changes row state,
+   *     so a switch reads as the list re-filling, not as a list replacement
+   *   - each row knows which kits contain it. Click a line you want and you
+   *     move to the CHEAPEST kit that has it
+   *   - a switch is described honestly in both directions — what it adds AND
+   *     what it drops. Where the kits do nest, nothing is ever listed as
+   *     dropped and this behaves exactly like the original upgrade ladder
+   *
+   * Line items are matched across kits by exact `label`.
    *
    * Zero hard-coded colour. Every value below is a Tier 2 semantic token, so
    * the same component reads as native in all three directions and all three
@@ -29,6 +34,8 @@
     tier_id: string;
     name: string;
     plain_name?: string;
+    focus?: string;
+    url?: string;
     one_liner?: string;
     best_for?: string;
     price: number;
@@ -44,8 +51,8 @@
     initial = '' as string,
     cta = 'Continue',
     /* Plain-language framing shown above the control. Kept a prop so each
-     * direction can orient the reader in its own voice before the word
-     * "tier" or any product name appears. */
+     * direction can orient the reader in its own voice before any product
+     * name appears. */
     orientation = '',
   } = $props();
 
@@ -57,36 +64,50 @@
   })();
 
   let selectedIndex = $state(startIndex);
-  /* Rows the reader has just gained, so the newest addition can be announced
-   * once rather than re-announced on every render. */
-  let lastDirection = $state<'up' | 'down' | null>(null);
+  /* The kit we just came from, so the rows this switch added can be
+   * announced once rather than on every render. */
+  let previousIndex = $state<number | null>(null);
 
   const selected = $derived(tiers[selectedIndex] ?? tiers[0]);
 
-  /* The union, in tier order. Each row remembers the cheapest tier that
-   * contains it — that index IS the upgrade target when the row is clicked. */
+  const has = (ti: number, label: string) =>
+    (tiers[ti]?.includes ?? []).some((i) => i.label === label);
+
+  /* The union, in kit order. Each row remembers every kit that contains it,
+   * and the cheapest of those — that index IS the target when it is clicked. */
   const rows = $derived.by(() => {
-    const seen = new Map<string, { item: Item; firstTier: number }>();
+    const seen = new Map<string, { item: Item; inTiers: number[] }>();
     tiers.forEach((tier, ti) => {
       (tier.includes ?? []).forEach((item) => {
-        if (!seen.has(item.label)) seen.set(item.label, { item, firstTier: ti });
+        const row = seen.get(item.label);
+        if (row) row.inTiers.push(ti);
+        else seen.set(item.label, { item, inTiers: [ti] });
       });
     });
-    return [...seen.values()];
+    return [...seen.values()].map((r) => ({
+      ...r,
+      cheapest: r.inTiers.reduce((best, ti) =>
+        tiers[ti].price < tiers[best].price ? ti : best
+      ),
+    }));
   });
 
-  const nextTier = $derived(tiers[selectedIndex + 1] ?? null);
+  /* What switching from the selected kit to another one actually changes. */
+  function diff(to: number) {
+    const gained = rows.filter((r) => has(to, r.item.label) && !has(selectedIndex, r.item.label));
+    const lost = rows.filter((r) => !has(to, r.item.label) && has(selectedIndex, r.item.label));
+    return { gained, lost, cost: (tiers[to]?.price ?? 0) - (selected?.price ?? 0) };
+  }
 
-  /* What upgrading one step actually buys, in rows and in dollars. */
+  const nextIndex = $derived(selectedIndex + 1 < tiers.length ? selectedIndex + 1 : null);
   const nextDelta = $derived.by(() => {
-    if (!nextTier) return null;
-    const gained = rows.filter((r) => r.firstTier === selectedIndex + 1);
+    if (nextIndex === null) return null;
+    const d = diff(nextIndex);
     return {
-      tier: nextTier,
-      count: gained.length,
-      headline: gained[0]?.item.label ?? '',
-      rest: Math.max(0, gained.length - 1),
-      cost: nextTier.price - (selected?.price ?? 0),
+      tier: tiers[nextIndex],
+      ...d,
+      headline: d.gained[0]?.item.label ?? '',
+      rest: Math.max(0, d.gained.length - 1),
     };
   });
 
@@ -101,26 +122,32 @@
       maximumFractionDigits: 0,
     }).format(n);
 
+  /* Signed price difference, in words a screen reader can say. */
+  const signed = (n: number) =>
+    n === 0 ? 'same price' : n > 0 ? `+${money(n)}` : `−${money(-n)}`;
+
   function select(i: number) {
     if (i < 0 || i >= tiers.length || i === selectedIndex) return;
-    lastDirection = i > selectedIndex ? 'up' : 'down';
+    previousIndex = selectedIndex;
     selectedIndex = i;
   }
 
-  /* Clicking a locked row is the shortcut: "I want that one" moves you to the
-   * cheapest tier that has it, rather than making you work out which tier. */
-  function claim(firstTier: number) {
-    if (firstTier > selectedIndex) select(firstTier);
+  /* Clicking a line you do not have is the shortcut: "I want that one" moves
+   * you to the cheapest kit that has it, rather than making you work it out. */
+  function claim(target: number) {
+    select(target);
   }
 
-  /* A locked row's accessible name must state the CONSEQUENCE, not just repeat
-   * the line item. Read on its own out of context, "At-home collection kit,
-   * +$300" does not tell a screen-reader user that activating it changes which
-   * package they have selected. This does. */
-  function claimLabel(label: string, firstTier: number) {
-    const target = tiers[firstTier];
-    const delta = (target?.price ?? 0) - (selected?.price ?? 0);
-    return `Add ${label}. Upgrades to ${target?.plain_name ?? target?.name}, ${money(delta)} more.`;
+  /* A locked row's accessible name must state the CONSEQUENCE, not just
+   * repeat the line item: which kit it switches you to, what that costs, and
+   * what you would lose by switching. */
+  function claimLabel(label: string, target: number) {
+    const t = tiers[target];
+    const d = diff(target);
+    const lost = d.lost.length
+      ? ` Drops ${d.lost.map((r) => r.item.label).join(', ')}.`
+      : '';
+    return `Add ${label}. Switches to ${t?.plain_name ?? t?.name}, ${signed(d.cost)}.${lost}`;
   }
 
   function onTierKey(e: KeyboardEvent) {
@@ -148,6 +175,7 @@
   <!-- ------------------------------------------------------ tier control -->
   <div
     class="tiers"
+    style={`--tier-count: ${Math.min(tiers.length, 4)}`}
     role="radiogroup"
     aria-label="Package"
     tabindex="-1"
@@ -161,7 +189,6 @@
         tabindex={i === selectedIndex ? 0 : -1}
         class="tier"
         class:is-active={i === selectedIndex}
-        class:is-owned={i < selectedIndex}
         onclick={() => select(i)}
       >
         <span class="tier-step tabular">{i + 1}</span>
@@ -170,7 +197,7 @@
                headline: a stranger should know what they are buying before
                they have to learn what we call it. -->
           <span class="tier-plain">{tier.plain_name ?? tier.name}</span>
-          <span class="tier-name">{tier.name}</span>
+          <span class="tier-name">{tier.focus ? `${tier.focus} · ` : ''}{tier.name}</span>
         </span>
         <span class="tier-price tabular">{money(tier.price)}</span>
         {#if tier.most_popular}
@@ -204,13 +231,15 @@
   <!-- -------------------------------------------------------------- rows -->
   <ul class="rows">
     {#each rows as row (row.item.label)}
-      {@const included = row.firstTier <= selectedIndex}
-      {@const justAdded = row.firstTier === selectedIndex && selectedIndex > 0}
+      {@const included = row.inTiers.includes(selectedIndex)}
+      {@const justAdded =
+        included && previousIndex !== null && !row.inTiers.includes(previousIndex)}
+      {@const cost = (tiers[row.cheapest]?.price ?? 0) - (selected?.price ?? 0)}
       <li
         class="row"
         class:is-included={included}
         class:is-locked={!included}
-        class:is-new={justAdded && lastDirection === 'up'}
+        class:is-new={justAdded}
       >
         {#if included}
           <span class="mark" aria-hidden="true">
@@ -223,7 +252,7 @@
             {#if row.item.detail}<span class="row-detail">{row.item.detail}</span>{/if}
           </span>
           <span class="row-tail tabular">
-            {#if justAdded && lastDirection === 'up'}
+            {#if justAdded}
               <span class="row-added">Added</span>
             {:else if row.item.list_value}
               {money(row.item.list_value)}
@@ -233,8 +262,8 @@
           <button
             type="button"
             class="row-claim"
-            aria-label={claimLabel(row.item.label, row.firstTier)}
-            onclick={() => claim(row.firstTier)}
+            aria-label={claimLabel(row.item.label, row.cheapest)}
+            onclick={() => claim(row.cheapest)}
           >
             <span class="mark mark--add" aria-hidden="true">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -244,11 +273,12 @@
             <span class="row-body">
               <span class="row-label">{row.item.label}</span>
               {#if row.item.detail}<span class="row-detail">{row.item.detail}</span>{/if}
+              <span class="row-where">
+                In {tiers[row.cheapest]?.plain_name ?? tiers[row.cheapest]?.name}
+              </span>
             </span>
             <span class="row-tail tabular">
-              <span class="row-add-cost">
-                +{money((tiers[row.firstTier]?.price ?? 0) - (selected?.price ?? 0))}
-              </span>
+              <span class="row-add-cost">{signed(cost)}</span>
             </span>
           </button>
         {/if}
@@ -258,27 +288,41 @@
 
   <!-- ------------------------------------------------------------ actions -->
   <div class="actions">
-    <a class="go" href="#start">{cta} &mdash; {money(selected?.price ?? 0)}</a>
+    <a class="go" href={selected?.url ?? '#start'} rel="noopener">
+      {cta} &mdash; {money(selected?.price ?? 0)}
+    </a>
 
     {#if nextDelta}
       <button
         type="button"
         class="bump"
-        aria-label={`Upgrade to ${nextDelta.tier.plain_name ?? nextDelta.tier.name}: adds ${nextDelta.count} item${nextDelta.count === 1 ? '' : 's'} for ${money(nextDelta.cost)} more.`}
+        aria-label={`Switch to ${nextDelta.tier.plain_name ?? nextDelta.tier.name}: adds ${nextDelta.gained.length} item${nextDelta.gained.length === 1 ? '' : 's'}${nextDelta.lost.length ? `, drops ${nextDelta.lost.length}` : ''}, ${signed(nextDelta.cost)}.`}
         onclick={() => select(selectedIndex + 1)}
       >
         <span class="bump-lead">
-          Add {nextDelta.headline}{#if nextDelta.rest > 0}
-            <span class="bump-rest"> and {nextDelta.rest} more</span>
+          {#if nextDelta.headline}
+            Add {nextDelta.headline}{#if nextDelta.rest > 0}
+              <span class="bump-rest"> and {nextDelta.rest} more</span>
+            {/if}
+          {:else}
+            Switch to {nextDelta.tier.plain_name ?? nextDelta.tier.name}
           {/if}
         </span>
-        <span class="bump-cost tabular">+{money(nextDelta.cost)}</span>
+        <span class="bump-cost tabular">{signed(nextDelta.cost)}</span>
       </button>
+      {#if nextDelta.lost.length > 0}
+        <p class="bump-drop">
+          Switching to {nextDelta.tier.plain_name ?? nextDelta.tier.name} leaves out
+          {nextDelta.lost.map((r) => r.item.label.toLowerCase()).join(', ')}.
+        </p>
+      {/if}
       {#if selected?.upgrade_hook}
         <p class="bump-why">{selected.upgrade_hook}</p>
       {/if}
     {:else}
-      <p class="bump-why">Everything we offer, in one box. Nothing above this.</p>
+      <p class="bump-why">
+        {selected?.upgrade_hook || 'The most complete kit there is. Nothing above this.'}
+      </p>
     {/if}
   </div>
 </section>
@@ -307,7 +351,10 @@
     gap: 0.5rem;
   }
   @container (min-width: 40rem) {
-    .tiers { grid-template-columns: repeat(3, 1fr); }
+    .tiers { grid-template-columns: repeat(2, 1fr); }
+  }
+  @container (min-width: 56rem) {
+    .tiers { grid-template-columns: repeat(var(--tier-count, 3), 1fr); }
   }
 
   .tier {
@@ -332,7 +379,6 @@
     background: var(--color-surface-raised);
     box-shadow: inset 0 0 0 1px var(--color-primary);
   }
-  .tier.is-owned .tier-price { color: var(--color-text-faint); }
 
   .tier-step {
     display: grid;
@@ -343,8 +389,7 @@
     border: 1px solid var(--color-border);
     color: var(--color-text-muted);
   }
-  .tier.is-active .tier-step,
-  .tier.is-owned .tier-step {
+  .tier.is-active .tier-step {
     background: var(--color-primary);
     border-color: var(--color-primary);
     color: var(--color-background);
@@ -488,6 +533,15 @@
     max-width: 58ch;
   }
 
+  .row-where {
+    font-family: var(--font-eyebrow, var(--font-data));
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    margin-top: 0.15rem;
+  }
+
   .row.is-locked .row-label { color: var(--color-text-muted); }
   .row.is-locked .row-detail { color: var(--color-text-faint); }
 
@@ -548,6 +602,13 @@
   .bump:hover { border-color: var(--color-primary); color: var(--color-primary); }
   .bump-rest { color: var(--color-text-muted); }
   .bump-cost { color: var(--color-accent); }
+  .bump-drop {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-text-faint);
+    max-width: 52ch;
+  }
   .bump-why {
     margin: 0;
     font-size: 0.875rem;
@@ -565,7 +626,7 @@
      on a tint so the whole thing reads as a table of the same measurements. */
   .ladder--compare .tiers { gap: 0; }
   .ladder--compare .tier { border-radius: 0; }
-  @container (min-width: 40rem) {
+  @container (min-width: 56rem) {
     .ladder--compare .tier + .tier { border-left: 0; }
     .ladder--compare .tier:first-child { border-radius: var(--radius-control, 0.5rem) 0 0 0; }
     .ladder--compare .tier:last-child { border-radius: 0 var(--radius-control, 0.5rem) 0 0; }
@@ -586,6 +647,7 @@
     .ladder--steps .tiers { grid-template-columns: 1fr; }
     .ladder--steps .tier:nth-child(2) { margin-left: 1.75rem; }
     .ladder--steps .tier:nth-child(3) { margin-left: 3.5rem; }
+    .ladder--steps .tier:nth-child(4) { margin-left: 5.25rem; }
   }
   .ladder--steps .tier { border-radius: 999px; }
   .ladder--steps .mark { border-radius: 999px; }

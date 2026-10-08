@@ -8,43 +8,46 @@
  * nothing.
  * ========================================================================== */
 
+import { BRAND, LINKS, SUBPAGES } from '../../lib/site';
+
 export interface Props {
   disclaimer: string;
   issue: string;
   issueDate: string;
+  home?: boolean;
 }
 
-const { disclaimer, issue, issueDate } = Astro.props;
+const { disclaimer, issue, issueDate, home = true } = Astro.props;
+const base = home ? '' : '/journal';
 ---
 
 <footer class="colophon">
   <div class="jr-sheet">
     <div class="top">
       <div class="imprint">
-        <p class="mark">Threshold</p>
-        <p class="line">
-          A clinical publication about the mouth, the gut, and what travels
-          between them.
-        </p>
+        <p class="mark">{BRAND.name}</p>
+        <p class="line">{BRAND.tagline}. {BRAND.line}</p>
         <p class="dateline tabular">{issue} &middot; {issueDate}</p>
       </div>
 
       <nav class="links" aria-label="Footer">
         <p class="jr-eyebrow">Sections</p>
         <ul>
-          <li><a href="#orientation">Orientation</a></li>
-          <li><a href="#evidence">Why it matters</a></li>
-          <li><a href="#board">Masthead</a></li>
-          <li><a href="#library">The library</a></li>
-          <li><a href="#series">The series</a></li>
-          <li><a href="#panel">The panel</a></li>
+          <li><a href={`${base}#orientation`}>Orientation</a></li>
+          <li><a href={`${base}#evidence`}>Why start here</a></li>
+          <li><a href={`${base}#ways`}>Ways to begin</a></li>
+          <li><a href={`${base}#board`}>Masthead</a></li>
+          <li><a href={`${base}#library`}>The library</a></li>
+          <li><a href={`${base}#panel`}>Test kits</a></li>
         </ul>
       </nav>
 
       <nav class="links" aria-label="Elsewhere">
         <p class="jr-eyebrow">Elsewhere</p>
         <ul>
-          <li><a href="/articles">Full article library</a></li>
+          {SUBPAGES.map((p) => <li><a href={`/journal/${p.slug}`}>{p.label}</a></li>)}
+          <li><a href="/blog">Full article library</a></li>
+          <li><a href={LINKS.privacy}>Privacy</a> &middot; <a href={LINKS.terms}>Terms</a></li>
           <li><a href="/">All three directions</a></li>
         </ul>
       </nav>

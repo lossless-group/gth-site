@@ -11,7 +11,7 @@
  * She introduces her colleagues in her own voice, which is also why they read
  * as people she works with rather than as logos on a trust bar.
  * ========================================================================== */
-import { PRACTITIONERS } from '../../lib/site';
+import { PRACTITIONERS, ORAL_EXPERTS, COACHES } from '../../lib/site';
 import PortraitFrame from './PortraitFrame.astro';
 
 const her = PRACTITIONERS.dental;
@@ -21,7 +21,7 @@ const SUPPORT = [
     person: PRACTITIONERS.medical,
     initials: 'PS',
     line:
-      'Pedram works the other end of the same tube. When a mouth result explains a gut that would not settle, he is the one who takes it from there.',
+      'Pedram works the other end of the same tube. He directs our gut-health programs, so when a mouth result explains a gut that would not settle, he is the one who takes it from there.',
   },
   {
     person: PRACTITIONERS.hygiene,
@@ -36,14 +36,14 @@ const SUPPORT = [
   <div class="wrap">
     <div class="lead">
       <div class="lead-portrait">
-        <PortraitFrame name={her.name} initials="EG" variant="lead" note={true} />
+        <PortraitFrame name={her.name} initials="ES" variant="lead" note={true} />
       </div>
 
       <div class="lead-copy">
         <p class="eyebrow">Who is telling you this</p>
         <h2 id="people-title">
-          I have spent twenty years looking in mouths and finding the rest of the
-          body.
+          I have spent eighteen years looking in mouths and finding the rest of
+          the body.
         </h2>
 
         <p>
@@ -61,9 +61,16 @@ const SUPPORT = [
           of those is an answer to the question they actually asked.
         </p>
 
+        <p>
+          Today I oversee a nationwide network of licensed dentists who read
+          oral microbiome results with people like you, alongside a team of
+          health coaches who help turn what we find into something you can
+          actually do.
+        </p>
+
         <p class="attrib">
           <span class="attrib-name">{her.name}, {her.credential}</span>
-          <span class="attrib-role">{her.role}</span>
+          <span class="attrib-role">{her.role}, {'Gateway to Health'}</span>
         </p>
       </div>
     </div>
@@ -86,11 +93,22 @@ const SUPPORT = [
           ))
         }
       </ul>
+      <p class="mates-more">
+        And {ORAL_EXPERTS.length - 1} more oral health experts and {COACHES.length}
+        certified health coaches. <a href="/practice/about">Meet everyone</a>
+      </p>
     </div>
   </div>
 </section>
 
 <style>
+  .mates-more {
+    margin: 1.5rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+  .mates-more a { color: var(--color-primary); }
   .people {
     padding-block: clamp(3rem, 7vw, 5rem);
     background: var(--color-surface);

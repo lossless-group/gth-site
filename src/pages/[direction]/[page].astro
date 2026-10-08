@@ -1,0 +1,297 @@
+---
+/* ============================================================================
+ * The secondary pages her rebuild added — the start guide, About, the series
+ * and the practitioner programme — once per direction, in that direction's
+ * chrome and tokens: /journal/start, /atlas/about, /practice/series, …
+ *
+ * Twelve routes from one file because the CONTENT is identical across
+ * directions (it is hers, from site.ts) and only the furniture differs, which
+ * DirectionShell and each component's `variant` already handle.
+ * ========================================================================== */
+import { getCollection } from 'astro:content';
+import DirectionShell from '../../components/shared/DirectionShell.astro';
+import StartGuide from '../../components/shared/StartGuide.svelte';
+import TeamGrid from '../../components/shared/TeamGrid.astro';
+import SeriesCards from '../../components/shared/SeriesCards.astro';
+import {
+  DIRECTIONS,
+  SUBPAGES,
+  START_GUIDE,
+  TEAM_GROUPS,
+  SERIES_INTRO,
+  PRACTITIONER_PAGE as PP,
+  LINKS,
+  type DirectionSlug,
+} from '../../lib/site';
+
+export function getStaticPaths() {
+  return DIRECTIONS.flatMap((d) =>
+    SUBPAGES.map((p) => ({ params: { direction: d.slug, page: p.slug } }))
+  );
+}
+
+const direction = Astro.params.direction as DirectionSlug;
+const page = Astro.params.page as (typeof SUBPAGES)[number]['slug'];
+
+const episodes = (await getCollection('series')).sort((a, b) => a.data.order - b.data.order);
+
+const head = {
+  start: {
+    title: 'Find your starting point',
+    eyebrow: START_GUIDE.intro.eyebrow,
+    heading: START_GUIDE.intro.title,
+    lead: START_GUIDE.intro.lead,
+  },
+  about: {
+    title: 'About us',
+    eyebrow: 'About us',
+    heading: 'The people behind the system.',
+    lead: 'Gateway is built by a team that sees oral health, gut health, and daily life as connected parts of the same human story.',
+  },
+  series: {
+    title: 'The series',
+    eyebrow: SERIES_INTRO.eyebrow,
+    heading: SERIES_INTRO.title,
+    lead: SERIES_INTRO.lead,
+  },
+  practitioners: {
+    title: 'For practitioners',
+    eyebrow: PP.eyebrow,
+    heading: PP.title,
+    lead: PP.lead,
+  },
+}[page];
+---
+
+<DirectionShell
+  direction={direction}
+  current={page}
+  title={head.title}
+  eyebrow={head.eyebrow}
+  heading={head.heading}
+  lead={head.lead}
+>
+  {page === 'start' && (
+    <div class="narrow">
+      <StartGuide client:load variant={direction} />
+    </div>
+  )}
+
+  {page === 'about' && (
+    <>
+      {TEAM_GROUPS.map((g, i) => (
+        <section class="block" aria-labelledby={`team-${g.id}`}>
+          <header class="block-head">
+            <p class="block-k">{g.eyebrow}</p>
+            <h2 class="block-h" id={`team-${g.id}`}>{g.title}</h2>
+            <p class="block-lead">{g.intro}</p>
+          </header>
+          <TeamGrid people={g.people} layout={i === 0 ? 'feature' : 'grid'} variant={direction} />
+        </section>
+      ))}
+      <section class="close">
+        <p class="block-k">The Gateway point of view</p>
+        <h2 class="block-h">The mouth is never just the mouth.</h2>
+        <p class="block-lead">
+          We believe health questions are more useful when they begin with a more
+          complete picture, and when people have a clear way to choose their next step.
+        </p>
+        <a class="btn" href={`/${direction}/start`}>Find your starting point</a>
+      </section>
+    </>
+  )}
+
+  {page === 'series' && (
+    <>
+      <SeriesCards variant={direction} />
+      <section class="block" aria-labelledby="episodes">
+        <header class="block-head">
+          <p class="block-k">Gateway to Health · Episode guide</p>
+          <h2 class="block-h" id="episodes">Eight episodes, in order.</h2>
+        </header>
+        <ol class="episodes">
+          {episodes.map((e) => (
+            <li class="ep">
+              <span class="ep-n tabular" aria-hidden="true">{String(e.data.order).padStart(2, '0')}</span>
+              <div class="ep-body">
+                <h3 class="ep-title">{e.data.title}</h3>
+                {e.data.promise && <p class="ep-promise">{e.data.promise}</p>}
+                {e.data.discoveries && e.data.discoveries.length > 0 && (
+                  <details class="ep-more">
+                    <summary>What you find out ({e.data.discoveries.length})</summary>
+                    <ul>{e.data.discoveries.map((d) => <li>{d}</li>)}</ul>
+                  </details>
+                )}
+              </div>
+              <span class="ep-run tabular">{e.data.runtime_minutes ? `${e.data.runtime_minutes} min` : ''}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section class="close">
+        <p class="block-k">Start with your next question</p>
+        <h2 class="block-h">Better health starts with a more connected view.</h2>
+        <p class="block-lead">
+          When you are ready to move from information to a more personal next
+          step, Gateway can help you choose a path forward.
+        </p>
+        <a class="btn" href={`/${direction}/start`}>Find your starting point</a>
+      </section>
+    </>
+  )}
+
+  {page === 'practitioners' && (
+    <>
+      <p class="actions">
+        <a class="btn" href={LINKS.partner}>Explore practitioner partnerships</a>
+      </p>
+
+      <section class="block split" aria-labelledby="pp-context">
+        <header class="block-head">
+          <p class="block-k">{PP.context.eyebrow}</p>
+          <h2 class="block-h" id="pp-context">{PP.context.title}</h2>
+        </header>
+        <p class="block-lead">{PP.context.body}</p>
+      </section>
+
+      <section class="block" aria-labelledby="pp-affiliate">
+        <header class="block-head">
+          <p class="block-k">{PP.affiliate.eyebrow}</p>
+          <h2 class="block-h" id="pp-affiliate">{PP.affiliate.title}</h2>
+          <p class="block-lead">{PP.affiliate.body}</p>
+        </header>
+        <ol class="steps">
+          {PP.affiliate.steps.map((s, i) => (
+            <li class="stepcard">
+              <span class="step-n tabular">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="step-h">{s.title}</h3>
+              <p class="step-b">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+        <p class="actions">
+          <a class="btn" href={LINKS.affiliate} rel="noopener">{PP.affiliate.cta}</a>
+        </p>
+      </section>
+
+      <section class="block" aria-label="Why practitioners partner with Gateway">
+        <ol class="steps">
+          {PP.benefits.map((s, i) => (
+            <li class="stepcard stepcard--quiet">
+              <span class="step-n tabular">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="step-h">{s.title}</h3>
+              <p class="step-b">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="close">
+        <p class="block-k">{PP.close.eyebrow}</p>
+        <h2 class="block-h">{PP.close.title}</h2>
+        <p class="block-lead">{PP.close.body}</p>
+        <a class="btn" href={LINKS.partner}>{PP.close.cta}</a>
+      </section>
+    </>
+  )}
+</DirectionShell>
+
+<style>
+  .narrow { max-width: 54rem; }
+
+  .block { margin-top: clamp(3rem, 7vw, 5rem); padding-top: clamp(1.75rem, 4vw, 2.5rem); border-top: 1px solid var(--color-rule, var(--color-border)); }
+  .block-head { margin-bottom: 2rem; max-width: 48rem; }
+  .block-k {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-eyebrow, var(--font-data));
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .block-h {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+  }
+  :global(.theme-atlas) .block-h { font-weight: 600; }
+  .block-lead {
+    margin: 0.9rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }
+  .split { display: grid; gap: 1rem 3rem; }
+  @media (min-width: 56rem) {
+    .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+    .split .block-lead { margin-top: 0; }
+  }
+
+  .close {
+    margin-top: clamp(3.5rem, 8vw, 6rem);
+    padding: clamp(1.75rem, 5vw, 3rem);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control, 0.5rem);
+  }
+  .close .btn { margin-top: 1.5rem; }
+
+  .actions { margin: 1.5rem 0 0; }
+  .btn {
+    display: inline-flex;
+    padding: 0.8rem 1.4rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    text-decoration: none;
+    color: var(--color-background);
+    background: var(--color-primary);
+    border-radius: var(--radius-control, 0.5rem);
+    transition: filter 150ms ease, transform 150ms ease;
+  }
+  .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  :global(.theme-practice) .btn { border-radius: 999px; }
+
+  /* ----------------------------------------------------------- steps -- */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+  @media (min-width: 52rem) { .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .stepcard {
+    padding: 1.4rem 1.3rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control, 0.5rem);
+    min-width: 0;
+  }
+  .stepcard--quiet { background: none; }
+  .step-n { font-family: var(--font-data); font-size: 0.75rem; color: var(--color-primary); }
+  .step-h {
+    margin: 0.6rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.25;
+    color: var(--color-text);
+  }
+  .step-b { margin: 0.6rem 0 0; font-size: 0.9375rem; line-height: 1.6; color: var(--color-text-muted); }
+
+  /* -------------------------------------------------------- episodes -- */
+  .episodes { list-style: none; margin: 0; padding: 0; }
+  .ep {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    gap: 0.5rem 1.25rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--color-grid, var(--color-border));
+  }
+  .ep-n { font-family: var(--font-data); font-size: 0.8125rem; color: var(--color-text-faint); padding-top: 0.3rem; }
+  .ep-title { margin: 0; font-family: var(--font-display); font-size: 1.25rem; line-height: 1.25; color: var(--color-text); }
+  .ep-promise { margin: 0.4rem 0 0; font-size: 0.9375rem; line-height: 1.6; color: var(--color-text-muted); max-width: 60ch; }
+  .ep-run { font-family: var(--font-data); font-size: 0.8125rem; color: var(--color-text-faint); padding-top: 0.3rem; }
+  .ep-more { margin-top: 0.6rem; font-size: 0.875rem; color: var(--color-text-muted); }
+  .ep-more summary { cursor: pointer; color: var(--color-primary); }
+  .ep-more ul { margin: 0.6rem 0 0; padding-left: 1.2rem; list-style: disc; }
+  .ep-more li { margin-bottom: 0.35rem; line-height: 1.55; }
+</style>

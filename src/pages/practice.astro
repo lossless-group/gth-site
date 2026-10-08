@@ -29,8 +29,9 @@ import PracticeFooter from '../components/practice/PracticeFooter.astro';
 
 import BundleLadder from '../components/cart/BundleLadder.svelte';
 import Plate from '../components/basics/Plate.astro';
+import Paths from '../components/shared/Paths.astro';
 import { getCollection } from 'astro:content';
-import { TESTIMONIALS } from '../lib/site';
+import { BRAND, PATHS_INTRO, TESTIMONIALS } from '../lib/site';
 
 const bundles = (await getCollection('bundles')).sort(
   (a, b) => a.data.order - b.data.order
@@ -40,8 +41,8 @@ const [tina, brian, vivian] = TESTIMONIALS;
 ---
 
 <BaseThemeLayout
-  title="Threshold — if nobody has told you why you feel like this, start with your mouth"
-  description="Your mouth is full of bacteria. Some protect you; some quietly make you ill. Spit in a tube at home, mail it back, and get a report naming which ones you have — plus a dentist who explains what to do about it."
+  title={`${BRAND.name} — when you don’t feel like yourself, start looking upstream`}
+  description="Gateway brings oral health, gut health, and whole-body patterns into one connected conversation through advanced assessment, private programs, and clinician-led guidance."
   theme="practice"
   mode="light"
 >
@@ -78,6 +79,15 @@ const [tina, brian, vivian] = TESTIMONIALS;
 
       <WhyItMatters />
 
+      <section class="ways" id="ways" aria-labelledby="ways-title">
+        <div class="ways-wrap">
+          <p class="ways-k">{PATHS_INTRO.eyebrow}</p>
+          <h2 id="ways-title" class="ways-h">{PATHS_INTRO.title}</h2>
+          <p class="ways-sub">{PATHS_INTRO.lead}</p>
+          <Paths variant="practice" startHref="/practice/start" />
+        </div>
+      </section>
+
       <ThePeople />
 
       <PullQuote
@@ -93,7 +103,7 @@ const [tina, brian, vivian] = TESTIMONIALS;
       <PullQuote
         quote={vivian.quote}
         who={vivian.who}
-        context="Two ends of one tube, which is why the largest kit tests both."
+        context="Two ends of one tube, which is why the complete kit tests both at once."
       />
 
       <TheKit>
@@ -102,16 +112,17 @@ const [tina, brian, vivian] = TESTIMONIALS;
             src="/img/illustration__Threshold--Vial.jpg"
             alt="A small sealed laboratory collection vial standing upright, drawn in ink hatching."
             ratio="3 / 2"
-            caption="This is the whole thing. One tube, four minutes, before you brush."
+            caption="Collected at home. No clinic visit, no doctor’s order."
             tint={0.4}
           />
         </div>
         <BundleLadder
           client:visible
           layout="steps"
+          initial="orobiome"
           tiers={bundles.map((b) => b.data)}
-          cta="Start with the test"
-          orientation="Three rungs, same test at the bottom of all of them — the only thing that changes is how much help you get reading your results. Pick a rung, or click any line you want and it will move you to the cheapest one that includes it."
+          cta="Start with this kit"
+          orientation="Four kits, one for each place you might want to start. Pick one, or click any line you want and I will move you to the cheapest kit that includes it — and tell you if that leaves anything out."
         />
       </TheKit>
     </main>
@@ -179,4 +190,37 @@ const [tina, brian, vivian] = TESTIMONIALS;
     overflow: hidden;
   }
   .pr-plate--tight { padding: 0 0 2rem; max-width: 34rem; }
+
+  /* Ways to begin — set in the same conversational register as the
+     sections either side of it. */
+  .ways { padding-block: clamp(3rem, 7vw, 5rem); }
+  .ways-wrap {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+  }
+  .ways-k {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-eyebrow);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--color-primary);
+  }
+  .ways-h {
+    margin: 0;
+    max-width: 22ch;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+  }
+  .ways-sub {
+    margin: 1rem 0 2rem;
+    max-width: 52ch;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
 </style>

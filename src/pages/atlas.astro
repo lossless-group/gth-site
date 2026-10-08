@@ -31,10 +31,16 @@ import TestimonialStrip from '../components/atlas/TestimonialStrip.astro';
 import AtlasFooter from '../components/atlas/AtlasFooter.astro';
 import AxisWatcher from '../components/atlas/AxisWatcher.astro';
 import Plate from '../components/basics/Plate.astro';
+import Paths from '../components/shared/Paths.astro';
 
 import {
-  PRACTITIONERS,
+  BRAND,
+  FOUNDERS,
+  ORAL_EXPERTS,
+  COACHES,
   TESTIMONIALS,
+  PATHS_INTRO,
+  WHY_UPSTREAM,
   CATEGORY_LABELS,
 } from '../lib/site';
 
@@ -54,7 +60,8 @@ const allArticles = (await getCollection('articles')).sort((a, b) => {
 });
 
 const featured = allArticles.filter((a) => a.data.featured);
-const rest = allArticles.filter((a) => !a.data.featured);
+/* A sample of the index on the plate; all of it lives at /blog. */
+const rest = allArticles.filter((a) => !a.data.featured).slice(0, 8);
 
 const labelFor = (slugs: string[] = []) =>
   slugs.map((s) => CATEGORY_LABELS[s] ?? s);
@@ -132,28 +139,26 @@ const SYSTEMS = [
   },
 ];
 
+/* `forYou` is the one line per person that is ours: what this person does
+ * for the reader, drawn from her About page rather than invented. */
 const PEOPLE = [
   {
-    ...PRACTITIONERS.dental,
+    ...FOUNDERS[0],
     forYou:
-      'She is the one who reads your results back to you, line by line, and writes down what to do about them.',
+      'She oversees the nationwide network of licensed dentists who review oral microbiome results and consult with you on them.',
   },
   {
-    ...PRACTITIONERS.medical,
+    ...FOUNDERS[1],
     forYou:
-      'He is why this does not stop at your teeth. The gut half of the protocol is his.',
+      'He is why this does not stop at your teeth. He directs the gut-health programs, Upstream included.',
   },
-  {
-    ...PRACTITIONERS.hygiene,
-    forYou:
-      'She has done this chairside thousands of times, on real mouths, which is a different kind of knowing.',
-  },
+  ...ORAL_EXPERTS.map((p) => ({ ...p, forYou: p.focus })),
 ];
 ---
 
 <BaseThemeLayout
-  title="Threshold — an atlas of one tube, from your mouth down"
-  description="Your mouth is full of bacteria. Some protect you; some quietly make you ill. Spit in a tube at home, mail it back, and get a report naming which ones you have — plus a dentist who explains what to do about it."
+  title={`${BRAND.name} — an atlas of one tube, from your mouth down`}
+  description="Gateway brings oral health, gut health, and whole-body patterns into one connected conversation through advanced assessment, private programs, and clinician-led guidance."
   theme="atlas"
   mode="dark"
 >
@@ -214,20 +219,38 @@ const PEOPLE = [
         </AtlasPlate>
       ))}
 
-      <!-- ============================================= 06 · PEOPLE ===== -->
+      <!-- ============================================== 06 · WAYS ====== -->
+      <AtlasPlate
+        id="ways"
+        fig="06"
+        node="index"
+        label="Ways to begin"
+        kind="index"
+        caption="three ways in — data, a guided plan, or a six-week system on your own."
+      >
+        <div class="block">
+          <h2 class="h2">{PATHS_INTRO.title}</h2>
+          <p class="lede">{PATHS_INTRO.lead}</p>
+          <Paths variant="atlas" startHref="/atlas/start" />
+        </div>
+      </AtlasPlate>
+
+      <!-- ============================================= 07 · PEOPLE ===== -->
       <AtlasPlate
         id="people"
-        fig="06"
+        fig="07"
         node="index"
         label="Who reads it"
         kind="index"
-        caption="the three people whose names are on every report that goes out."
+        caption={`two founders, three oral health experts and ${COACHES.length} health coaches.`}
       >
         <div class="block">
           <h2 class="h2">A result is only as good as the person who reads it to you</h2>
           <p class="lede">
             The test is a machine measurement. Everything after it is a
-            conversation with one of these three.
+            conversation — with a licensed dentist, an oral health expert, or one
+            of {COACHES.length} certified health coaches.
+            <a class="inline" href="/atlas/about">Meet the whole team</a>.
           </p>
           <div class="people">
             {PEOPLE.map((p, i) => (
@@ -244,10 +267,10 @@ const PEOPLE = [
         </div>
       </AtlasPlate>
 
-      <!-- ============================================ 07 · LIBRARY ===== -->
+      <!-- ============================================ 08 · LIBRARY ===== -->
       <AtlasPlate
         id="library"
-        fig="07"
+        fig="08"
         node="index"
         label="The library"
         kind="index"
@@ -265,7 +288,7 @@ const PEOPLE = [
               {featured.map((a, i) => (
                 <ArticleCard
                   variant="featured"
-                  href={`/articles/${a.id}`}
+                  href={`/blog/${a.id}`}
                   index={i + 1}
                   plainQuestion={a.data.plain_question ?? a.data.title}
                   title={a.data.title}
@@ -286,7 +309,7 @@ const PEOPLE = [
               <p class="rest__k">Everything else in the library</p>
               {rest.map((a, i) => (
                 <ArticleCard
-                  href={`/articles/${a.id}`}
+                  href={`/blog/${a.id}`}
                   index={featured.length + i + 1}
                   plainQuestion={a.data.plain_question ?? a.data.title}
                   title={a.data.title}
@@ -297,17 +320,17 @@ const PEOPLE = [
                 />
               ))}
               <p class="rest__more">
-                <a href="/articles">Open the full index</a>
+                <a href="/blog">Open the full index — all {allArticles.length}</a>
               </p>
             </div>
           )}
         </div>
       </AtlasPlate>
 
-      <!-- ============================================= 08 · SERIES ===== -->
+      <!-- ============================================= 09 · SERIES ===== -->
       <AtlasPlate
         id="series"
-        fig="08"
+        fig="09"
         node="index"
         label="The series"
         kind="index"
@@ -317,37 +340,40 @@ const PEOPLE = [
           <h2 class="h2">Eight episodes, if you would rather be told than read</h2>
           <p class="lede">
             The same argument as this page, at length, with the clinicians on
-            camera. The first three are free; the rest come with every package.
+            camera. The full series comes with Orobiome testing. Interconnected
+            and GutCheck pick up the gut side of the story.
+            <a class="inline" href="/atlas/series">All three series</a>.
           </p>
           <SeriesTable episodes={episodes} />
         </div>
       </AtlasPlate>
 
-      <!-- ============================================== 09 · PANEL ===== -->
+      <!-- ============================================== 10 · PANEL ===== -->
       <AtlasPlate
         id="panel"
-        fig="09"
+        fig="10"
         node="index"
-        label="What it costs"
+        label="Test kits"
         kind="index"
-        caption="three packages, each a strict superset of the one before it."
+        caption="four kits — mouth, gut, sleep, or both ends at once."
       >
         <div class="block">
-          <h2 class="h2">What it costs</h2>
+          <h2 class="h2">The test kits, and what each one costs</h2>
           <BundleLadder
             client:visible
             layout="compare"
+            initial="orobiome"
             tiers={bundles.map((b) => b.data)}
-            cta="Order the panel"
-            orientation="Pick a row below and the list underneath fills in — each package contains everything in the one before it, so moving up never takes anything away."
+            cta="Order this kit"
+            orientation="Pick a kit and the list underneath shows exactly what is in it. Click any line you want and you move to the cheapest kit that has it — and if that switch leaves something out, it says so."
           />
         </div>
       </AtlasPlate>
 
-      <!-- ============================================ 10 · READERS ===== -->
+      <!-- ============================================ 11 · READERS ===== -->
       <AtlasPlate
         id="readers"
-        fig="10"
+        fig="11"
         node="index"
         label="Afterwards"
         kind="index"
@@ -360,10 +386,9 @@ const PEOPLE = [
           </p>
           <TestimonialStrip items={TESTIMONIALS} />
           <p class="closer">
-            <a class="closer__cta" href="#panel">See what it costs</a>
+            <a class="closer__cta" href="/atlas/start">Find your starting point</a>
             <span class="closer__note">
-              Spit in a tube at home, mail it back, and a dentist walks you
-              through what came out.
+              {WHY_UPSTREAM.points[2].body}
             </span>
           </p>
         </div>
@@ -429,6 +454,13 @@ const PEOPLE = [
   .people {
     border-bottom: 1px solid var(--color-grid);
   }
+
+  .inline {
+    color: var(--color-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .inline:hover { border-bottom-color: var(--color-primary); }
 
   /* ------------------------------------------------------------ library -- */
   .feature-grid {

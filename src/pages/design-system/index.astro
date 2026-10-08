@@ -9,6 +9,11 @@ import Wordmark from '../../components/basics/Wordmark.astro';
 import ModeToggle from '../../components/ui/ModeToggle.astro';
 import Plate from '../../components/basics/Plate.astro';
 import BundleLadder from '../../components/cart/BundleLadder.svelte';
+import Paths from '../../components/shared/Paths.astro';
+import TeamGrid from '../../components/shared/TeamGrid.astro';
+import SeriesCards from '../../components/shared/SeriesCards.astro';
+import StartGuide from '../../components/shared/StartGuide.svelte';
+import { BRAND, FOUNDERS, ORAL_EXPERTS } from '../../lib/site';
 
 const bundles = (await getCollection('bundles')).sort((a, b) => a.data.order - b.data.order);
 const tiers = bundles.map((b) => b.data);
@@ -16,14 +21,14 @@ const tiers = bundles.map((b) => b.data);
 /* `as const` so `key` narrows to the island's literal union rather than
  * widening to `string` — otherwise astro check flags the prop below. */
 const layouts = [
-  { key: 'ledger', dir: 'Journal', note: 'Hairline rules, no fill. The order is a printed ledger filling in line by line.' },
+  { key: 'ledger', dir: 'Journal', note: 'Hairline rules, no fill. The kit is a printed ledger filling in line by line.' },
   { key: 'compare', dir: 'Atlas', note: 'Column headers over a tinted table. Reads as a set of measurements.' },
-  { key: 'steps', dir: 'Practice', note: 'A staircase — each rung indents further. The ladder is legible as a ladder.' },
+  { key: 'steps', dir: 'Practice', note: 'A staircase — each kit indents further, mouth first.' },
 ] as const;
 ---
 
 <BaseThemeLayout
-  title="Design system — Threshold"
+  title={`Design system — ${BRAND.name}`}
   description="The live component catalogue, switchable across all three directions and all three modes."
   theme="journal"
   mode="light"
@@ -50,12 +55,14 @@ const layouts = [
     </p>
 
     <section>
-      <h2>BundleLadder <span class="h2-note">the upgrade cart · Svelte island</span></h2>
+      <h2>BundleLadder <span class="h2-note">the kit chooser · Svelte island</span></h2>
       <p class="note">
-        One component, three presentations. The mechanic: each tier is a strict
-        superset of the one below, so the cart shows the <em>delta</em> rather than
-        swapping in a new cart. Click any greyed line item and you are moved to the
-        cheapest tier that contains it.
+        One component, three presentations, fed by the <code>bundles</code>
+        collection (her four real test kits). Every line item across every kit is
+        always in the list; switching kit only changes row state. Click a greyed
+        line and you move to the cheapest kit that contains it. Kits need not nest:
+        any switch says what it adds <em>and</em> what it drops. Where kits do nest,
+        nothing is ever listed as dropped and it behaves as a plain upgrade ladder.
       </p>
       {layouts.map((l) => (
         <div class="specimen">
@@ -66,12 +73,50 @@ const layouts = [
               client:visible
               layout={l.key}
               tiers={tiers}
+              initial="orobiome"
               cta="Continue"
-              orientation="Pick how far you want to go. You can move up or down at any point — nothing is removed when you upgrade."
+              orientation="Pick a kit, or click any line you want."
             />
           </div>
         </div>
       ))}
+    </section>
+
+    <section>
+      <h2>Paths <span class="h2-note">shared · the three ways to begin</span></h2>
+      <p class="note">
+        Her three entry points (test kits, guided support, Upstream) plus the
+        bridge to the start guide. <code>variant</code> sets composition only:
+        hairline columns (journal), square raised panels (atlas), soft cards
+        (practice). Content from <code>PATHS</code> in <code>site.ts</code>.
+      </p>
+      <div class="spec-stage"><Paths variant="journal" startHref="/journal/start" /></div>
+    </section>
+
+    <section>
+      <h2>StartGuide <span class="h2-note">shared · Svelte island · /&lt;direction&gt;/start</span></h2>
+      <p class="note">
+        Four questions, one recommendation, all copy hers (<code>START_GUIDE</code>).
+        Answered steps stay visible and editable as a summary row. Mixed-answer
+        routing is our inference — majority across Q1–Q3, ties to Q2.
+      </p>
+      <div class="spec-stage"><StartGuide client:visible variant="journal" /></div>
+    </section>
+
+    <section>
+      <h2>TeamGrid <span class="h2-note">shared · /&lt;direction&gt;/about</span></h2>
+      <p class="note">
+        <code>layout="feature"</code> for founders (portrait beside full bio);
+        <code>layout="grid"</code> for experts and coaches.
+      </p>
+      <div class="spec-stage"><TeamGrid people={FOUNDERS.slice(0, 1)} layout="feature" /></div>
+      <div class="spec-stage"><TeamGrid people={ORAL_EXPERTS} layout="grid" /></div>
+    </section>
+
+    <section>
+      <h2>SeriesCards <span class="h2-note">shared · /&lt;direction&gt;/series</span></h2>
+      <p class="note">Her three series, poster beside copy, alternating sides.</p>
+      <div class="spec-stage"><SeriesCards /></div>
     </section>
 
     <section>

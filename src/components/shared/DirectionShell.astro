@@ -1,0 +1,110 @@
+---
+/* ============================================================================
+ * DirectionShell — the frame for every secondary page (/<direction>/<page>).
+ *
+ * The homepage of each direction composes its own chrome by hand. Secondary
+ * pages share one structure — chrome, a page head, the content, the footer —
+ * so this picks the right direction's chrome and footer, pins the route's
+ * palette, and gives the content a measure. Colour, type and corners all
+ * arrive through that direction's Tier 2 tokens; nothing here is per-palette.
+ * ========================================================================== */
+import BaseThemeLayout from '../../layouts/BaseThemeLayout.astro';
+import Masthead from '../journal/Masthead.astro';
+import Colophon from '../journal/Colophon.astro';
+import JournalStyles from '../journal/JournalStyles.astro';
+import Grain from '../journal/Grain.astro';
+import AtlasChrome from '../atlas/AtlasChrome.astro';
+import AtlasFooter from '../atlas/AtlasFooter.astro';
+import PracticeChrome from '../practice/PracticeChrome.astro';
+import PracticeFooter from '../practice/PracticeFooter.astro';
+import { BRAND, DIRECTIONS, DISCLAIMER, type DirectionSlug } from '../../lib/site';
+
+interface Props {
+  direction: DirectionSlug;
+  current: string;
+  title: string;
+  description?: string;
+  eyebrow: string;
+  heading: string;
+  lead?: string;
+}
+
+const { direction, current, title, description, eyebrow, heading, lead } = Astro.props;
+const mode = DIRECTIONS.find((d) => d.slug === direction)?.mode ?? 'light';
+
+const issue = 'Vol. I, No. 1';
+const issueDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(new Date());
+---
+
+<BaseThemeLayout
+  title={`${title} — ${BRAND.name}`}
+  description={description ?? lead}
+  theme={direction}
+  mode={mode}
+>
+  <div class={`shell shell--${direction}`}>
+    {direction === 'journal' && (
+      <>
+        <Grain />
+        <Masthead issue={issue} issueDate={issueDate} editorialLine={BRAND.line} home={false} current={current} />
+      </>
+    )}
+    {direction === 'atlas' && <AtlasChrome home={false} current={current} />}
+    {direction === 'practice' && <PracticeChrome home={false} current={current} />}
+
+    <main id="main" class="body">
+      <header class="head">
+        <p class="eyebrow">{eyebrow}</p>
+        <h1 class="h1">{heading}</h1>
+        {lead && <p class="lead">{lead}</p>}
+      </header>
+      <slot />
+    </main>
+
+    {direction === 'journal' && <Colophon disclaimer={DISCLAIMER} issue={issue} issueDate={issueDate} home={false} />}
+    {direction === 'atlas' && <AtlasFooter home={false} />}
+    {direction === 'practice' && <PracticeFooter home={false} />}
+  </div>
+
+  {direction === 'journal' && <JournalStyles />}
+</BaseThemeLayout>
+
+<style>
+  .shell { position: relative; }
+  .shell--journal { padding-inline: 0; }
+
+  .body {
+    max-width: var(--page-measure);
+    margin-inline: auto;
+    padding: clamp(2.5rem, 7vw, 5rem) var(--page-gutter) clamp(3.5rem, 8vw, 6rem);
+  }
+  .shell--journal .body { padding-top: clamp(2rem, 5vw, 3.5rem); }
+
+  .head { margin-bottom: clamp(2.5rem, 6vw, 4rem); max-width: 50rem; }
+  .eyebrow {
+    margin: 0 0 1rem;
+    font-family: var(--font-eyebrow, var(--font-data));
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+  }
+  .h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.1rem, 5.5vw, 3.75rem);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+  .shell--atlas .h1 { font-weight: 600; }
+  .lead {
+    margin: 1.25rem 0 0;
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
+    line-height: 1.65;
+    color: var(--color-text-muted);
+    max-width: 58ch;
+  }
+</style>

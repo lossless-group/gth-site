@@ -9,20 +9,30 @@ import SectionHead from './SectionHead.astro';
 
 export interface Props {
   systems: { numeral: string; name: string; claim: string }[];
+  eyebrow?: string;
+  title?: string;
+  standfirst?: string;
+  meta?: string;
 }
 
-const { systems } = Astro.props;
+const {
+  systems,
+  eyebrow = 'Why it matters',
+  title = 'Three systems downstream of your mouth',
+  standfirst = 'The mouth is the top of the digestive tract, not a separate department of the body. What lives up there ends up further down, and these are the three places it shows.',
+  meta = 'Three systems',
+} = Astro.props;
 ---
 
 <section class="jr-section" id="evidence" aria-labelledby="evidence-title">
   <div class="jr-sheet">
     <SectionHead
       num="01"
-      eyebrow="Why it matters"
-      title="Three systems downstream of your mouth"
+      eyebrow={eyebrow}
+      title={title}
       titleId="evidence-title"
-      standfirst="The mouth is the top of the digestive tract, not a separate department of the body. What lives up there ends up further down, and these are the three places it shows."
-      meta="Three systems"
+      standfirst={standfirst}
+      meta={meta}
     />
 
     <ol class="systems">
