@@ -23,6 +23,7 @@ tags:
   - Commerce
   - Content-Collections
   - Thought-Leadership
+type: Specs
 ---
 
 # Three Directions for a Practitioner-Led Testing and Content Site
